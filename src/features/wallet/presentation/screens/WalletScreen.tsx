@@ -5,7 +5,7 @@ import {
   Alert,
   Animated,
   Platform,
-  ScrollView,
+  FlatList,
   RefreshControl,
 } from 'react-native';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
@@ -17,7 +17,7 @@ import {WithdrawCard} from '../components/WithdrawCard';
 import {FilterTabs} from '../components/FilterTabs';
 import {AppText} from '../../../../components/common/AppText';
 import {Transaction} from '../../domain/types';
-import {TransactionList} from '../components/TransactionList';
+import {TransactionItem} from '../components/TransactionItem';
 
 type FilterType = 'all' | 'credit' | 'debit';
 
@@ -110,6 +110,84 @@ export const WalletScreen: React.FC = () => {
   const creditCount = transactions.filter(t => t.type === 'credit').length;
   const debitCount = transactions.filter(t => t.type === 'debit').length;
 
+  const keyExtractor = useCallback(
+    (item: Transaction) => item.createdAt ?? String(item.id),
+    [],
+  );
+
+  const renderItem = useCallback(
+    ({item}: {item: Transaction}) => <TransactionItem transaction={item} />,
+    [],
+  );
+
+  const listHeaderComponent = useMemo(
+    () => (
+      <>
+        <View style={styles.sectionHeader}>
+          <AppText variant="h4" color={theme.colors.text}>
+            Wallet
+          </AppText>
+          <AppText variant="caption" color={theme.colors.textSecondary}>
+            {filteredTransactions.length} items
+          </AppText>
+        </View>
+
+        {isMockData && (
+          <View
+            style={[
+              styles.mockBadge,
+              {backgroundColor: theme.colors.warningLight},
+            ]}>
+            <AppText variant="caption" color={theme.colors.warning}>
+              Demo Mode
+            </AppText>
+          </View>
+        )}
+
+        <BalanceCard
+          balance={balance}
+          todayEarnings={earnings?.today}
+          lastPayout={earnings?.lastPayout}
+          onWithdrawPress={() => setShowWithdrawModal(true)}
+        />
+
+        {showWithdrawModal && (
+          <WithdrawCard
+            balance={balance}
+            onWithdraw={handleWithdraw}
+            loading={withdrawing}
+          />
+        )}
+
+        <FilterTabs
+          selectedFilter={selectedFilter}
+          onFilterChange={setSelectedFilter}
+          creditCount={creditCount}
+          debitCount={debitCount}
+          onDateFilterChange={handleDateFilterChange}
+        />
+      </>
+    ),
+    [
+      theme.colors.text,
+      theme.colors.textSecondary,
+      theme.colors.warningLight,
+      theme.colors.warning,
+      filteredTransactions.length,
+      isMockData,
+      balance,
+      earnings?.today,
+      earnings?.lastPayout,
+      showWithdrawModal,
+      withdrawing,
+      handleWithdraw,
+      selectedFilter,
+      creditCount,
+      debitCount,
+      handleDateFilterChange,
+    ],
+  );
+
   if (loading && !refreshing) {
     return (
       <SafeAreaView
@@ -139,70 +217,28 @@ export const WalletScreen: React.FC = () => {
     <SafeAreaView
       style={[styles.container, {backgroundColor: theme.colors.background}]}
       edges={['top']}>
-      <ScrollView
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            colors={[theme.colors.primary]}
-            tintColor={theme.colors.primary}
-          />
-        }>
-        <Animated.View style={styles.animatedView}>
-          <View style={styles.sectionHeader}>
-            <AppText variant="h4" color={theme.colors.text}>
-              Wallet
-            </AppText>
-            <AppText variant="caption" color={theme.colors.textSecondary}>
-              {filteredTransactions.length} items
-            </AppText>
-          </View>
-
-          <TransactionList
-            transactions={filteredTransactions}
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            ListHeaderComponent={
-              <>
-                {isMockData && (
-                  <View
-                    style={[
-                      styles.mockBadge,
-                      {backgroundColor: theme.colors.warningLight},
-                    ]}>
-                    <AppText variant="caption" color={theme.colors.warning}>
-                      Demo Mode
-                    </AppText>
-                  </View>
-                )}
-                <BalanceCard
-                  balance={balance}
-                  todayEarnings={earnings?.today}
-                  lastPayout={earnings?.lastPayout}
-                  onWithdrawPress={() => setShowWithdrawModal(true)}
-                />
-
-                {showWithdrawModal && (
-                  <WithdrawCard
-                    balance={balance}
-                    onWithdraw={handleWithdraw}
-                    loading={withdrawing}
-                  />
-                )}
-
-                <FilterTabs
-                  selectedFilter={selectedFilter}
-                  onFilterChange={setSelectedFilter}
-                  creditCount={creditCount}
-                  debitCount={debitCount}
-                  onDateFilterChange={handleDateFilterChange}
-                />
-              </>
-            }
-            contentContainerStyle={{paddingBottom: insets.bottom + spacing.lg}}
-          />
-        </Animated.View>
-      </ScrollView>
+      <Animated.View style={styles.animatedView}>
+        <FlatList
+          style={styles.flatList}
+          data={filteredTransactions}
+          renderItem={renderItem}
+          keyExtractor={keyExtractor}
+          contentContainerStyle={[
+            styles.listContent,
+            {paddingBottom: insets.bottom + spacing.lg},
+          ]}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={[theme.colors.primary]}
+              tintColor={theme.colors.primary}
+            />
+          }
+          ListHeaderComponent={listHeaderComponent}
+        />
+      </Animated.View>
     </SafeAreaView>
   );
 };
@@ -211,11 +247,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  flatList: {
+    flex: 1,
+  },
   animatedView: {
     flex: 1,
   },
-  contentContainer: {
-    paddingBottom: spacing.xxxl,
+  listContent: {
+    paddingBottom: spacing.xxl,
   },
   loadingContainer: {
     flex: 1,
@@ -249,7 +288,5 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginHorizontal: spacing.lg,
-    // marginTop: spacing.md,
-    // marginBottom: spacing.md,
   },
 });

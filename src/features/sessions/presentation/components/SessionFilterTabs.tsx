@@ -20,7 +20,7 @@ const STATUS_FILTERS: { key: FilterType; label: string; iconName?: string }[] =
       label: 'Active',
       iconName: 'radio-button-checked',
     },
-    { key: FilterType.PENDING, label: 'Pending', iconName: 'schedule' },
+    // { key: FilterType.PENDING, label: 'Pending', iconName: 'schedule' },
     { key: FilterType.COMPLETED, label: 'Completed', iconName: 'check-circle' },
     { key: FilterType.MISSED, label: 'Missed', iconName: 'cancel' },
   ];

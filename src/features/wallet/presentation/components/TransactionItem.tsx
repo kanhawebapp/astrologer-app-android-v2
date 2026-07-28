@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {memo} from 'react';
 import {View, StyleSheet} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {useTheme} from '../../../../hooks/useTheme';
@@ -10,111 +10,112 @@ interface TransactionItemProps {
   transaction: Transaction;
 }
 
-export const TransactionItem: React.FC<TransactionItemProps> = ({
-  transaction,
-}) => {
-  const {theme} = useTheme();
+const TransactionItem: React.FC<TransactionItemProps> = memo(
+  ({transaction}) => {
+    const {theme} = useTheme();
 
-  const formatCurrency = (amount: number): string => {
-    return `₹${amount.toLocaleString('en-IN')}`;
-  };
+    const formatCoins = (coins?: number): string => {
+      return `${coins ?? 0} coins`;
+    };
 
-  const formatCoins = (coins?: number): string => {
-    return `${coins ?? 0} coins`;
-  };
+    const formatDate = (dateString: string): string => {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-IN', {
+        day: 'numeric',
+        month: 'short',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    };
 
-  const formatDate = (dateString: string): string => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-IN', {
-      day: 'numeric',
-      month: 'short',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
+    const getIconName = (): string => {
+      switch (transaction.icon) {
+        case 'chat':
+          return 'chat';
+        case 'call':
+          return 'call';
+        case 'video':
+          return 'videocam';
+        case 'withdrawal':
+          return 'call-made';
+        case 'bonus':
+          return 'card-giftcard';
+        case 'refund':
+          return 'replay';
+        default:
+          return 'account-balance-wallet';
+      }
+    };
 
-  const getIconName = (): string => {
-    switch (transaction.icon) {
-      case 'chat':
-        return 'chat';
-      case 'call':
-        return 'call';
-      case 'video':
-        return 'videocam';
-      case 'withdrawal':
-        return 'call-made';
-      case 'bonus':
-        return 'card-giftcard';
-      case 'refund':
-        return 'replay';
-      default:
-        return 'account-balance-wallet';
-    }
-  };
+    const getStatusColor = (): string => {
+      switch (transaction.status) {
+        case 'success':
+          return theme.colors.success;
+        case 'pending':
+          return theme.colors.warning;
+        case 'failed':
+          return theme.colors.error;
+        default:
+          return theme.colors.textSecondary;
+      }
+    };
 
-  const getStatusColor = (): string => {
-    switch (transaction.status) {
-      case 'success':
-        return theme.colors.success;
-      case 'pending':
-        return theme.colors.warning;
-      case 'failed':
-        return theme.colors.error;
-      default:
-        return theme.colors.textSecondary;
-    }
-  };
+    const isCredit = transaction.type === 'credit';
 
-  const isCredit = transaction.type === 'credit';
-
-  return (
-    <View style={[styles.container, {backgroundColor: theme.colors.surface}]}>
-      <View
-        style={[
-          styles.iconContainer,
-          {backgroundColor: theme.colors.primary+20},
-        ]}>
-        <Icon name={getIconName()} size={22} color={theme.colors.primary} />
-      </View>
-
-      <View style={styles.content}>
-        <AppText variant="body1" color={theme.colors.text} style={styles.title}>
-          {transaction.title}
-        </AppText>
-        <AppText variant="caption" color={theme.colors.textSecondary}>
-          {formatDate(transaction.date)}
-        </AppText>
-        {transaction.description && (
-          <AppText
-            variant="caption"
-            color={theme.colors.textTertiary}
-            style={styles.description}>
-            {transaction.description}
-          </AppText>
-        )}
-      </View>
-
-      <View style={styles.amountContainer}>
-        <AppText
-          variant="body1"
-          color={isCredit ? theme.colors.success : theme.colors.error}
-          style={styles.amount}>
-          {isCredit ? '+' : '-'} {formatCoins(transaction.coins)}
-        </AppText>
+    return (
+      <View style={[styles.container, {backgroundColor: theme.colors.surface}]}>
         <View
           style={[
-            styles.statusBadge,
-            {backgroundColor: getStatusColor() + '20'},
+            styles.iconContainer,
+            {backgroundColor: theme.colors.primary + 20},
           ]}>
-          <AppText variant="caption" color={getStatusColor()}>
-            {transaction.status.charAt(0).toUpperCase() +
-              transaction.status.slice(1)}
+          <Icon name={getIconName()} size={22} color={theme.colors.primary} />
+        </View>
+
+        <View style={styles.content}>
+          <AppText
+            variant="body1"
+            color={theme.colors.text}
+            style={styles.title}>
+            {transaction.title}
           </AppText>
+          <AppText variant="caption" color={theme.colors.textSecondary}>
+            {formatDate(transaction.date)}
+          </AppText>
+          {transaction.description && (
+            <AppText
+              variant="caption"
+              color={theme.colors.textTertiary}
+              style={styles.description}>
+              {transaction.description}
+            </AppText>
+          )}
+        </View>
+
+        <View style={styles.amountContainer}>
+          <AppText
+            variant="body1"
+            color={isCredit ? theme.colors.success : theme.colors.error}
+            style={styles.amount}>
+            {isCredit ? '+' : '-'} {formatCoins(transaction.coins)}
+          </AppText>
+          <View
+            style={[
+              styles.statusBadge,
+              {backgroundColor: getStatusColor() + '20'},
+            ]}>
+            <AppText variant="caption" color={getStatusColor()}>
+              {transaction.status.charAt(0).toUpperCase() +
+                transaction.status.slice(1)}
+            </AppText>
+          </View>
         </View>
       </View>
-    </View>
-  );
-};
+    );
+  },
+);
+
+TransactionItem.displayName = 'TransactionItem';
 
 const styles = StyleSheet.create({
   container: {
@@ -161,3 +162,5 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.xs,
   },
 });
+
+export {TransactionItem};
