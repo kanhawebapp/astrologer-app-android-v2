@@ -1,9 +1,9 @@
-import React, { useRef, useCallback, useEffect } from 'react';
-import { View, TextInput, Pressable, StyleSheet } from 'react-native';
-import { UseFormReturn } from 'react-hook-form';
-import { AppButton } from '../../../components/common/AppButton';
-import { AppText } from '../../../components/common/AppText';
-import { useTheme } from '../../../hooks/useTheme';
+import React, {useRef, useCallback, useEffect} from 'react';
+import {View, TextInput, Pressable, StyleSheet} from 'react-native';
+import {UseFormReturn} from 'react-hook-form';
+import {AppButton} from '../../../components/common/AppButton';
+import {AppText} from '../../../components/common/AppText';
+import {useTheme} from '../../../hooks/useTheme';
 
 const OTP_LENGTH = 4;
 
@@ -21,6 +21,8 @@ interface OtpInputFormProps {
   isLoading: boolean;
   isOtpComplete: boolean;
   autoFocus?: boolean;
+  onResendOtp?: () => void;
+  resendCountdown?: number;
 }
 
 export const OtpInputForm: React.FC<OtpInputFormProps> = ({
@@ -41,9 +43,10 @@ export const OtpInputForm: React.FC<OtpInputFormProps> = ({
   isLoading,
   isOtpComplete,
   autoFocus = false,
-
+  onResendOtp,
+  resendCountdown = 0,
 }) => {
-  const { theme } = useTheme();
+  const {theme} = useTheme();
   const inputRefs = useRef<(TextInput | null)[]>([]);
 
   const handleBoxPress = useCallback((index: number) => {
@@ -80,8 +83,8 @@ export const OtpInputForm: React.FC<OtpInputFormProps> = ({
                   borderColor: isActive
                     ? theme.colors.primary
                     : isFilled
-                      ? theme.colors.primaryLight
-                      : theme.colors.border,
+                    ? theme.colors.primaryLight
+                    : theme.colors.border,
                   backgroundColor: isFilled
                     ? theme.colors.accentPurpleLight
                     : theme.colors.surfaceSecondary,
@@ -125,7 +128,7 @@ export const OtpInputForm: React.FC<OtpInputFormProps> = ({
                 ref={ref => {
                   inputRefs.current[index] = ref;
                 }}
-                style={[styles.otpInput, { color: theme.colors.text }]}
+                style={[styles.otpInput, {color: theme.colors.text}]}
                 keyboardType="number-pad"
                 textContentType="oneTimeCode"
                 autoComplete="sms-otp"
@@ -141,7 +144,7 @@ export const OtpInputForm: React.FC<OtpInputFormProps> = ({
                     inputRefs.current[index + 1]?.focus();
                   }
                 }}
-                onKeyPress={({ nativeEvent }) => {
+                onKeyPress={({nativeEvent}) => {
                   onOtpKeyPress(nativeEvent.key, index);
 
                   if (
@@ -157,14 +160,14 @@ export const OtpInputForm: React.FC<OtpInputFormProps> = ({
                 <AppText
                   variant="h2"
                   color={theme.colors.white}
-                  style={[styles.otpDigit, { backgroundColor: 'transparent' }]}>
+                  style={[styles.otpDigit, {backgroundColor: 'transparent'}]}>
                   {digit}
                 </AppText>
               ) : isFirstEmpty ? null : (
                 <View
                   style={[
                     styles.otpPlaceholder,
-                    { backgroundColor: theme.colors.border },
+                    {backgroundColor: theme.colors.border},
                   ]}
                 />
               )}
@@ -197,11 +200,20 @@ export const OtpInputForm: React.FC<OtpInputFormProps> = ({
         <AppText variant="body2" color="white" align="center">
           Didn't receive code?{' '}
         </AppText>
-        <Pressable onPress={form.handleSubmit(onSubmit)}>
-          <AppText variant="label" color={theme.colors.secondary}>
-            Resend OTP
+        {resendCountdown > 0 ? (
+          <AppText
+            variant="label"
+            color={theme.colors.secondary}
+            style={{opacity: 0.6}}>
+            Resend OTP in {resendCountdown}s
           </AppText>
-        </Pressable>
+        ) : (
+          <Pressable onPress={onResendOtp} disabled={isLoading}>
+            <AppText variant="label" color={theme.colors.secondary}>
+              Resend OTP
+            </AppText>
+          </Pressable>
+        )}
       </View>
 
       <AppButton
@@ -210,7 +222,7 @@ export const OtpInputForm: React.FC<OtpInputFormProps> = ({
         variant="ghost"
         fullWidth
         size="large"
-        textStyle={{ color: theme.colors.white }}
+        textStyle={{color: theme.colors.white}}
         style={styles.backButton}
       />
     </View>
@@ -236,7 +248,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowOffset: { width: 0, height: 3 },
+    shadowOffset: {width: 0, height: 3},
     shadowOpacity: 0.15,
     shadowRadius: 8,
     elevation: 4,

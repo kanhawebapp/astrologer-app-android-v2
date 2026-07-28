@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, {useState, useRef, useCallback, useEffect} from 'react';
 import {
   Keyboard,
   TextInput,
@@ -9,19 +9,19 @@ import {
   Platform,
   Button,
 } from 'react-native';
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
+import {useForm} from 'react-hook-form';
+import {yupResolver} from '@hookform/resolvers/yup';
 import LinearGradient from 'react-native-linear-gradient';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { CountryCode } from 'react-native-country-picker-modal';
-import { Loader } from '../../../components/common/Loader';
-import { useAuth } from '../../../hooks/useAuth';
-import { useTheme } from '../../../hooks/useTheme';
-import { useToast } from '../../../hooks/useToast';
-import { phoneSchema, otpSchema } from '../../../utils/validators';
-import { LoginHeader } from './LoginHeader';
-import { PhoneInputForm } from './PhoneInputForm';
-import { OtpInputForm } from './OtpInputForm';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {CountryCode} from 'react-native-country-picker-modal';
+import {Loader} from '../../../components/common/Loader';
+import {useAuth} from '../../../hooks/useAuth';
+import {useTheme} from '../../../hooks/useTheme';
+import {useToast} from '../../../hooks/useToast';
+import {phoneSchema, otpSchema} from '../../../utils/validators';
+import {LoginHeader} from './LoginHeader';
+import {PhoneInputForm} from './PhoneInputForm';
+import {OtpInputForm} from './OtpInputForm';
 import RNRestart from 'react-native-restart';
 
 const OTP_LENGTH = 4;
@@ -35,28 +35,29 @@ interface OtpFormValues {
 }
 
 export const LoginScreen: React.FC = () => {
-  const { requestOtp, verifyOtp, isLoading, error, clearError } = useAuth();
-  const { theme } = useTheme();
+  const {requestOtp, verifyOtp, isLoading, error, clearError} = useAuth();
+  const {theme} = useTheme();
   const insets = useSafeAreaInsets();
-  const { toast, hideToast, showError, showSuccess } = useToast();
+  const {toast, hideToast, showError, showSuccess} = useToast();
   const [step, setStep] = useState<'phone' | 'otp'>('phone');
   const [contactNo, setContactNo] = useState('');
   const [callingCode, setCallingCode] = useState('+91');
   const [otpDigits, setOtpDigits] = useState<string[]>(
     Array(OTP_LENGTH).fill(''),
   );
+  const [resendCountdown, setResendCountdown] = useState(0);
   const inputRefs = useRef<(TextInput | null)[]>([]);
 
   const phoneForm = useForm<PhoneFormValues>({
     resolver: yupResolver(phoneSchema),
     mode: 'onBlur',
-    defaultValues: { contactNo: '' },
+    defaultValues: {contactNo: ''},
   });
 
   const otpForm = useForm<OtpFormValues>({
     resolver: yupResolver(otpSchema),
     mode: 'onBlur',
-    defaultValues: { otp: '' },
+    defaultValues: {otp: ''},
   });
 
   useEffect(() => {
@@ -111,14 +112,14 @@ export const LoginScreen: React.FC = () => {
         setOtpDigits(newDigits);
         const nextIndex = Math.min(index + chars.length, OTP_LENGTH - 1);
         inputRefs.current[nextIndex]?.focus();
-        otpForm.setValue('otp', newDigits.join(''), { shouldValidate: true });
+        otpForm.setValue('otp', newDigits.join(''), {shouldValidate: true});
         return;
       }
 
       const newDigits = [...otpDigits];
       newDigits[index] = cleanText;
       setOtpDigits(newDigits);
-      otpForm.setValue('otp', newDigits.join(''), { shouldValidate: true });
+      otpForm.setValue('otp', newDigits.join(''), {shouldValidate: true});
 
       // if (cleanText && index < OTP_LENGTH - 1) {
       //   inputRefs.current[index + 1]?.focus();
@@ -145,7 +146,7 @@ export const LoginScreen: React.FC = () => {
         const newDigits = [...otpDigits];
         newDigits[index - 1] = '';
         setOtpDigits(newDigits);
-        otpForm.setValue('otp', newDigits.join(''), { shouldValidate: true });
+        otpForm.setValue('otp', newDigits.join(''), {shouldValidate: true});
         inputRefs.current[index - 1]?.focus();
       }
     },
@@ -156,7 +157,36 @@ export const LoginScreen: React.FC = () => {
     setStep('phone');
     setOtpDigits(Array(OTP_LENGTH).fill(''));
     otpForm.reset();
+    setResendCountdown(0);
   };
+
+  const handleResendOtp = async () => {
+    Keyboard.dismiss();
+    if (resendCountdown > 0 || isLoading) {
+      return;
+    }
+    try {
+      await requestOtp(contactNo);
+      setOtpDigits(Array(OTP_LENGTH).fill(''));
+      otpForm.reset();
+      setResendCountdown(30);
+      showSuccess('Please check your phone for the new OTP.', 'OTP Sent');
+    } catch {
+      // Error handled by error effect
+    }
+  };
+
+  useEffect(() => {
+    if (resendCountdown <= 0) {
+      return;
+    }
+
+    const timerId = setInterval(() => {
+      setResendCountdown(prev => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(timerId);
+  }, [resendCountdown]);
 
   const isOtpComplete = otpDigits.every(d => d !== '');
 
@@ -175,10 +205,10 @@ export const LoginScreen: React.FC = () => {
             ? ['#0B0B2A', '#12123A', '#0F172A', '#070720']
             : ['#1E1B4B', '#312E81', '#1E1B4B', '#0F172A']
         }
-        start={{ x: 0, y: 0 }}
-        end={{ x: 0.5, y: 1 }}
+        start={{x: 0, y: 0}}
+        end={{x: 0.5, y: 1}}
         style={styles.gradient}>
-        <View style={[styles.statusBarSpacer, { height: insets.top }]} />
+        <View style={[styles.statusBarSpacer, {height: insets.top}]} />
         <KeyboardAvoidingView
           style={styles.flex}
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
@@ -196,7 +226,6 @@ export const LoginScreen: React.FC = () => {
                 isLoading={isLoading}
                 onCountryChange={handleCountryChange}
                 type="numeric"
-
               />
             ) : (
               <OtpInputForm
@@ -209,6 +238,8 @@ export const LoginScreen: React.FC = () => {
                 isLoading={isLoading}
                 isOtpComplete={isOtpComplete}
                 autoFocus={step === 'otp'}
+                onResendOtp={handleResendOtp}
+                resendCountdown={resendCountdown}
               />
             )}
           </View>
