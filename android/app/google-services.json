@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "831606193551",
+    "project_id": "dhwaniastrologerandroid",
+    "storage_bucket": "dhwaniastrologerandroid.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:831606193551:android:6b43e41d0ba6c39569dffa",
+        "android_client_info": {
+          "package_name": "com.dhwaniastrologer"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDeincjG3YOAnC6THBcgvAxNLicnBwWH4Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
