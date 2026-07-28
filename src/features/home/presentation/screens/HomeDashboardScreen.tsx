@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import {
   View,
   StyleSheet,
@@ -20,6 +20,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../../../store';
 import { useAccount } from '../../../account/presentation/hooks/useAccount';
 import useDoubleBackExit from '../../../../hooks/useDoubleBackExit';
+import { useFocusEffect } from '@react-navigation/native';
 
 const DEFAULT_LIVE_STATUS = {
   isOnline: true,
@@ -41,7 +42,20 @@ export const HomeDashboardScreen: React.FC = () => {
   const user = useSelector((state: RootState) => state.auth.user);
   useDoubleBackExit();
   const { analytics, loading, error, refreshing, refresh, dataType, setDataType } = useHomeAnalytics();
-  const { profile } = useAccount();
+  const { profile, refreshDashboard } = useAccount();
+
+  useEffect(() => {
+    refreshDashboard();
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      StatusBar.setHidden(false);
+      StatusBar.setBarStyle('light-content');
+      StatusBar.setBackgroundColor('transparent', true);
+      StatusBar.setTranslucent(true);
+    }, [])
+  );
 
   const chartWidth = Math.max(Dimensions.get('window').width - 64, 200);
 

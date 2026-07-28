@@ -63,6 +63,11 @@ export const AccountScreen: React.FC = () => {
     }
   }, [profile?.id]);
 
+
+  useEffect(() => {
+    refreshDashboard();
+  }, []);
+
   const handleRefresh = useCallback(async () => {
     setRefreshing(true);
     await Promise.allSettled([
@@ -75,7 +80,7 @@ export const AccountScreen: React.FC = () => {
   }, [refreshDashboard,
     //  fetchAnalytics,
     fetchServices, fetchReviews]);
-    
+
 
 
 
