@@ -34,11 +34,16 @@ interface UseSplashReturn {
   animating: boolean;
 }
 
-export const useSplash = (onComplete?: () => void): UseSplashReturn => {
-  const [currentPage, setCurrentPage] = useState(0);
+export const useSplash = (
+  onComplete?: () => void,
+  skipWelcome = false,
+): UseSplashReturn => {
+  const [currentPage, setCurrentPage] = useState(skipWelcome ? 1 : 0);
   const [animating, setAnimating] = useState(false);
   const onCompleteRef = useRef(onComplete);
   onCompleteRef.current = onComplete;
+  const skipWelcomeRef = useRef(skipWelcome);
+  skipWelcomeRef.current = skipWelcome;
 
   const logoOpacity = useRef(new Animated.Value(0)).current;
   const logoScale = useRef(new Animated.Value(0.3)).current;
@@ -77,6 +82,13 @@ export const useSplash = (onComplete?: () => void): UseSplashReturn => {
   }, []);
 
   const animatePage2 = useCallback(() => {
+    if (skipWelcomeRef.current) {
+      if (onCompleteRef.current) {
+        containerOpacity.setValue(0);
+        onCompleteRef.current();
+      }
+      return;
+    }
     setCurrentPage(1);
     currentPageRef.current = 1;
     dotAnim.setValue(1);

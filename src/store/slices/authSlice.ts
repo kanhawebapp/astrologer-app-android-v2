@@ -96,6 +96,10 @@ export const verifyOtpThunk = createAsyncThunk(
       console.log('[ASYNCSTORAGE] Writing user data to Config.USER_KEY');
       await AsyncStorage.setItem(Config.USER_KEY, JSON.stringify(astrologer));
       console.log('[ASYNCSTORAGE] User data write success');
+
+      await AsyncStorage.setItem('@onboarding_done', 'true');
+      console.log('[ONBOARDING] Marking onboarding done');
+
       return { token: accessToken, user: astrologer };
     } catch (error: any) {
       console.log('=== VERIFY OTP ERROR ===');
@@ -214,7 +218,11 @@ export const restoreSession = createAsyncThunk(
       }
 
       const user: Astrologer = JSON.parse(userData);
-      console.log(`[AUTH STEP 7] Final Token Returning from restoreSession: ${currentToken.substring(0, 20)}...`);
+      console.log(
+        '[ONBOARDING] Restoring session — marking onboarding done',
+      );
+      await AsyncStorage.setItem('@onboarding_done', 'true');
+      console.log('[AUTH STEP 7] Final Token Returning from restoreSession:', currentToken.substring(0, 20) + '...');
 
       console.log('========== AUTH SUMMARY ==========');
       console.log(`Refresh API Called: ${refreshAPICalled ? 'YES' : 'NO'}`);
@@ -313,12 +321,13 @@ export const logoutThunk = createAsyncThunk(
       }
 
       // Clear local storage
-      console.log('[ASYNCSTORAGE] Clearing storage keys:', [Config.TOKEN_KEY, Config.USER_KEY, 'accessToken', 'refreshToken']);
+      console.log('[ASYNCSTORAGE] Clearing storage keys:', [Config.TOKEN_KEY, Config.USER_KEY, 'accessToken', 'refreshToken', '@onboarding_done']);
       await AsyncStorage.multiRemove([
         Config.TOKEN_KEY,
         Config.USER_KEY,
         'accessToken',
         'refreshToken',
+        '@onboarding_done',
       ]);
 
       console.log('[ASYNCSTORAGE] Storage cleared');

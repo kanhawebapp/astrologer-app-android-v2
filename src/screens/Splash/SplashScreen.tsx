@@ -1,12 +1,14 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, StyleSheet, StatusBar, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../../hooks/useTheme';
 import { useAuth } from '../../hooks/useAuth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSplash } from './hooks/useSplash';
 import { BrandingScreen } from './components/BrandingScreen';
 import { WelcomeScreen } from './components/WelcomeScreen';
 import { PageIndicator } from './components/PageIndicator';
+import { STORAGE_KEYS } from '../../utils/constants';
 
 const TOTAL_PAGES = 2;
 
@@ -22,6 +24,21 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ navigation }) => {
   const { restore, isAuthenticated } = useAuth();
   const isAuthenticatedRef = useRef(isAuthenticated);
   isAuthenticatedRef.current = isAuthenticated;
+  const [skipWelcome, setSkipWelcome] = useState(false);
+  const [skipWelcomeReady, setSkipWelcomeReady] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const done = await AsyncStorage.getItem(STORAGE_KEYS.ONBOARDING_DONE);
+        setSkipWelcome(!!done);
+      } catch {
+        setSkipWelcome(false);
+      } finally {
+        setSkipWelcomeReady(true);
+      }
+    })();
+  }, []);
 
   const handleNavigateToAuth = useCallback(() => {
     if (isAuthenticatedRef.current) {
@@ -31,7 +48,10 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ navigation }) => {
     }
   }, [navigation]);
 
-  const { currentPage, animations } = useSplash(handleNavigateToAuth);
+  const { currentPage, animations } = useSplash(
+    handleNavigateToAuth,
+    skipWelcome && skipWelcomeReady,
+  );
 
   React.useEffect(() => {
     console.log('[AUTH STEP 2] Splash Screen Mounted, Starting Auth Restore');
