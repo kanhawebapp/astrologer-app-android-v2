@@ -1,23 +1,23 @@
-import React, {useCallback, useEffect, useRef} from 'react';
-import {StyleSheet, View} from 'react-native';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {useNavigation} from '@react-navigation/native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import React, { useCallback, useEffect, useRef } from 'react';
+import { StyleSheet, View } from 'react-native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { useNavigation } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 // import Icon from 'react-native-vector-icons/MaterialIcons';
-import {MainTabParamList, RootStackParamList} from './types';
-import {HomeDashboardScreen} from '../features/home/presentation/screens/HomeDashboardScreen';
-import {SessionsScreen} from '../features/sessions/presentation/screens/SessionsScreen';
-import {AvailabilityScreen} from '../features/availability/presentation/screens/AvailabilityScreen';
-import {WalletScreen} from '../features/wallet/presentation/screens/WalletScreen';
-import {AccountScreen} from '../features/account/presentation/screens/AccountScreen';
-import {useTheme} from '../hooks/useTheme';
-import {AppText} from '../components/common/AppText';
-import {FloatingChatBubble} from '../components/common/FloatingChatBubble';
-import {ChatRequestCard} from '../components/common/ChatRequestCard';
-import {IncomingCallFullScreen} from '../features/call/presentation/components/IncomingCallFullScreen';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {useSelector} from 'react-redux';
-import {RootState} from '../store';
+import { MainTabParamList, RootStackParamList } from './types';
+import { HomeDashboardScreen } from '../features/home/presentation/screens/HomeDashboardScreen';
+import { SessionsScreen } from '../features/sessions/presentation/screens/SessionsScreen';
+import { AvailabilityScreen } from '../features/availability/presentation/screens/AvailabilityScreen';
+import { WalletScreen } from '../features/wallet/presentation/screens/WalletScreen';
+import { AccountScreen } from '../features/account/presentation/screens/AccountScreen';
+import { useTheme } from '../hooks/useTheme';
+import { AppText } from '../components/common/AppText';
+import { FloatingChatBubble } from '../components/common/FloatingChatBubble';
+import { ChatRequestCard } from '../components/common/ChatRequestCard';
+import { IncomingCallFullScreen } from '../features/call/presentation/components/IncomingCallFullScreen';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 
@@ -116,7 +116,7 @@ const TabBarIcon: React.FC<{
   activeIcon?: string;
   focused: boolean;
   color: string;
-}> = ({icon, activeIcon, focused, color}) => (
+}> = ({ icon, activeIcon, focused, color }) => (
   <Icon
     name={focused && activeIcon ? activeIcon : icon}
     size={24}
@@ -128,7 +128,7 @@ const TabBarLabel: React.FC<{
   label: string;
   color: string;
   focused: boolean;
-}> = ({label, color, focused}) => (
+}> = ({ label, color, focused }) => (
   <AppText
     variant="caption"
     color={color}
@@ -139,7 +139,7 @@ const TabBarLabel: React.FC<{
 
 const renderTabIcon =
   (icon: string, activeIcon?: string) =>
-  ({focused, color}: {focused: boolean; color: string}) =>
+    ({ focused, color }: { focused: boolean; color: string }) =>
     (
       <TabBarIcon
         icon={icon}
@@ -151,11 +151,11 @@ const renderTabIcon =
 
 const renderTabLabel =
   (label: string) =>
-  ({color, focused}: {color: string; focused: boolean}) =>
-    <TabBarLabel label={label} color={color} focused={focused} />;
+    ({ color, focused }: { color: string; focused: boolean }) =>
+      <TabBarLabel label={label} color={color} focused={focused} />;
 
 export const MainNavigator: React.FC = () => {
-  const {theme} = useTheme();
+  const { theme } = useTheme();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<MainNavigatorNavigationProp>();
   const chat = useSelector((state: RootState) => state.chat as any);
@@ -163,11 +163,22 @@ export const MainNavigator: React.FC = () => {
   const chatStatus = chat?.chatStatus ?? 'IDLE';
 
   const hasNavigatedRef = useRef(false);
+  const authUser = useSelector((state: RootState) => state.auth.user);
+  const currentAstrologerId = authUser?.id;
+
 
   useEffect(() => {
-    if (activeSession && chatStatus === 'ACTIVE' && !hasNavigatedRef.current) {
+    console.log('Current Astro:', currentAstrologerId);
+    console.log('Session:', activeSession);
+
+    if (
+      activeSession &&
+      chatStatus === 'ACTIVE' &&
+      activeSession.astrologerId === currentAstrologerId &&
+      !hasNavigatedRef.current
+    ) {
       hasNavigatedRef.current = true;
-      console.log('Navigating to ChatScreen due to active session');
+
       navigation.navigate('ChatScreen', {
         roomId: activeSession.roomId,
         userId: activeSession.userId,
@@ -177,7 +188,7 @@ export const MainNavigator: React.FC = () => {
     } else if (!activeSession) {
       hasNavigatedRef.current = false;
     }
-  }, [activeSession, chatStatus, navigation]);
+  }, [activeSession, chatStatus, currentAstrologerId, navigation]);
 
   const screenOptions = useCallback(
     () => ({
