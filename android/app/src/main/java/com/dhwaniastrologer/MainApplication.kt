@@ -41,9 +41,16 @@ class MainApplication : Application(), ReactApplication {
   }
 
   private fun initOneSignal() {
+    // The appId is required at the native level for the OneSignal SDK to
+    // self-initialize from the FCM receiver and render kill-mode notifications.
+    // It is also declared as <meta-data android:name="com.onesignal.appId"> in
+    // AndroidManifest.xml so the killed-process push path works independently
+    // of the JS bundle. JS (oneSignalService.init) re-initializes with the same
+    // appId, which is idempotent.
     try {
-      OneSignal.initWithContext(this)
+      OneSignal.initWithContext(this, getString(R.string.onesignal_app_id))
     } catch (e: Exception) {
+      android.util.Log.e("MainApplication", "OneSignal.initialize failed", e)
     }
   }
 }

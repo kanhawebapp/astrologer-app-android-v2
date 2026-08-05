@@ -45,6 +45,8 @@ export const CallScreen: React.FC = () => {
   const [speakerOn, setSpeakerOnState] = React.useState(false);
   const { theme } = useTheme();
 
+  console.log(`${DEBUG_PREFIX} mounted`, { roomId, callerName });
+
   const { callState, callDuration, callTime, isMuted, isSpeakerOn, error } = useSelector(
     (state: RootState) => state.call,
   );
@@ -131,7 +133,7 @@ export const CallScreen: React.FC = () => {
       ringtoneManager.stopRingtone();
       stopCallAudio();
       dispatch(setCallState('ended'));
-      webrtcService.cleanup();
+      webrtcService.cleanup('end_call_button');
       dispatch(resetCall());
     }
   }, [roomId, dispatch]);

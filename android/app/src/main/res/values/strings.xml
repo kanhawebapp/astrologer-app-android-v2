@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">DhwaniAstrologer</string>
+    <string name="onesignal_app_id" translatable="false">a26df6aa-88d3-46db-8f39-e09f50059e01</string>
 </resources>

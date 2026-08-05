@@ -45,6 +45,10 @@
             android:name="com.onesignal.NotificationServiceExtension"
             android:value="com.dhwaniastrologer.CallNotificationServiceExtension" />
 
+        <meta-data
+            android:name="com.onesignal.appId"
+            android:value="@string/onesignal_app_id" />
+
         <!-- ================= MAIN ACTIVITY ================= -->
         <activity
             android:name=".MainActivity"

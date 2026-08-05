@@ -62,9 +62,11 @@ import { MainNavigator } from './MainNavigator';
 import { SplashScreen } from '../screens/Splash/SplashScreen';
 import { ChatScreen } from '../features/chat/presentation/screens/ChatScreen';
 import { CallScreen } from '../features/call/presentation/screens/CallScreen';
+import { IncomingCallFullscreen } from '../features/call/presentation/screens/IncomingCallFullscreen';
 import { EditProfileScreen } from '../features/account/presentation/screens/EditProfile/EditProfileScreen';
 import { AllReviewScreen } from '../features/account/presentation/screens/AllReviewScreen';
 import { useAuth } from '../hooks/useAuth';
+import { navigationService } from '../services/navigation/navigationService';
 import OfferScreen from '../features/account/presentation/screens/OfferSecreen';
 import SessionDetailScreen from '../features/sessions/presentation/screens/SessionDetailScreen';
 import KundliScreen from '../features/sessions/screens/KundliScreen';
@@ -81,9 +83,19 @@ export const RootNavigator: React.FC = () => {
   const { isAuthenticated } = useAuth();
 
   return (
-    <NavigationContainer>
+    <NavigationContainer
+      ref={navigationService.navigationRef}
+      onReady={() => navigationService.markNavigationReady()}>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Splash" component={SplashScreen} />
+        <Stack.Screen
+          name="IncomingCallFullscreen"
+          component={IncomingCallFullscreen}
+          options={{
+            presentation: 'fullScreenModal',
+            animation: 'fade',
+          }}
+        />
         {isAuthenticated ? (
           <>
             <Stack.Screen name="MainTabs" component={MainNavigator} />

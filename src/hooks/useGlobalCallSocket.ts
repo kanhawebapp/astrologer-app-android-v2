@@ -1,11 +1,11 @@
-import { useEffect, useCallback, useRef } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '../store';
-import { setCallState, setError } from '../store/slices/callSlice';
-import { webrtcService } from '../services/call/webrtc.service';
-import { callSocketEmitters } from '../features/call/data/callSocketEmitters';
-import { callSocketService } from '../features/call/data/callSocketService';
-import { ringtoneManager } from '../services/call/ringtoneManager';
+import {useEffect, useCallback, useRef} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
+import {AppDispatch, RootState} from '../store';
+import {setCallState, setError} from '../store/slices/callSlice';
+import {webrtcService} from '../services/call/webrtc.service';
+import {callSocketEmitters} from '../features/call/data/callSocketEmitters';
+import {callSocketService} from '../features/call/data/callSocketService';
+import {ringtoneManager} from '../services/call/ringtoneManager';
 
 const DEBUG_PREFIX = '[useGlobalCallSocket]';
 
@@ -21,7 +21,7 @@ export const useGlobalCallSocket = () => {
   // after hydration and re-runs setupListeners.
   const token = useSelector((state: RootState) => state.auth.token);
 
-  console.log("[useGlobalCallSocket] effect");
+  console.log('[useGlobalCallSocket] effect');
 
   const handleIncomingCall = useCallback((data: any) => {
     console.log(`${DEBUG_PREFIX} Received incoming call`, data);
@@ -29,8 +29,8 @@ export const useGlobalCallSocket = () => {
   }, []);
 
   const handleIceCandidate = useCallback(
-    async (payload: { roomId: string; candidate: any }) => {
-      const { roomId, candidate } = payload;
+    async (payload: {roomId: string; candidate: any}) => {
+      const {roomId, candidate} = payload;
       roomIdRef.current = roomId;
 
       console.log(`${DEBUG_PREFIX} Received ICE candidate`);
@@ -54,30 +54,36 @@ export const useGlobalCallSocket = () => {
     [],
   );
 
-const handleCallEndedByUser = useCallback(
-     (data: any) => {
-       console.log(`${DEBUG_PREFIX} Call ended by user`, data);
-       remoteDescriptionReadyRef.current = false;
-       queuedCandidatesRef.current = [];
-       ringtoneManager.stopRingtone();
-       dispatch(setCallState('ended'));
-       dispatch(setError('User ended the call'));
-       webrtcService.cleanup();
-     },
-     [dispatch],
-   );
+  const handleCallEndedByUser = useCallback(
+    (data: any) => {
+      console.log(
+        `${DEBUG_PREFIX} Call ended by user [CALL END TRIGGER: call_ended_by_user]`,
+        data,
+      );
+      remoteDescriptionReadyRef.current = false;
+      queuedCandidatesRef.current = [];
+      ringtoneManager.stopRingtone();
+      dispatch(setCallState('ended'));
+      dispatch(setError('User ended the call'));
+      webrtcService.cleanup('call_ended_by_user');
+    },
+    [dispatch],
+  );
 
-   const handleCallEndedByAstrologer = useCallback(
-     (data: any) => {
-       console.log(`${DEBUG_PREFIX} Call ended by astrologer (self?)`, data);
-       remoteDescriptionReadyRef.current = false;
-       queuedCandidatesRef.current = [];
-       ringtoneManager.stopRingtone();
-       dispatch(setCallState('ended'));
-       webrtcService.cleanup();
-     },
-     [dispatch],
-   );
+  const handleCallEndedByAstrologer = useCallback(
+    (data: any) => {
+      console.log(
+        `${DEBUG_PREFIX} Call ended by astrologer (self?) [CALL END TRIGGER: call_ended_by_astrologer]`,
+        data,
+      );
+      remoteDescriptionReadyRef.current = false;
+      queuedCandidatesRef.current = [];
+      ringtoneManager.stopRingtone();
+      dispatch(setCallState('ended'));
+      webrtcService.cleanup('call_ended_by_astrologer');
+    },
+    [dispatch],
+  );
 
   const handlePeerJoined = useCallback((data: any) => {
     console.log(`${DEBUG_PREFIX} Peer joined`, data);
@@ -125,12 +131,12 @@ const handleCallEndedByUser = useCallback(
         console.log(`${DEBUG_PREFIX} Failed to setup call listeners:`, error);
       });
 
- return () => {
-        isMounted.current = false;
-        // Stop ringtone on hook cleanup (e.g., navigation away)
-        ringtoneManager.stopRingtone();
-        console.log(`${DEBUG_PREFIX} Cleanup called`);
-      };
+    return () => {
+      isMounted.current = false;
+      // Stop ringtone on hook cleanup (e.g., navigation away)
+      ringtoneManager.stopRingtone();
+      console.log(`${DEBUG_PREFIX} Cleanup called`);
+    };
   }, [
     token,
     handleIncomingCall,

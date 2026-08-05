@@ -14,6 +14,7 @@ import {
 } from '../store/slices/callSlice';
 import {ringtoneManager} from '../services/call/ringtoneManager';
 import {callSocketEmitters} from '../features/call/data/callSocketEmitters';
+import {navigationService} from '../services/navigation/navigationService';
 
 const DEBUG_PREFIX = '[NotificationRequestHandler]';
 
@@ -159,4 +160,15 @@ const handleCallRequest = (data: Record<string, any>): void => {
   console.log(
     `${DEBUG_PREFIX} call_request: dispatched incoming call UI for room ${roomId}`,
   );
+
+  console.log(
+    `${DEBUG_PREFIX} Pending call restored (notification click) for room ${roomId}`,
+  );
+  navigationService.navigateWhenReady('IncomingCallFullscreen', {
+    roomId,
+    callId,
+    callerId,
+    callerName,
+    callTime: Number(callTime),
+  });
 };

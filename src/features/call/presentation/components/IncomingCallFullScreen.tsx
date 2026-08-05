@@ -109,6 +109,8 @@ export const IncomingCallFullScreen = forwardRef<IncomingCallFullScreenRef>((pro
   const navigation = useNavigation<NavigationProp>();
   const { theme } = useTheme();
 
+  console.log(`${DEBUG_PREFIX} mounted`);
+
   const callStateData = useSelector((state: RootState) => state.call);
   if (!callStateData) {
     return null;
@@ -433,6 +435,19 @@ export const IncomingCallFullScreen = forwardRef<IncomingCallFullScreenRef>((pro
           const callTimeInSeconds = state.call.callTime;
           const callTimeInMinutes = callTimeInSeconds / 60;
 
+          if (callTimeInSeconds <= 0) {
+            // A zero/negative duration is treated by the server as an invalid
+            // call and can cause an immediate call_ended_by_user. This happens
+            // in kill mode when the notification payload lacked maximumTime and
+            // no authoritative socket incoming_call refresh arrived in time.
+            console.warn(
+              `${DEBUG_PREFIX} ⚠️ callTime is ${callTimeInSeconds}s (<=0). Accepting with 0 duration - server may end the call immediately. Check notification payload maximumTime.`,
+            );
+          }
+          console.log(
+            `${DEBUG_PREFIX} Emitting callAcceptedByAstrologer room=${currentRoomId} callTimeSeconds=${callTimeInSeconds} callTimeMinutes=${callTimeInMinutes}`,
+          );
+
           await callSocketEmitters.acceptCall(
             currentRoomId,
             astroId,
@@ -444,7 +459,10 @@ export const IncomingCallFullScreen = forwardRef<IncomingCallFullScreenRef>((pro
           dispatch(setError(null));
           dispatch(setCallDuration(0));
 
-          navigation.navigate('CallScreen', {
+          // Replace the incoming call screen so the stack stays
+          // [MainTabs, CallScreen] and goBack returns to the app after the
+          // call ends.
+          navigation.replace('CallScreen', {
             roomId: currentRoomId,
             callerId: callerIdRef.current || '',
             callerName: participantRef.current?.name || 'Unknown',

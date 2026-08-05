@@ -130,16 +130,37 @@ class CallNotificationServiceExtension : INotificationServiceExtension {
                 )
             }
 
-            showCustomNotification(
-                event.context,
-                notification,
-                requestType,
-                title,
-                body,
-                acceptLabel,
-                rejectLabel
-            )
-            android.util.Log.d("CallExtension", "Returned from showCustomNotification().")
+            // preventDefault() has already been called, so if the custom
+            // rendering throws for any reason the default OneSignal
+            // notification is the only way the user still sees the incoming
+            // call. Fall back to notification.display() instead of dropping it.
+            try {
+                showCustomNotification(
+                    event.context,
+                    notification,
+                    requestType,
+                    title,
+                    body,
+                    acceptLabel,
+                    rejectLabel
+                )
+                android.util.Log.d("CallExtension", "Returned from showCustomNotification().")
+            } catch (e: Exception) {
+                android.util.Log.e(
+                    "CallExtension",
+                    "showCustomNotification() failed, falling back to default notification",
+                    e
+                )
+                try {
+                    notification.display()
+                } catch (displayError: Exception) {
+                    android.util.Log.e(
+                        "CallExtension",
+                        "Fallback notification.display() also failed",
+                        displayError
+                    )
+                }
+            }
         } else {
             android.util.Log.d(
                 "CallExtension",
@@ -357,91 +378,70 @@ class CallNotificationServiceExtension : INotificationServiceExtension {
         val notificationId = (roomId.hashCode() % Int.MAX_VALUE)
         createNotificationChannel(context)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            if (requestType == "chat_request") {
-                // Chat requests are NOT phone calls. Notification.CallStyle forces
-                // the system "Answer"/"Decline" labels and its button-text setters
-                // (setAnswerButtonText/setDeclineButtonText) are not available in
-                // this project's AndroidX/compile setup, so we use a full-screen
-                // custom NotificationCompat notification with Accept/Reject actions
-                // instead. The call path below is left completely unchanged.
-                android.util.Log.d(
-                    "CallExtension",
-                    "API=${Build.VERSION.SDK_INT} [showCustomNotification] requestType=$requestType Building full-screen chat notification with Accept/Reject actions"
-                )
-                val chatNotification = buildFullScreenNotification(
-                    context,
-                    title,
-                    body,
-                    acceptLabel,
-                    rejectLabel,
-                    acceptPendingIntent,
-                    rejectPendingIntent
-                )
-                val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                manager.notify(notificationId, chatNotification)
-                android.util.Log.d(
-                    "CallExtension",
-                    "API=${Build.VERSION.SDK_INT} [showCustomNotification] NotificationManager.notify() EXECUTED with id=$notificationId requestType=$requestType"
-                )
-            } else {
-                val personBuilder = android.app.Person.Builder()
-                    .setName(callerName as CharSequence)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && requestType != "chat_request") {
+            // Notification.CallStyle requires API 28+. Chat requests use the
+            // full-screen NotificationCompat builder below (CallStyle forces
+            // system "Answer"/"Decline" labels and its button-text setters are
+            // not available in this project's AndroidX/compile setup).
+            val personBuilder = android.app.Person.Builder()
+                .setName(callerName as CharSequence)
 
-                val avatarBitmap = loadAvatarBitmap(context, callerAvatar)
-                if (avatarBitmap != null) {
-                    personBuilder.setIcon(android.graphics.drawable.Icon.createWithBitmap(avatarBitmap))
-                }
-
-                android.util.Log.d(
-                    "CallExtension",
-                    "API=${Build.VERSION.SDK_INT} [showCustomNotification] requestType=$requestType Building CallStyle.forIncomingCall() person=${personBuilder.build().name}"
-                )
-                val callStyle = Notification.CallStyle.forIncomingCall(
-                    personBuilder.build(),
-                    rejectPendingIntent,
-                    acceptPendingIntent
-                )
-
-                callStyle.setAnswerButtonColorHint(
-                    ContextCompat.getColor(context, R.color.call_accept_green)
-                )
-                callStyle.setDeclineButtonColorHint(
-                    ContextCompat.getColor(context, R.color.call_reject_red)
-                )
-
-                val notification = Notification.Builder(context, "incoming_call_channel")
-                    .setSmallIcon(R.mipmap.ic_launcher)
-                    .setContentTitle(title)
-                    .setCategory(Notification.CATEGORY_CALL)
-                    .setPriority(Notification.PRIORITY_HIGH)
-                    .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE))
-                    .setVibrate(longArrayOf(0, 1000, 500, 1000))
-                    .setOngoing(true)
-                    .setFullScreenIntent(acceptPendingIntent, true)
-                    .setVisibility(Notification.VISIBILITY_PUBLIC)
-                    .setStyle(callStyle)
-                    .setTimeoutAfter(30000)
-                    .setColor(ContextCompat.getColor(context, R.color.call_accept_green))
-                    .build()
-
-                android.util.Log.d(
-                    "CallExtension",
-                    "API=${Build.VERSION.SDK_INT} [showCustomNotification] about to call builder.setStyle(callStyle), category=${notification.category}, channelId=${notification.channelId}, smallIcon=${notification.icon}, contentTitle=$title, contentText=$body, ongoing=${notification.flags and Notification.FLAG_ONGOING_EVENT != 0}, callStyleApplied=true"
-                )
-                android.util.Log.d(
-                    "CallExtension",
-                    "API=${Build.VERSION.SDK_INT} [showCustomNotification] DUMP notification before notify: [icon=$title, channel=incoming_call_channel, category=CATEGORY_CALL, priority=HIGH, ongoing=true, fullScreen=true, style=CallStyle, notificationId=$notificationId, requestType=$requestType, acceptAction=$acceptAction, rejectAction=$rejectAction]"
-                )
-
-                val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                manager.notify(notificationId, notification)
-                android.util.Log.d(
-                    "CallExtension",
-                    "API=${Build.VERSION.SDK_INT} [showCustomNotification] NotificationManager.notify() EXECUTED with id=$notificationId notificationId=$notificationId requestType=$requestType"
-                )
+            val avatarBitmap = loadAvatarBitmap(context, callerAvatar)
+            if (avatarBitmap != null) {
+                personBuilder.setIcon(android.graphics.drawable.Icon.createWithBitmap(avatarBitmap))
             }
+
+            android.util.Log.d(
+                "CallExtension",
+                "API=${Build.VERSION.SDK_INT} [showCustomNotification] requestType=$requestType Building CallStyle.forIncomingCall() person=${personBuilder.build().name}"
+            )
+            val callStyle = Notification.CallStyle.forIncomingCall(
+                personBuilder.build(),
+                rejectPendingIntent,
+                acceptPendingIntent
+            )
+
+            callStyle.setAnswerButtonColorHint(
+                ContextCompat.getColor(context, R.color.call_accept_green)
+            )
+            callStyle.setDeclineButtonColorHint(
+                ContextCompat.getColor(context, R.color.call_reject_red)
+            )
+
+            val notification = Notification.Builder(context, "incoming_call_channel")
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle(title)
+                .setCategory(Notification.CATEGORY_CALL)
+                .setPriority(Notification.PRIORITY_HIGH)
+                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE))
+                .setVibrate(longArrayOf(0, 1000, 500, 1000))
+                .setOngoing(true)
+                .setFullScreenIntent(acceptPendingIntent, true)
+                .setVisibility(Notification.VISIBILITY_PUBLIC)
+                .setStyle(callStyle)
+                .setTimeoutAfter(30000)
+                .setColor(ContextCompat.getColor(context, R.color.call_accept_green))
+                .build()
+
+            android.util.Log.d(
+                "CallExtension",
+                "API=${Build.VERSION.SDK_INT} [showCustomNotification] about to call builder.setStyle(callStyle), category=${notification.category}, channelId=${notification.channelId}, smallIcon=${notification.icon}, contentTitle=$title, contentText=$body, ongoing=${notification.flags and Notification.FLAG_ONGOING_EVENT != 0}, callStyleApplied=true"
+            )
+            android.util.Log.d(
+                "CallExtension",
+                "API=${Build.VERSION.SDK_INT} [showCustomNotification] DUMP notification before notify: [icon=$title, channel=incoming_call_channel, category=CATEGORY_CALL, priority=HIGH, ongoing=true, fullScreen=true, style=CallStyle, notificationId=$notificationId, requestType=$requestType, acceptAction=$acceptAction, rejectAction=$rejectAction]"
+            )
+
+            val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            manager.notify(notificationId, notification)
+            android.util.Log.d(
+                "CallExtension",
+                "API=${Build.VERSION.SDK_INT} [showCustomNotification] NotificationManager.notify() EXECUTED with id=$notificationId notificationId=$notificationId requestType=$requestType"
+            )
         } else {
+            // Fallback path: API < 28 (CallStyle unavailable) OR chat requests.
+            // NotificationCompat.Builder works from API 23+, and on API 26+ it
+            // posts to the incoming_call_channel created above.
             val chatNotification = buildFullScreenNotification(
                 context,
                 title,

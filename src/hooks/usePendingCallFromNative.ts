@@ -18,6 +18,7 @@ import {
   handleChatRejectFromNative,
 } from '../components/common/chatRequestCardNativeHandlers';
 import {socketManager} from '../services/socket/socketManager';
+import {navigationService} from '../services/navigation/navigationService';
 
 const DEBUG_PREFIX = '[PendingCallFromNative]';
 
@@ -149,6 +150,17 @@ export const usePendingCallFromNative = () => {
     console.log(
       `${DEBUG_PREFIX} call_request: dispatched incoming call UI for room ${roomId}`,
     );
+
+    console.log(
+      `${DEBUG_PREFIX} Pending call restored (call_request) for room ${roomId}`,
+    );
+    navigationService.navigateWhenReady('IncomingCallFullscreen', {
+      roomId,
+      callId,
+      callerId,
+      callerName,
+      callTime: Number(callTime),
+    });
   };
 
   const handleAcceptCall = async (data: Record<string, any>) => {
@@ -177,9 +189,32 @@ export const usePendingCallFromNative = () => {
     store.dispatch(
       setParticipant({id: callerId, name: callerName, avatar: undefined}),
     );
-    store.dispatch(setCallState('connecting'));
+    store.dispatch(setCallState('ringing'));
     store.dispatch(setError(null));
     store.dispatch(setCallTime(Number(callTime) * 60));
+
+    console.log(
+      `${DEBUG_PREFIX} Pending call restored (ACCEPT_CALL) for room ${roomId}`,
+    );
+    console.log(
+      `${DEBUG_PREFIX} Pending call data: callTime(notif)=${JSON.stringify(
+        data.callTime ?? data.call_time ?? data.maximumTime ?? null,
+      )} resolvedCallTimeMin=${callTime} storedSeconds=${
+        Number(callTime) * 60
+      }`,
+    );
+
+    // Open the incoming call UI as soon as navigation is ready. The screen
+    // registers the accept trigger that triggerAccept() below invokes, so the
+    // auto-accept from the notification button goes through the exact same
+    // handler as an in-app Accept press.
+    navigationService.navigateWhenReady('IncomingCallFullscreen', {
+      roomId,
+      callId,
+      callerId,
+      callerName,
+      callTime: Number(callTime),
+    });
 
     console.log(
       `${DEBUG_PREFIX} accept: prepared call state for room ${roomId}, waiting for socket ready`,
@@ -192,6 +227,12 @@ export const usePendingCallFromNative = () => {
     // sequencing (connectAndWait -> connected -> register) without retrying
     // emits blindly. Zero delay when the socket is already connected+registered.
     await socketManager.ensureSocketReady();
+
+    // Wait until navigation is fully initialized so the IncomingCallFullscreen
+    // screen is mounted and its accept trigger registered. Without this the
+    // triggerAccept() retry window (20 x 100ms) can be exhausted on a slow cold
+    // launch and the accepted call is silently dropped.
+    await navigationService.waitUntilReady();
 
     console.log(`${DEBUG_PREFIX} PendingCall accept starts`);
 

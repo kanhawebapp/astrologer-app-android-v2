@@ -6,6 +6,13 @@ export type RootStackParamList = {
   Splash: undefined;
   AuthStack: undefined;
   MainTabs: undefined;
+  IncomingCallFullscreen: {
+    roomId: string;
+    callId?: string;
+    callerId?: string;
+    callerName?: string;
+    callTime?: number;
+  };
   ChatScreen: {
     chatId?: string;
     sessionId?: string;

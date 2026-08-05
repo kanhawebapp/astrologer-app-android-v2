@@ -37,6 +37,7 @@ class WebRTCService {
   private pendingIceCandidateResolvers: ((value: void) => void)[] = [];
   private negotiationInProgress = false;
   private pendingCleanupAfterNegotiation = false;
+  private pendingLocalStreamPromise: Promise<MediaStream> | null = null;
   private audioConstraints: any = {
     audio: {
       echoCancellation: true,
@@ -46,7 +47,35 @@ class WebRTCService {
   };
 
   async getLocalStream(): Promise<MediaStream> {
-    try {
+    // Reuse an existing live stream instead of calling getUserMedia again. On
+    // a cold launch the accept flow (handleAccept) and the socket OFFER
+    // handler can both request the mic concurrently; two overlapping
+    // getUserMedia calls in react-native-webrtc can fail the second request,
+    // which breaks the offer/answer path and makes the server end the call
+    // ("User ended the call") because no answer is ever sent.
+    if (this.localStream) {
+      const tracks = this.localStream.getTracks();
+      if (tracks.some(track => track.readyState === 'live')) {
+        console.log(
+          `${DEBUG_PREFIX} Reusing existing local stream (${tracks.length} tracks)`,
+        );
+        return this.localStream;
+      }
+      console.log(
+        `${DEBUG_PREFIX} Existing local stream has no live tracks - requesting a new one`,
+      );
+    }
+
+    // Serialize concurrent getUserMedia requests so a second caller waits for
+    // the first instead of triggering a second (conflicting) mic capture.
+    if (this.pendingLocalStreamPromise) {
+      console.log(
+        `${DEBUG_PREFIX} getUserMedia already in progress - awaiting shared promise`,
+      );
+      return this.pendingLocalStreamPromise;
+    }
+
+    this.pendingLocalStreamPromise = (async () => {
       console.log(`${DEBUG_PREFIX} Getting local audio stream...`);
       const stream = await mediaDevices.getUserMedia(this.audioConstraints);
       console.log(
@@ -55,32 +84,66 @@ class WebRTCService {
       );
       this.localStream = stream;
       return stream;
+    })();
+
+    try {
+      return await this.pendingLocalStreamPromise;
     } catch (error) {
       console.log(`${DEBUG_PREFIX} Failed to get local stream:`, error);
       throw error;
+    } finally {
+      this.pendingLocalStreamPromise = null;
     }
+  }
+
+  private isPcClosed(): boolean {
+    if (!this.pc) {
+      return true;
+    }
+    const state = (this.pc as any).connectionState;
+    const signaling = (this.pc as any).signalingState;
+    return state === 'closed' || signaling === 'closed';
   }
 
   createPeerConnection(
     onIceCandidate?: (candidate: any) => void,
     onRemoteTrack?: (event: any) => void,
   ): RTCPeerConnection {
-    if (this.pc) {
+    if (this.pc && !this.isPcClosed()) {
       console.log(`${DEBUG_PREFIX} Reusing existing peer connection`);
       return this.pc;
     }
 
-    console.log(`${DEBUG_PREFIX} Creating new RTCPeerConnection`);
-    this.pc = new RTCPeerConnection(iceConfig);
+    if (this.pc) {
+      // The stored pc is already closed (e.g. a deferred cleanup closed it)
+      // but was not nulled. Drop it so a fresh connection is created instead
+      // of reusing a dead one.
+      console.log(
+        `${DEBUG_PREFIX} Existing peer connection is closed - discarding and recreating`,
+      );
+      this.pc = null;
+    }
 
+    console.log(`${DEBUG_PREFIX} Creating new RTCPeerConnection`);
+    const pc = new RTCPeerConnection(iceConfig);
+    this.pc = pc;
+
+    // NOTE: every handler below closes over the local `pc` (NOT `this.pc`).
+    // cleanup() closes the connection and nulls this.pc; react-native-webrtc
+    // then fires connectionstatechange -> 'closed' / iceconnectionstatechange
+    // -> 'closed' asynchronously. Reading this.pc inside those callbacks at
+    // fire time crashed with "Cannot read property 'connectionState' of null".
     if (this.localStream) {
       this.localStream.getTracks().forEach(track => {
         console.log(`${DEBUG_PREFIX} Adding track:`, track.kind);
-        this.pc!.addTrack(track, this.localStream!);
+        pc.addTrack(track, this.localStream!);
       });
     }
 
-    (this.pc as any).onicecandidate = (event: any) => {
+    (pc as any).onicecandidate = (event: any) => {
+      if ((pc as any).signalingState === 'closed') {
+        return;
+      }
       if (event.candidate) {
         console.log(`${DEBUG_PREFIX} New ICE candidate:`, {
           candidate: event.candidate.candidate,
@@ -95,16 +158,28 @@ class WebRTCService {
       }
     };
 
-    (this.pc as any).ontrack = (event: any) => {
+    (pc as any).ontrack = (event: any) => {
+      // Ignore remote-track events fired after the pc was closed/cleaned up
+      // (a late track from a closing connection must not resurrect the call).
+      if (
+        (pc as any).signalingState === 'closed' ||
+        pc.connectionState === 'closed'
+      ) {
+        console.log(
+          `${DEBUG_PREFIX} Ignoring remote track from closed peer connection`,
+        );
+        return;
+      }
       console.log(`${DEBUG_PREFIX} Received remote track:`, {
         kind: event.track.kind,
         streams: event.streams?.length || 0,
       });
       if (event.streams && event.streams[0]) {
-        this.remoteStream = event.streams[0];
+        const remoteStream = event.streams[0];
+        this.remoteStream = remoteStream;
         console.log(
           `${DEBUG_PREFIX} Remote stream set with tracks:`,
-          this.remoteStream.getTracks().length,
+          remoteStream.getTracks().length,
         );
         if (onRemoteTrack) {
           onRemoteTrack(event);
@@ -112,22 +187,36 @@ class WebRTCService {
       }
     };
 
-    (this.pc as any).onconnectionstatechange = () => {
-      const state = (this.pc as any).connectionState;
-      console.log(`${DEBUG_PREFIX} Connection state changed:`, state);
+    (pc as any).onconnectionstatechange = () => {
+      if (!pc) {
+        return;
+      }
+      const state = pc.connectionState;
+      console.log(
+        `${DEBUG_PREFIX} Connection state changed: ${state} (pc active: ${
+          this.pc === pc
+        })`,
+      );
     };
 
-    (this.pc as any).oniceconnectionstatechange = () => {
-      const state = (this.pc as any).iceConnectionState;
-      console.log(`${DEBUG_PREFIX} ICE connection state changed:`, state);
+    (pc as any).oniceconnectionstatechange = () => {
+      if (!pc) {
+        return;
+      }
+      const state = pc.iceConnectionState;
+      console.log(
+        `${DEBUG_PREFIX} ICE connection state changed: ${state} (pc active: ${
+          this.pc === pc
+        })`,
+      );
     };
 
-    return this.pc;
+    return pc;
   }
 
   async setRemoteDescription(description: any): Promise<void> {
-    if (!this.pc) {
-      throw new Error('PeerConnection not created');
+    if (!this.pc || this.isPcClosed()) {
+      throw new Error('PeerConnection not created or already closed');
     }
     const rtcDesc = new RTCSessionDescription(description);
     console.log(`${DEBUG_PREFIX} Setting remote description:`, rtcDesc.type);
@@ -136,8 +225,8 @@ class WebRTCService {
   }
 
   async createAnswer(): Promise<{type: string; sdp: string}> {
-    if (!this.pc) {
-      throw new Error('PeerConnection not created');
+    if (!this.pc || this.isPcClosed()) {
+      throw new Error('PeerConnection not created or already closed');
     }
     console.log(`${DEBUG_PREFIX} Creating answer...`);
     const answer = await this.pc.createAnswer();
@@ -153,7 +242,7 @@ class WebRTCService {
     this.negotiationInProgress = inProgress;
     if (!inProgress && this.pendingCleanupAfterNegotiation) {
       this.pendingCleanupAfterNegotiation = false;
-      this.cleanup();
+      this.cleanup('deferred_after_negotiation');
     }
   }
 
@@ -162,8 +251,8 @@ class WebRTCService {
   }
 
   async setLocalDescription(description: any): Promise<void> {
-    if (!this.pc) {
-      throw new Error('PeerConnection not created');
+    if (!this.pc || this.isPcClosed()) {
+      throw new Error('PeerConnection not created or already closed');
     }
     const rtcDesc = new RTCSessionDescription(description);
     console.log(`${DEBUG_PREFIX} Setting local description:`, rtcDesc.type);
@@ -173,11 +262,12 @@ class WebRTCService {
 
   async addIceCandidate(candidate: any): Promise<void> {
     console.log(
-      `${DEBUG_PREFIX} addIceCandidate called, pc exists: ${!!this.pc}`,
+      `${DEBUG_PREFIX} addIceCandidate called, pc exists: ${!!this
+        .pc}, pc closed: ${this.isPcClosed()}`,
     );
 
     // Queue if peer connection doesn't exist yet
-    if (!this.pc) {
+    if (!this.pc || this.isPcClosed()) {
       console.log(
         `${DEBUG_PREFIX} Peer connection not ready, queuing ICE candidate`,
       );
@@ -205,7 +295,11 @@ class WebRTCService {
   }
 
   async processQueuedIceCandidates(): Promise<void> {
-    if (!this.pc || this.queuedIceCandidates.length === 0) {
+    if (
+      !this.pc ||
+      this.isPcClosed() ||
+      this.queuedIceCandidates.length === 0
+    ) {
       return;
     }
 
@@ -245,14 +339,35 @@ class WebRTCService {
     return this.pc;
   }
 
-  async cleanup(force: boolean = false): Promise<void> {
+  // Safe snapshot of the peer connection state. Returns null when no
+  // connection exists; never throws, unlike reading pc.connectionState /
+  // pc.iceConnectionState directly when the pc has been closed and nulled.
+  getConnectionStatus(): {
+    connectionState: string;
+    iceConnectionState: string;
+    signalingState: string;
+  } | null {
+    if (!this.pc) {
+      return null;
+    }
+    return {
+      connectionState: (this.pc as any).connectionState,
+      iceConnectionState: (this.pc as any).iceConnectionState,
+      signalingState: (this.pc as any).signalingState,
+    };
+  }
+
+  async cleanup(source?: string, force: boolean = false): Promise<void> {
     console.log(
-      `${DEBUG_PREFIX} Cleaning up WebRTC resources${force ? ' (forced)' : ''}`,
+      `${DEBUG_PREFIX} Cleaning up WebRTC resources` +
+        `${source ? ` [trigger: ${source}]` : ''}` +
+        `${force ? ' (forced)' : ''}`,
     );
 
     if (!force && this.negotiationInProgress) {
       console.log(
-        `${DEBUG_PREFIX} Deferring cleanup during offer/answer negotiation`,
+        `${DEBUG_PREFIX} Deferring cleanup during offer/answer negotiation` +
+          `${source ? ` [trigger: ${source}]` : ''}`,
       );
       this.pendingCleanupAfterNegotiation = true;
       return;
@@ -266,13 +381,45 @@ class WebRTCService {
       this.localStream = null;
     }
 
-    if (this.pc) {
-      this.pc.close();
+    const pc = this.pc;
+    if (pc) {
+      console.log(
+        `${DEBUG_PREFIX} Destroying RTCPeerConnection (connection=${
+          pc.connectionState
+        }, ice=${pc.iceConnectionState}, signaling=${
+          (pc as any).signalingState
+        })`,
+      );
+      // Detach every handler BEFORE close(). react-native-webrtc fires
+      // connectionstatechange -> 'closed' and iceconnectionstatechange ->
+      // 'closed' asynchronously after close(); with this.pc already nulled,
+      // the old handlers dereferenced this.pc and crashed with
+      // "Cannot read property 'connectionState' of null".
+      (pc as any).onicecandidate = null;
+      (pc as any).ontrack = null;
+      (pc as any).onconnectionstatechange = null;
+      (pc as any).oniceconnectionstatechange = null;
+      try {
+        pc.close();
+      } catch (e) {
+        console.log(`${DEBUG_PREFIX} Error closing RTCPeerConnection:`, e);
+      }
       this.pc = null;
+    } else {
+      console.log(
+        `${DEBUG_PREFIX} No peer connection to destroy${
+          source ? ` [trigger: ${source}]` : ''
+        }`,
+      );
     }
 
     this.remoteStream = null;
-    console.log(`${DEBUG_PREFIX} Cleanup complete`);
+    this.queuedIceCandidates = [];
+    console.log(
+      `${DEBUG_PREFIX} Cleanup complete${
+        source ? ` [trigger: ${source}]` : ''
+      }`,
+    );
   }
 
   async toggleMute(): Promise<boolean> {

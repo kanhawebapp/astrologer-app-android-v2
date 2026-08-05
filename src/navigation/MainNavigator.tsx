@@ -14,7 +14,6 @@ import { useTheme } from '../hooks/useTheme';
 import { AppText } from '../components/common/AppText';
 import { FloatingChatBubble } from '../components/common/FloatingChatBubble';
 import { ChatRequestCard } from '../components/common/ChatRequestCard';
-import { IncomingCallFullScreen } from '../features/call/presentation/components/IncomingCallFullScreen';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
@@ -210,7 +209,6 @@ export const MainNavigator: React.FC = () => {
   return (
     <View style={styles.container}>
       <ChatRequestCard />
-      <IncomingCallFullScreen />
       <Tab.Navigator screenOptions={screenOptions}>
         {TAB_CONFIGS.map(tab => (
           <Tab.Screen

@@ -18,6 +18,7 @@ import {
   startCallAudio,
   stopCallAudio,
 } from '../../../services/call/call.service';
+import {navigationService} from '../../../services/navigation/navigationService';
 
 const DEBUG_PREFIX = '[CallEventHandler]';
 
@@ -162,9 +163,37 @@ export const setupEventHandlers = async (): Promise<void> => {
       currentCallState === 'connecting' ||
       currentCallState === 'connected';
     if (callAlreadyActive && (!roomId || roomId === currentRoomId)) {
-      console.log(
-        `${DEBUG_PREFIX} ⏭️ Skipping duplicate INCOMING_CALL (call already active for room ${currentRoomId})`,
-      );
+      // The notification (kill mode) already drove the UI, but its payload may
+      // be missing the authoritative fields the socket event carries (e.g. the
+      // caller-selected callTime). Fill in ONLY missing data here - never
+      // reset an in-progress call or re-navigate.
+      if (roomId === currentRoomId) {
+        const callState = store.getState().call;
+        if (callTime > 0 && callState.callTime <= 0) {
+          console.log(
+            `${DEBUG_PREFIX} Refreshing missing callTime from authoritative socket payload: ${callTime}min -> ${
+              callTime * 60
+            }s for room ${currentRoomId}`,
+          );
+          store.dispatch(setCallTime(callTime * 60));
+        }
+        if (callId && !callState.callId) {
+          store.dispatch(setCallId(callId));
+        }
+        if (!callState.participant?.id && callerId) {
+          store.dispatch(
+            setParticipant({
+              id: callerId,
+              name: callerName,
+              avatar: callerAvatar,
+            }),
+          );
+        }
+      } else {
+        console.log(
+          `${DEBUG_PREFIX} ⏭️ Skipping duplicate INCOMING_CALL (call already active for room ${currentRoomId})`,
+        );
+      }
       return;
     }
 
@@ -193,6 +222,20 @@ export const setupEventHandlers = async (): Promise<void> => {
 
     // Start ringing sound immediately when incoming call arrives
     ringtoneManager.startRingtone();
+
+    // Open the incoming call UI via navigation (replaces the old overlay in
+    // MainNavigator) so foreground socket calls use the exact same screen as
+    // notification-driven calls.
+    console.log(
+      `${DEBUG_PREFIX} Pending call restored (socket incoming_call) for room ${roomId}`,
+    );
+    navigationService.navigateWhenReady('IncomingCallFullscreen', {
+      roomId,
+      callId,
+      callerId,
+      callerName,
+      callTime: Number(callTime),
+    });
 
     callCallbackManager.invokeCallbacks('onIncomingCall', normalizedData);
   });
@@ -245,7 +288,19 @@ export const setupEventHandlers = async (): Promise<void> => {
       };
 
       const onRemoteTrack = (event: any) => {
-        console.log(`${DEBUG_PREFIX} Remote track received, setting connected`);
+        const currentCallState = store.getState().call.callState;
+        console.log(
+          `${DEBUG_PREFIX} Remote track received (current callState: ${currentCallState})`,
+        );
+        // Never resurrect a call that has already been ended. A remote track
+        // can arrive after call_ended_by_user/call_timeout ran cleanup(); in
+        // that case the call must stay ended, not flip back to 'connected'.
+        if (currentCallState === 'ended' || currentCallState === 'idle') {
+          console.log(
+            `${DEBUG_PREFIX} Ignoring remote track - call already ${currentCallState}`,
+          );
+          return;
+        }
         // CONNECTED state ONLY when remote track fires
         store.dispatch(setCallState('connected'));
         callCallbackManager.invokeCallbacks('onRemoteTrack', event);
@@ -324,9 +379,28 @@ export const setupEventHandlers = async (): Promise<void> => {
   });
 
   socket.on(CallSocketEvents.CALL_ENDED_BY_USER, (data: any) => {
+    const eventRoomId = data?.room_id || data?.roomId;
+    const currentRoomId = store.getState().call.roomId;
+    if (eventRoomId && currentRoomId && eventRoomId !== currentRoomId) {
+      // A call-end event for a different room (e.g. stale replay after a
+      // reconnect) must never kill the currently active call.
+      console.warn(
+        `${DEBUG_PREFIX} call_ended_by_user room mismatch (${eventRoomId} vs current ${currentRoomId}). Ignoring.`,
+      );
+      return;
+    }
+    const pcStatus = webrtcService.getConnectionStatus();
+    const currentCallState = store.getState().call.callState;
     console.log(
-      `${DEBUG_PREFIX} 📥 EVENT: "${CallSocketEvents.CALL_ENDED_BY_USER}"`,
+      `${DEBUG_PREFIX} 📥 EVENT: "${CallSocketEvents.CALL_ENDED_BY_USER}" [CALL END TRIGGER: call_ended_by_user]`,
       data,
+    );
+    console.log(
+      `${DEBUG_PREFIX} [CALL END TRIGGER: call_ended_by_user] current callState=${currentCallState} peerConnection=${
+        pcStatus
+          ? `connection=${pcStatus.connectionState}, ice=${pcStatus.iceConnectionState}`
+          : 'null'
+      }`,
     );
     store.dispatch(setCallState('ended'));
     store.dispatch(setError('User ended the call'));
@@ -336,8 +410,16 @@ export const setupEventHandlers = async (): Promise<void> => {
   });
 
   socket.on(CallSocketEvents.CALL_REJECTED, (data: any) => {
+    const eventRoomId = data?.room_id || data?.roomId;
+    const currentRoomId = store.getState().call.roomId;
+    if (eventRoomId && currentRoomId && eventRoomId !== currentRoomId) {
+      console.warn(
+        `${DEBUG_PREFIX} call_cancel_by_astrologer room mismatch (${eventRoomId} vs current ${currentRoomId}). Ignoring.`,
+      );
+      return;
+    }
     console.log(
-      `${DEBUG_PREFIX} 📥 EVENT: "${CallSocketEvents.CALL_REJECTED}"`,
+      `${DEBUG_PREFIX} 📥 EVENT: "${CallSocketEvents.CALL_REJECTED}" [CALL END TRIGGER: call_cancel_by_astrologer]`,
       data,
     );
     store.dispatch(setCallState('ended'));
@@ -347,8 +429,16 @@ export const setupEventHandlers = async (): Promise<void> => {
   });
 
   socket.on(CallSocketEvents.CALL_TIMEOUT, (data: any) => {
+    const eventRoomId = data?.room_id || data?.roomId;
+    const currentRoomId = store.getState().call.roomId;
+    if (eventRoomId && currentRoomId && eventRoomId !== currentRoomId) {
+      console.warn(
+        `${DEBUG_PREFIX} call_timeout room mismatch (${eventRoomId} vs current ${currentRoomId}). Ignoring.`,
+      );
+      return;
+    }
     console.log(
-      `${DEBUG_PREFIX} 📥 EVENT: "${CallSocketEvents.CALL_TIMEOUT}"`,
+      `${DEBUG_PREFIX} 📥 EVENT: "${CallSocketEvents.CALL_TIMEOUT}" [CALL END TRIGGER: call_timeout]`,
       data,
     );
     store.dispatch(setCallState('ended'));
@@ -474,6 +564,14 @@ export const setupEventHandlers = async (): Promise<void> => {
 
     console.log(
       `${DEBUG_PREFIX} ✅ CALL_CANCEL_BY_USER: Match found, ending call`,
+    );
+    const pcStatus = webrtcService.getConnectionStatus();
+    console.log(
+      `${DEBUG_PREFIX} [CALL END TRIGGER: call_cancel_by_user] peerConnection=${
+        pcStatus
+          ? `connection=${pcStatus.connectionState}, ice=${pcStatus.iceConnectionState}`
+          : 'null'
+      }`,
     );
     store.dispatch(setCallState('ended'));
     store.dispatch(setError('User cancelled the call'));
