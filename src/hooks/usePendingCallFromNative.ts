@@ -22,14 +22,100 @@ import {navigationService} from '../services/navigation/navigationService';
 
 const DEBUG_PREFIX = '[PendingCallFromNative]';
 
+// Cold start: the Decline tap launches the app and processPending() runs on
+// mount, but auth (restoreSession) hydrates asynchronously and the socket is
+// not connected yet. These waits make the reject emit happen only once the
+// prerequisites exist (otherwise rejectCall is silently skipped/dropped).
+
+const waitForAuthUserId = (timeoutMs = 15000): Promise<string | null> => {
+  return new Promise(resolve => {
+    const getUserId = (): string | null =>
+      (store.getState().auth.user as {id?: string} | null)?.id ?? null;
+
+    const existing = getUserId();
+    if (existing) {
+      resolve(existing);
+      return;
+    }
+
+    let settled = false;
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+    let unsubscribe: () => void = () => {};
+
+    unsubscribe = store.subscribe(() => {
+      if (settled) {
+        return;
+      }
+      const userId = getUserId();
+      if (userId) {
+        settled = true;
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+        }
+        unsubscribe();
+        resolve(userId);
+      }
+    });
+
+    timeoutId = setTimeout(() => {
+      if (settled) {
+        return;
+      }
+      settled = true;
+      unsubscribe();
+      resolve(null);
+    }, timeoutMs);
+  });
+};
+
+const withTimeout = <T>(
+  promise: Promise<T>,
+  timeoutMs: number,
+  onTimeout?: () => void,
+): Promise<T | null> => {
+  return new Promise(resolve => {
+    let settled = false;
+    const timeoutId = setTimeout(() => {
+      if (settled) {
+        return;
+      }
+      settled = true;
+      onTimeout?.();
+      resolve(null);
+    }, timeoutMs);
+    promise.then(
+      value => {
+        if (settled) {
+          return;
+        }
+        settled = true;
+        clearTimeout(timeoutId);
+        resolve(value);
+      },
+      error => {
+        if (settled) {
+          return;
+        }
+        settled = true;
+        clearTimeout(timeoutId);
+        console.log(`${DEBUG_PREFIX} withTimeout: promise rejected`, error);
+        resolve(null);
+      },
+    );
+  });
+};
+
 export const usePendingCallFromNative = () => {
   const processedRef = useRef(false);
   const mountedRef = useRef(false);
+  const processingRef = useRef(false);
 
   const processPending = async () => {
-    if (!mountedRef.current || processedRef.current) {
+    if (!mountedRef.current || processedRef.current || processingRef.current) {
       return;
     }
+
+    processingRef.current = true;
 
     const CallNotificationModule = NativeModules.CallNotificationModule as
       | {
@@ -42,11 +128,15 @@ export const usePendingCallFromNative = () => {
       | undefined;
 
     if (!CallNotificationModule?.getPendingAction) {
+      processingRef.current = false;
       return;
     }
 
     try {
       const pending = await CallNotificationModule.getPendingAction();
+      console.log(
+        `[REJECT_FLOW] getPendingAction() resolved at ${new Date().toISOString()}`,
+      );
       console.log("🚀 Pending =", JSON.stringify(pending, null, 2));
       if (!mountedRef.current || !pending?.action) {
         return;
@@ -76,7 +166,7 @@ export const usePendingCallFromNative = () => {
         handleAcceptCall(pending.data);
       } else if (pending.action === 'com.dhwaniastrologer.REJECT_CALL') {
         console.log(`${DEBUG_PREFIX} [DEBUG] -> calling handleRejectRequest`);
-        handleRejectRequest(pending.data);
+        await handleRejectRequest(pending.data);
       } else if (pending.action === 'com.dhwaniastrologer.ACCEPT_CHAT') {
         console.log(`${DEBUG_PREFIX} [DEBUG] -> calling handleAcceptChat`);
         handleAcceptChat(pending.data);
@@ -96,6 +186,8 @@ export const usePendingCallFromNative = () => {
       }
     } catch (e) {
       console.log(`${DEBUG_PREFIX} Error reading pending action:`, e);
+    } finally {
+      processingRef.current = false;
     }
   };
 
@@ -247,7 +339,9 @@ console.log("callTime ===", data.callTime);
     triggerAccept();
   };
 
-  const handleRejectRequest = (data: Record<string, any> | undefined): void => {
+  const handleRejectRequest = async (
+    data: Record<string, any> | undefined,
+  ): Promise<void> => {
     if (!data || typeof data !== 'object') {
       return;
     }
@@ -259,14 +353,54 @@ console.log("callTime ===", data.callTime);
       return;
     }
 
-    const astroId = (store.getState().auth.user as any)?.id;
+    console.log(
+      `[REJECT_FLOW] handleRejectRequest entered at ${new Date().toISOString()} roomId=${roomId} callState=${
+        store.getState().call.callState
+      }`,
+    );
 
     ringtoneManager.stopRingtone();
 
-    if (astroId) {
-      callSocketEmitters
-        .rejectCall(astroId, roomId)
-        .catch(err => console.log(`${DEBUG_PREFIX} reject socket error:`, err));
+    // Cold start: auth is not hydrated yet, so astroId may be null here.
+    // Wait for hydration before emitting (fall back to the notification
+    // payload's astrologerId as a secondary source).
+    const astroId =
+      (await waitForAuthUserId()) || data.astrologerId || data.astro_id;
+
+    if (!astroId) {
+      console.log(
+        `${DEBUG_PREFIX} reject: astroId unavailable after auth wait, aborting reject emit`,
+      );
+      store.dispatch(setCallState('idle'));
+      return;
+    }
+
+    console.log(
+      `[REJECT_FLOW] astroId=${astroId} (auth hydrated after cold start)`,
+    );
+
+    // socketManager.emit() silently drops the packet when the socket is not
+    // connected. Wait until it is connected (and registered) before sending
+    // call_cancel_by_astrologer.
+    console.log(
+      `[REJECT_FLOW] Waiting for socket ready... connected=${socketManager.isConnected()} at ${new Date().toISOString()}`,
+    );
+    await withTimeout(socketManager.ensureSocketReady(), 25000, () => {
+      console.log(
+        `${DEBUG_PREFIX} reject: socket not ready within 25s, proceeding anyway`,
+      );
+    });
+
+    console.log(
+      `[REJECT_FLOW] Emitting call_cancel_by_astrologer at ${new Date().toISOString()} roomId=${roomId} socketConnected=${socketManager.isConnected()}`,
+    );
+    try {
+      await callSocketEmitters.rejectCall(astroId, roomId);
+      console.log(
+        `[REJECT_FLOW] call_cancel_by_astrologer emitted successfully roomId=${roomId}`,
+      );
+    } catch (error) {
+      console.log(`${DEBUG_PREFIX} reject socket error:`, error);
     }
 
     store.dispatch(setCallState('idle'));

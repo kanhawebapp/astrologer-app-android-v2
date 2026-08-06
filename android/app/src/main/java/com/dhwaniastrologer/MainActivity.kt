@@ -59,6 +59,18 @@ class MainActivity : ReactActivity() {
 
     Log.d("MainActivity", "NATIVE_ACTION_RECEIVED action=$action")
 
+    Log.d(
+      "MainActivity",
+      "ACTION_TS at=${System.currentTimeMillis()} action=$action " +
+        "extras=[roomId=${intent.getStringExtra("extra_room_id")}, " +
+        "callId=${intent.getStringExtra("extra_call_id")}, " +
+        "callerId=${intent.getStringExtra("extra_caller_id")}, " +
+        "callerName=${intent.getStringExtra("extra_caller_name")}, " +
+        "astrologerId=${intent.getStringExtra("extra_astrologer_id")}, " +
+        "callTime=${intent.getStringExtra("extra_call_time")}, " +
+        "sessionId=${intent.getStringExtra("extra_session_id")}]",
+    )
+
     val prefs = getSharedPreferences("call_notification_prefs", Context.MODE_PRIVATE)
     val roomId = intent.getStringExtra("extra_room_id") ?: ""
     val callId = intent.getStringExtra("extra_call_id") ?: ""
