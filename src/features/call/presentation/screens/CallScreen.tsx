@@ -51,6 +51,25 @@ export const CallScreen: React.FC = () => {
     (state: RootState) => state.call,
   );
 
+  // Guard against the screen being removed by navigation (e.g. a background
+  // Splash -> MainTabs transition during a killed-mode launch) while a call is
+  // still active. The call UI must stay on top until the call is ended; the
+  // end-call flows set callState to 'ended' before navigating away, so they are
+  // unaffected.
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('beforeRemove', e => {
+      if (
+        callState === 'ringing' ||
+        callState === 'connecting' ||
+        callState === 'connected'
+      ) {
+        e.preventDefault();
+      }
+    });
+
+    return unsubscribe;
+  }, [navigation, callState]);
+
   const timerIntervalRef = useRef<any | null>(null);
   const callTimeTimerRef = useRef<any | null>(null);
   const appStateRef = useRef(AppState.currentState);

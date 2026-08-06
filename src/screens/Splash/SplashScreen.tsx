@@ -9,13 +9,13 @@ import { BrandingScreen } from './components/BrandingScreen';
 import { WelcomeScreen } from './components/WelcomeScreen';
 import { PageIndicator } from './components/PageIndicator';
 import { STORAGE_KEYS } from '../../utils/constants';
+import { store } from '../../store';
+import type { RootNavigationProp } from '../../navigation/types';
 
 const TOTAL_PAGES = 2;
 
 interface SplashScreenProps {
-  navigation: {
-    replace: (name: string) => void;
-  };
+  navigation: RootNavigationProp;
 }
 
 export const SplashScreen: React.FC<SplashScreenProps> = ({ navigation }) => {
@@ -40,13 +40,58 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ navigation }) => {
     })();
   }, []);
 
-  const handleNavigateToAuth = useCallback(() => {
-    if (isAuthenticatedRef.current) {
+  const navigateAwayFromSplash = useCallback(
+    (destination: 'MainTabs' | 'AuthStack') => {
+      if (destination === 'AuthStack') {
+        navigation.replace('AuthStack');
+        return;
+      }
+
+      const state = navigation.getState();
+
+      // navigation.replace() dispatches a REPLACE action without a target, so
+      // the stack router replaces the *focused* route (state.index), not the
+      // Splash route that dispatched it. When the splash finishes while an
+      // incoming/active call is on top of the stack (killed-mode launch), that
+      // would tear down IncomingCallFullscreen/CallScreen. Reset instead: map
+      // Splash -> MainTabs and preserve every route stacked above it while a
+      // call is active (keeping their keys so the call screens don't remount),
+      // leaving the active call UI on top. Once no call is active, reset to
+      // [MainTabs] so any stale incoming-call screen is dropped too.
+      const callState = store.getState().call.callState;
+      const callActive =
+        callState === 'ringing' ||
+        callState === 'connecting' ||
+        callState === 'connected';
+
+      if (state?.routes?.length) {
+        const preservedRoutes = callActive
+          ? state.routes.filter(route => route.name !== 'Splash')
+          : [];
+        navigation.reset({
+          index: preservedRoutes.length,
+          routes: [
+            { name: 'MainTabs' },
+            ...preservedRoutes.map(route => ({
+              key: route.key,
+              name: route.name,
+              params: route.params,
+            })),
+          ],
+        });
+        return;
+      }
+
       navigation.replace('MainTabs');
-    } else {
-      navigation.replace('AuthStack');
-    }
-  }, [navigation]);
+    },
+    [navigation],
+  );
+
+  const handleNavigateToAuth = useCallback(() => {
+    navigateAwayFromSplash(
+      isAuthenticatedRef.current ? 'MainTabs' : 'AuthStack',
+    );
+  }, [navigateAwayFromSplash]);
 
   const { currentPage, animations } = useSplash(
     handleNavigateToAuth,
@@ -66,11 +111,9 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ navigation }) => {
   }, [restore]);
 
   const handleGetStarted = () => {
-    if (isAuthenticatedRef.current) {
-      navigation.replace('MainTabs');
-    } else {
-      navigation.replace('AuthStack');
-    }
+    navigateAwayFromSplash(
+      isAuthenticatedRef.current ? 'MainTabs' : 'AuthStack',
+    );
   };
 
   return (
