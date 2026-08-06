@@ -23,77 +23,80 @@ import {navigationService} from '../../../services/navigation/navigationService'
 const DEBUG_PREFIX = '[CallEventHandler]';
 
 export const setupEventHandlers = async (): Promise<void> => {
-  console.log(`${DEBUG_PREFIX} >>> SETUP EVENT HANDLERS CALLED <<<`);
+  // console.log(`${DEBUG_PREFIX} >>> SETUP EVENT HANDLERS CALLED <<<`);
 
   const socket = await socketClient.getSocket();
-  console.log(`${DEBUG_PREFIX} Socket ID:`, socket.id);
-  console.log(`${DEBUG_PREFIX} Socket connected:`, socket.connected);
+  // console.log(`${DEBUG_PREFIX} Socket ID:`, socket.id);
+  // console.log(`${DEBUG_PREFIX} Socket connected:`, socket.connected);
 
   // Add GLOBAL logger to catch ALL events
   socket.onAny((eventName: string, ...args: any[]) => {
-    console.log(`🔍 [ASTRO ALL EVENTS] ${eventName}`, args);
+    // console.log(`🔍 [ASTRO ALL EVENTS] ${eventName}`, args);
   });
 
-  console.log(`${DEBUG_PREFIX} Registering call-specific listeners...`);
+  // console.log(`${DEBUG_PREFIX} Registering call-specific listeners...`);
 
   socket.on(CallSocketEvents.INCOMING_CALL, (data: any) => {
-    console.log(
-      `${DEBUG_PREFIX} 📥 EVENT: "${CallSocketEvents.INCOMING_CALL}" received`,
-    );
+
+     console.log("🔥 INCOMING_CALL SOCKET EVENT");
+  console.log("Payload =", data);
+    // console.log(
+    //   `${DEBUG_PREFIX} 📥 EVENT: "${CallSocketEvents.INCOMING_CALL}" received`,
+    // );
 
     // Deep payload debugging - normalize any structure
-    console.log(`${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] typeof data:`, typeof data);
-    console.log(
-      `${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Array.isArray(data):`,
-      Array.isArray(data),
-    );
-    console.log(`${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Raw data:`, data);
+    // console.log(`${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] typeof data:`, typeof data);
+    // console.log(
+    //   `${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Array.isArray(data):`,
+    //   Array.isArray(data),
+    // );
+    // console.log(`${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Raw data:`, data);
 
     let normalizedData = data;
 
     // Case 2: Stringified JSON
     if (typeof data === 'string') {
-      console.log(
-        `${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Data is string, attempting parse...`,
-      );
+      // console.log(
+      //   `${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Data is string, attempting parse...`,
+      // );
       try {
         normalizedData = JSON.parse(data);
-        console.log(
-          `${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Parsed string to object:`,
-          normalizedData,
-        );
+        // console.log(
+        //   `${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Parsed string to object:`,
+        //   normalizedData,
+        // );
       } catch (e) {
-        console.log(
-          `${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Failed to parse string:`,
-          e,
-        );
+        // console.log(
+        //   `${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Failed to parse string:`,
+        //   e,
+        // );
       }
     }
 
     // Case 3: Array with stringified JSON
     if (Array.isArray(data) && data.length > 0 && typeof data[0] === 'string') {
-      console.log(
-        `${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Array with string first element, attempting parse...`,
-      );
+      // console.log(
+      //   `${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Array with string first element, attempting parse...`,
+      // );
       try {
         normalizedData = JSON.parse(data[0]);
-        console.log(
-          `${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Parsed array[0] to object:`,
-          normalizedData,
-        );
+        // console.log(
+        //   `${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Parsed array[0] to object:`,
+        //   normalizedData,
+        // );
       } catch (e) {
-        console.log(
-          `${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Failed to parse array[0]:`,
-          e,
-        );
+        // console.log(
+        //   `${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Failed to parse array[0]:`,
+        //   e,
+        // );
       }
     }
 
     // Case 4: Array with object
     if (Array.isArray(data) && data.length > 0 && typeof data[0] === 'object') {
-      console.log(
-        `${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Array with object first element`,
-      );
+      // console.log(
+      //   `${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Array with object first element`,
+      // );
       normalizedData = data[0];
     }
 
@@ -103,24 +106,24 @@ export const setupEventHandlers = async (): Promise<void> => {
       typeof normalizedData === 'object' &&
       normalizedData.data
     ) {
-      console.log(
-        `${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Found nested data.data property`,
-      );
+      // console.log(
+      //   `${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Found nested data.data property`,
+      // );
       normalizedData = normalizedData.data;
     }
 
-    console.log(
-      `${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Object.keys(normalizedData):`,
-      normalizedData ? Object.keys(normalizedData) : 'null/undefined',
-    );
-    console.log(
-      `${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Final normalized payload:`,
-      JSON.stringify(normalizedData, null, 2),
-    );
-    console.log(
-      `${DEBUG_PREFIX} 📥 Payload:`,
-      JSON.stringify(normalizedData, null, 2),
-    );
+    // console.log(
+    //   `${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Object.keys(normalizedData):`,
+    //   normalizedData ? Object.keys(normalizedData) : 'null/undefined',
+    // );
+    // console.log(
+    //   `${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Final normalized payload:`,
+    //   JSON.stringify(normalizedData, null, 2),
+    // );
+    // console.log(
+    //   `${DEBUG_PREFIX} 📥 Payload:`,
+    //   JSON.stringify(normalizedData, null, 2),
+    // );
 
     const astroId = store.getState().auth.user?.id;
     const receiverId =
@@ -143,9 +146,9 @@ export const setupEventHandlers = async (): Promise<void> => {
       normalizedData?.userAvatar ||
       normalizedData?.user_avatar;
 
-    console.log(
-      `${DEBUG_PREFIX} 📥 Extracted - receiverId:${receiverId}, callerId:${callerId}, roomId:${roomId}, callId:${callId}, callTime:${callTime}`,
-    );
+    // console.log(
+    //   `${DEBUG_PREFIX} 📥 Extracted - receiverId:${receiverId}, callerId:${callerId}, roomId:${roomId}, callId:${callId}, callTime:${callTime}`,
+    // );
 
     if (receiverId && astroId && receiverId !== astroId) {
       console.warn(`${DEBUG_PREFIX} ⚠️ Receiver ID mismatch! Ignoring.`);
@@ -170,11 +173,11 @@ export const setupEventHandlers = async (): Promise<void> => {
       if (roomId === currentRoomId) {
         const callState = store.getState().call;
         if (callTime > 0 && callState.callTime <= 0) {
-          console.log(
-            `${DEBUG_PREFIX} Refreshing missing callTime from authoritative socket payload: ${callTime}min -> ${
-              callTime * 60
-            }s for room ${currentRoomId}`,
-          );
+          // console.log(
+          //   `${DEBUG_PREFIX} Refreshing missing callTime from authoritative socket payload: ${callTime}min -> ${
+          //     callTime * 60
+          //   }s for room ${currentRoomId}`,
+          // );
           store.dispatch(setCallTime(callTime * 60));
         }
         if (callId && !callState.callId) {
@@ -190,14 +193,14 @@ export const setupEventHandlers = async (): Promise<void> => {
           );
         }
       } else {
-        console.log(
-          `${DEBUG_PREFIX} ⏭️ Skipping duplicate INCOMING_CALL (call already active for room ${currentRoomId})`,
-        );
+        // console.log(
+        //   `${DEBUG_PREFIX} ⏭️ Skipping duplicate INCOMING_CALL (call already active for room ${currentRoomId})`,
+        // );
       }
       return;
     }
 
-    console.log(`${DEBUG_PREFIX} ✅ Setting call state for incoming call`);
+    // console.log(`${DEBUG_PREFIX} ✅ Setting call state for incoming call`);
     store.dispatch(setRoomId(roomId));
     store.dispatch(setCallId(callId));
     store.dispatch(setCallerId(callerId));
@@ -212,13 +215,13 @@ export const setupEventHandlers = async (): Promise<void> => {
     store.dispatch(setError(null));
     store.dispatch(setCallTime(callTime * 60));
 
-    console.log(`${DEBUG_PREFIX} Incoming call state set. Ready to show UI.`);
-    console.log(
-      `${DEBUG_PREFIX} 📥 INCOMING PAYLOAD callTime: ${callTime} (minutes)`,
-    );
-    console.log(
-      `${DEBUG_PREFIX} 🕒 STORED COUNTDOWN VALUE: ${callTime * 60} (seconds)`,
-    );
+    // console.log(`${DEBUG_PREFIX} Incoming call state set. Ready to show UI.`);
+    // console.log(
+    //   `${DEBUG_PREFIX} 📥 INCOMING PAYLOAD callTime: ${callTime} (minutes)`,
+    // );
+    // console.log(
+    //   `${DEBUG_PREFIX} 🕒 STORED COUNTDOWN VALUE: ${callTime * 60} (seconds)`,
+    // );
 
     // Start ringing sound immediately when incoming call arrives
     ringtoneManager.startRingtone();
@@ -226,9 +229,9 @@ export const setupEventHandlers = async (): Promise<void> => {
     // Open the incoming call UI via navigation (replaces the old overlay in
     // MainNavigator) so foreground socket calls use the exact same screen as
     // notification-driven calls.
-    console.log(
-      `${DEBUG_PREFIX} Pending call restored (socket incoming_call) for room ${roomId}`,
-    );
+    // console.log(
+    //   `${DEBUG_PREFIX} Pending call restored (socket incoming_call) for room ${roomId}`,
+    // );
     navigationService.navigateWhenReady('IncomingCallFullscreen', {
       roomId,
       callId,
@@ -241,45 +244,45 @@ export const setupEventHandlers = async (): Promise<void> => {
   });
 
   socket.on(CallSocketEvents.OFFER, async (data: any) => {
-    console.log(`${DEBUG_PREFIX} 📥 EVENT: "${CallSocketEvents.OFFER}"`, data);
+    // console.log(`${DEBUG_PREFIX} 📥 EVENT: "${CallSocketEvents.OFFER}"`, data);
 
     // Stop ringtone when offer arrives (call is connecting)
-    console.log(
-      `${DEBUG_PREFIX} OFFER received - stopping ringtone if playing...`,
-    );
+    // console.log(
+    //   `${DEBUG_PREFIX} OFFER received - stopping ringtone if playing...`,
+    // );
     ringtoneManager.stopRingtone();
 
     const roomId = data?.room_id || data?.roomId;
     const offer = data?.offer;
 
     if (!offer) {
-      console.log(`${DEBUG_PREFIX} Offer missing in payload`);
+      // console.log(`${DEBUG_PREFIX} Offer missing in payload`);
       return;
     }
 
     // Validate room matches current call
     const currentRoomId = store.getState().call.roomId;
     if (roomId !== currentRoomId) {
-      console.warn(`${DEBUG_PREFIX} Offer room mismatch. Ignoring.`);
+      // console.warn(`${DEBUG_PREFIX} Offer room mismatch. Ignoring.`);
       return;
     }
 
     try {
-      console.log(`${DEBUG_PREFIX} Processing offer for room:`, roomId);
+      // console.log(`${DEBUG_PREFIX} Processing offer for room:`, roomId);
       webrtcService.setNegotiation(true);
 
       // Get local audio stream FIRST (required for adding tracks to peer connection)
       const localStream = await webrtcService.getLocalStream();
-      console.log(
-        `${DEBUG_PREFIX} Local stream obtained, tracks:`,
-        localStream.getTracks().length,
-      );
+      // console.log(
+      //   `${DEBUG_PREFIX} Local stream obtained, tracks:`,
+      //   localStream.getTracks().length,
+      // );
 
       // Start InCallManager for audio routing (handles headset auto-detection)
       startCallAudio(roomId);
 
       const onIceCandidate = (candidate: any) => {
-        console.log(`${DEBUG_PREFIX} Sending ICE candidate`, candidate);
+        // console.log(`${DEBUG_PREFIX} Sending ICE candidate`, candidate);
         callSocketEmitters.sendIceCandidate(roomId, {
           candidate: candidate.candidate,
           sdpMid: candidate.sdpMid,
@@ -289,16 +292,16 @@ export const setupEventHandlers = async (): Promise<void> => {
 
       const onRemoteTrack = (event: any) => {
         const currentCallState = store.getState().call.callState;
-        console.log(
-          `${DEBUG_PREFIX} Remote track received (current callState: ${currentCallState})`,
-        );
+        // console.log(
+        //   `${DEBUG_PREFIX} Remote track received (current callState: ${currentCallState})`,
+        // );
         // Never resurrect a call that has already been ended. A remote track
         // can arrive after call_ended_by_user/call_timeout ran cleanup(); in
         // that case the call must stay ended, not flip back to 'connected'.
         if (currentCallState === 'ended' || currentCallState === 'idle') {
-          console.log(
-            `${DEBUG_PREFIX} Ignoring remote track - call already ${currentCallState}`,
-          );
+          // console.log(
+          //   `${DEBUG_PREFIX} Ignoring remote track - call already ${currentCallState}`,
+          // );
           return;
         }
         // CONNECTED state ONLY when remote track fires
@@ -308,32 +311,32 @@ export const setupEventHandlers = async (): Promise<void> => {
 
       // Create peer connection with local stream tracks
       webrtcService.createPeerConnection(onIceCandidate, onRemoteTrack);
-      console.log(`${DEBUG_PREFIX} Peer connection created`);
+      // console.log(`${DEBUG_PREFIX} Peer connection created`);
 
       // 2. Set remote description (the offer)
       await webrtcService.setRemoteDescription(offer);
-      console.log(`${DEBUG_PREFIX} Remote description set`);
+      // console.log(`${DEBUG_PREFIX} Remote description set`);
 
       // Process any queued ICE candidates
       await webrtcService.processQueuedIceCandidates();
 
       // 3. Create answer
-      console.log(`${DEBUG_PREFIX} About to create answer...`);
+      // console.log(`${DEBUG_PREFIX} About to create answer...`);
       const answer = await webrtcService.createAnswer();
-      console.log(`${DEBUG_PREFIX} Answer created:`, answer);
+      // console.log(`${DEBUG_PREFIX} Answer created:`, answer);
 
       // 4. Send answer back - with defensive check
-      console.log(
-        `${DEBUG_PREFIX} Checking callSocketEmitters.sendAnswer exists:`,
-        typeof callSocketEmitters.sendAnswer,
-      );
+      // console.log(
+      //   `${DEBUG_PREFIX} Checking callSocketEmitters.sendAnswer exists:`,
+      //   typeof callSocketEmitters.sendAnswer,
+      // );
       if (typeof callSocketEmitters.sendAnswer !== 'function') {
         throw new Error('sendAnswer is not a function - check import');
       }
       await callSocketEmitters.sendAnswer(roomId, answer);
-      console.log(`${DEBUG_PREFIX} ✅ Answer sent`);
+      // console.log(`${DEBUG_PREFIX} ✅ Answer sent`);
     } catch (error) {
-      console.log(`${DEBUG_PREFIX} Error handling offer:`, error);
+      // console.log(`${DEBUG_PREFIX} Error handling offer:`, error);
       store.dispatch(setError('Failed to process offer'));
     } finally {
       webrtcService.setNegotiation(false);
@@ -341,10 +344,10 @@ export const setupEventHandlers = async (): Promise<void> => {
   });
 
   socket.on(CallSocketEvents.ICE_CANDIDATE, async (data: any) => {
-    console.log(
-      `${DEBUG_PREFIX} 📥 EVENT: "${CallSocketEvents.ICE_CANDIDATE}"`,
-      data,
-    );
+    // console.log(
+    //   `${DEBUG_PREFIX} 📥 EVENT: "${CallSocketEvents.ICE_CANDIDATE}"`,
+    //   data,
+    // );
 
     const roomId = data?.room_id || data?.roomId;
     const candidate = data?.candidate;
@@ -357,24 +360,24 @@ export const setupEventHandlers = async (): Promise<void> => {
     // Validate room
     const currentRoomId = store.getState().call.roomId;
     if (roomId !== currentRoomId) {
-      console.warn(`${DEBUG_PREFIX} ICE candidate room mismatch. Ignoring.`);
+      // console.warn(`${DEBUG_PREFIX} ICE candidate room mismatch. Ignoring.`);
       return;
     }
 
     try {
-      console.log(`${DEBUG_PREFIX} Adding ICE candidate`);
+      // console.log(`${DEBUG_PREFIX} Adding ICE candidate`);
       await webrtcService.addIceCandidate(candidate);
-      console.log(`${DEBUG_PREFIX} ✅ ICE candidate added`);
+      // console.log(`${DEBUG_PREFIX} ✅ ICE candidate added`);
     } catch (error) {
-      console.log(`${DEBUG_PREFIX} Error adding ICE candidate:`, error);
+      // console.log(`${DEBUG_PREFIX} Error adding ICE candidate:`, error);
     }
   });
 
   socket.on(CallSocketEvents.PEER_JOINED, (data: any) => {
-    console.log(
-      `${DEBUG_PREFIX} 📥 EVENT: "${CallSocketEvents.PEER_JOINED}"`,
-      data,
-    );
+    // console.log(
+    //   `${DEBUG_PREFIX} 📥 EVENT: "${CallSocketEvents.PEER_JOINED}"`,
+    //   data,
+    // );
     callCallbackManager.invokeCallbacks('onPeerJoined', data);
   });
 
@@ -391,17 +394,17 @@ export const setupEventHandlers = async (): Promise<void> => {
     }
     const pcStatus = webrtcService.getConnectionStatus();
     const currentCallState = store.getState().call.callState;
-    console.log(
-      `${DEBUG_PREFIX} 📥 EVENT: "${CallSocketEvents.CALL_ENDED_BY_USER}" [CALL END TRIGGER: call_ended_by_user]`,
-      data,
-    );
-    console.log(
-      `${DEBUG_PREFIX} [CALL END TRIGGER: call_ended_by_user] current callState=${currentCallState} peerConnection=${
-        pcStatus
-          ? `connection=${pcStatus.connectionState}, ice=${pcStatus.iceConnectionState}`
-          : 'null'
-      }`,
-    );
+    // console.log(
+    //   `${DEBUG_PREFIX} 📥 EVENT: "${CallSocketEvents.CALL_ENDED_BY_USER}" [CALL END TRIGGER: call_ended_by_user]`,
+    //   data,
+    // );
+    // console.log(
+    //   `${DEBUG_PREFIX} [CALL END TRIGGER: call_ended_by_user] current callState=${currentCallState} peerConnection=${
+    //     pcStatus
+    //       ? `connection=${pcStatus.connectionState}, ice=${pcStatus.iceConnectionState}`
+    //       : 'null'
+    //   }`,
+    // );
     store.dispatch(setCallState('ended'));
     store.dispatch(setError('User ended the call'));
     ringtoneManager.stopRingtone();
@@ -418,10 +421,10 @@ export const setupEventHandlers = async (): Promise<void> => {
       );
       return;
     }
-    console.log(
-      `${DEBUG_PREFIX} 📥 EVENT: "${CallSocketEvents.CALL_REJECTED}" [CALL END TRIGGER: call_cancel_by_astrologer]`,
-      data,
-    );
+    // console.log(
+    //   `${DEBUG_PREFIX} 📥 EVENT: "${CallSocketEvents.CALL_REJECTED}" [CALL END TRIGGER: call_cancel_by_astrologer]`,
+    //   data,
+    // );
     store.dispatch(setCallState('ended'));
     ringtoneManager.stopRingtone();
     stopCallAudio();
@@ -437,10 +440,10 @@ export const setupEventHandlers = async (): Promise<void> => {
       );
       return;
     }
-    console.log(
-      `${DEBUG_PREFIX} 📥 EVENT: "${CallSocketEvents.CALL_TIMEOUT}" [CALL END TRIGGER: call_timeout]`,
-      data,
-    );
+    // console.log(
+    //   `${DEBUG_PREFIX} 📥 EVENT: "${CallSocketEvents.CALL_TIMEOUT}" [CALL END TRIGGER: call_timeout]`,
+    //   data,
+    // );
     store.dispatch(setCallState('ended'));
     store.dispatch(setError('Call timed out'));
     ringtoneManager.stopRingtone();
@@ -449,67 +452,67 @@ export const setupEventHandlers = async (): Promise<void> => {
   });
 
   socket.on(CallSocketEvents.CALL_CANCEL_BY_USER, (data: any) => {
-    console.log(
-      `${DEBUG_PREFIX} 📥 EVENT: "${CallSocketEvents.CALL_CANCEL_BY_USER}" received`,
-    );
+    // console.log(
+    //   `${DEBUG_PREFIX} 📥 EVENT: "${CallSocketEvents.CALL_CANCEL_BY_USER}" received`,
+    // );
 
     // Deep payload debugging - normalize any structure
-    console.log(`${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] typeof data:`, typeof data);
-    console.log(
-      `${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Array.isArray(data):`,
-      Array.isArray(data),
-    );
-    console.log(`${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Raw data:`, data);
-    console.log(
-      `${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] JSON.stringify(data):`,
-      JSON.stringify(data),
-    );
+    // console.log(`${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] typeof data:`, typeof data);
+    // console.log(
+    //   `${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Array.isArray(data):`,
+    //   Array.isArray(data),
+    // );
+    // console.log(`${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Raw data:`, data);
+    // console.log(
+    //   `${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] JSON.stringify(data):`,
+    //   JSON.stringify(data),
+    // );
 
     let normalizedData = data;
 
     // Case 2: Stringified JSON
     if (typeof data === 'string') {
-      console.log(
-        `${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Data is string, attempting parse...`,
-      );
+      // console.log(
+      //   `${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Data is string, attempting parse...`,
+      // );
       try {
         normalizedData = JSON.parse(data);
-        console.log(
-          `${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Parsed string to object:`,
-          normalizedData,
-        );
+        // console.log(
+        //   `${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Parsed string to object:`,
+        //   normalizedData,
+        // );
       } catch (e) {
-        console.log(
-          `${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Failed to parse string:`,
-          e,
-        );
+        // console.log(
+        //   `${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Failed to parse string:`,
+        //   e,
+        // );
       }
     }
 
     // Case 3: Array with stringified JSON
     if (Array.isArray(data) && data.length > 0 && typeof data[0] === 'string') {
-      console.log(
-        `${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Array with string first element, attempting parse...`,
-      );
+      // console.log(
+      //   `${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Array with string first element, attempting parse...`,
+      // );
       try {
         normalizedData = JSON.parse(data[0]);
-        console.log(
-          `${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Parsed array[0] to object:`,
-          normalizedData,
-        );
+        // console.log(
+        //   `${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Parsed array[0] to object:`,
+        //   normalizedData,
+        // );
       } catch (e) {
-        console.log(
-          `${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Failed to parse array[0]:`,
-          e,
-        );
+        // console.log(
+        //   `${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Failed to parse array[0]:`,
+        //   e,
+        // );
       }
     }
 
     // Case 4: Array with object
     if (Array.isArray(data) && data.length > 0 && typeof data[0] === 'object') {
-      console.log(
-        `${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Array with object first element`,
-      );
+      // console.log(
+      //   `${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Array with object first element`,
+      // );
       normalizedData = data[0];
     }
 
@@ -519,20 +522,20 @@ export const setupEventHandlers = async (): Promise<void> => {
       typeof normalizedData === 'object' &&
       normalizedData.data
     ) {
-      console.log(
-        `${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Found nested data.data property`,
-      );
+      // console.log(
+      //   `${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Found nested data.data property`,
+      // );
       normalizedData = normalizedData.data;
     }
 
-    console.log(
-      `${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Object.keys(normalizedData):`,
-      normalizedData ? Object.keys(normalizedData) : 'null/undefined',
-    );
-    console.log(
-      `${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Final normalized payload:`,
-      JSON.stringify(normalizedData, null, 2),
-    );
+    // console.log(
+    //   `${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Object.keys(normalizedData):`,
+    //   normalizedData ? Object.keys(normalizedData) : 'null/undefined',
+    // );
+    // console.log(
+    //   `${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Final normalized payload:`,
+    //   JSON.stringify(normalizedData, null, 2),
+    // );
 
     let roomId = normalizedData?.roomId || normalizedData?.room_id;
     let astroid =
@@ -541,16 +544,16 @@ export const setupEventHandlers = async (): Promise<void> => {
       normalizedData?.astro_id;
     const user_id = normalizedData?.user_id;
 
-    console.log(
-      `${DEBUG_PREFIX} 📥 EXTRACTED VALUES: roomId: ${roomId}, astroid: ${astroid}, user_id: ${user_id}`,
-    );
+    // console.log(
+    //   `${DEBUG_PREFIX} 📥 EXTRACTED VALUES: roomId: ${roomId}, astroid: ${astroid}, user_id: ${user_id}`,
+    // );
 
     const currentRoomId = store.getState().call.roomId;
     const astroId = store.getState().auth.user?.id;
 
-    console.log(
-      `${DEBUG_PREFIX} CALL_CANCEL_BY_USER - roomId: ${roomId}, currentRoomId: ${currentRoomId}, astroid: ${astroid}, currentAstroId: ${astroId}`,
-    );
+    // console.log(
+    //   `${DEBUG_PREFIX} CALL_CANCEL_BY_USER - roomId: ${roomId}, currentRoomId: ${currentRoomId}, astroid: ${astroid}, currentAstroId: ${astroId}`,
+    // );
 
     const roomMatches = roomId && roomId === currentRoomId;
     const astroMatches = astroid && astroid === astroId;
@@ -562,17 +565,17 @@ export const setupEventHandlers = async (): Promise<void> => {
       return;
     }
 
-    console.log(
-      `${DEBUG_PREFIX} ✅ CALL_CANCEL_BY_USER: Match found, ending call`,
-    );
+    // console.log(
+    //   `${DEBUG_PREFIX} ✅ CALL_CANCEL_BY_USER: Match found, ending call`,
+    // );
     const pcStatus = webrtcService.getConnectionStatus();
-    console.log(
-      `${DEBUG_PREFIX} [CALL END TRIGGER: call_cancel_by_user] peerConnection=${
-        pcStatus
-          ? `connection=${pcStatus.connectionState}, ice=${pcStatus.iceConnectionState}`
-          : 'null'
-      }`,
-    );
+    // console.log(
+    //   `${DEBUG_PREFIX} [CALL END TRIGGER: call_cancel_by_user] peerConnection=${
+    //     pcStatus
+    //       ? `connection=${pcStatus.connectionState}, ice=${pcStatus.iceConnectionState}`
+    //       : 'null'
+    //   }`,
+    // );
     store.dispatch(setCallState('ended'));
     store.dispatch(setError('User cancelled the call'));
     ringtoneManager.stopRingtone();
@@ -583,7 +586,7 @@ export const setupEventHandlers = async (): Promise<void> => {
     );
   });
 
-  console.log(`${DEBUG_PREFIX} Call listeners registered`);
+  // console.log(`${DEBUG_PREFIX} Call listeners registered`);
 };
 
 export const removeEventHandlers = async (): Promise<void> => {
@@ -604,6 +607,6 @@ export const removeEventHandlers = async (): Promise<void> => {
     ringtoneManager.stopRingtone();
     stopCallAudio();
   } catch (error) {
-    console.log('Error removing call event handlers:', error);
+    // console.log('Error removing call event handlers:', error);
   }
 };

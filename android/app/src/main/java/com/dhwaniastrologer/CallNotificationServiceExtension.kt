@@ -30,6 +30,23 @@ class CallNotificationServiceExtension : INotificationServiceExtension {
     override fun onNotificationReceived(event: INotificationReceivedEvent) {
         val notification = event.notification
         val additionalData = notification.additionalData
+ android.util.Log.d("ONESIGNAL_PAYLOAD", "==============================")
+    android.util.Log.d("ONESIGNAL_PAYLOAD", "Title = ${notification.title}")
+    android.util.Log.d("ONESIGNAL_PAYLOAD", "Body = ${notification.body}")
+
+    android.util.Log.d(
+        "ONESIGNAL_PAYLOAD",
+        "additionalData = ${additionalData?.toString(4)}"
+    )
+
+    additionalData?.keys()?.forEach { key ->
+        android.util.Log.d(
+            "ONESIGNAL_PAYLOAD",
+            "$key = ${additionalData.opt(key)}"
+        )
+    }
+
+    android.util.Log.d("ONESIGNAL_PAYLOAD", "==============================")
 
         android.util.Log.d("TRACE_NATIVE_1", "FULL additionalData")
         android.util.Log.d("TRACE_NATIVE_1", additionalData?.toString(4) ?: "null")
@@ -268,6 +285,10 @@ class CallNotificationServiceExtension : INotificationServiceExtension {
         val astrologerId = chatField("astrologerId", "astrologer_id", "astro_id")
         val userName = chatField("userName", "user_name")
         val maximumTime = chatField("maximumTime", "maximum_time")
+        val callTime =
+    additionalData?.optString("callTime")
+        ?: additionalData?.optString("call_time")
+        ?: ""
         val pricePerMinute = chatField("pricePerMinute", "price_per_minute")
         val userProfilePic = chatField("userProfilePic", "user_profile_pic", "profilePic")
         val astrologerName = chatField("astrologerName", "astrologer_name")
@@ -286,6 +307,7 @@ class CallNotificationServiceExtension : INotificationServiceExtension {
             "astrologerId" to astrologerId,
             "userName" to userName,
             "maximumTime" to maximumTime,
+            "callTime" to callTime,
             "pricePerMinute" to pricePerMinute,
             "userProfilePic" to userProfilePic,
             "astrologerName" to astrologerName,
@@ -331,6 +353,7 @@ class CallNotificationServiceExtension : INotificationServiceExtension {
             putExtra("extra_astrologer_id", astrologerId ?: "")
             putExtra("extra_user_name", userName ?: "")
             putExtra("extra_maximum_time", maximumTime ?: "")
+            putExtra("extra_call_time", callTime)
             putExtra("extra_price_per_minute", pricePerMinute ?: "")
             putExtra("extra_user_profile_pic", userProfilePic ?: "")
             putExtra("extra_astrologer_name", astrologerName ?: "")
@@ -352,6 +375,7 @@ class CallNotificationServiceExtension : INotificationServiceExtension {
             putExtra("extra_astrologer_id", astrologerId ?: "")
             putExtra("extra_user_name", userName ?: "")
             putExtra("extra_maximum_time", maximumTime ?: "")
+            putExtra("extra_call_time", callTime)
             putExtra("extra_price_per_minute", pricePerMinute ?: "")
             putExtra("extra_user_profile_pic", userProfilePic ?: "")
             putExtra("extra_astrologer_name", astrologerName ?: "")

@@ -20,17 +20,17 @@ let registerWaiters: Array<() => void> = [];
 
 const connectSocket = async (authToken?: string): Promise<void> => {
   if (isConnecting) {
-    console.log(`⏳ ${DEBUG_PREFIX} Already connecting, skipping...`);
+    // console.log(`⏳ ${DEBUG_PREFIX} Already connecting, skipping...`);
     return;
   }
 
   if (socketClient.isConnected()) {
-    console.log(`⚡ ${DEBUG_PREFIX} Socket already connected, skipping...`);
+    // console.log(`⚡ ${DEBUG_PREFIX} Socket already connected, skipping...`);
     return;
   }
 
   isConnecting = true;
-  console.log(`🔄 ${DEBUG_PREFIX} Socket connect requested`);
+  // console.log(`🔄 ${DEBUG_PREFIX} Socket connect requested`);
   console.log(
     `[SOCKET_OWNER] connect called — instanceId=${socketClient.getInstanceId()} ` +
       `stack:\n${new Error().stack}`,
@@ -38,17 +38,17 @@ const connectSocket = async (authToken?: string): Promise<void> => {
 
   try {
     let token = authToken || currentAuthToken;
-    console.log(`[SOCKET] Token from param or currentAuthToken: ${token ? 'YES' : 'NO/UNDEFINED'}`);
+    // console.log(`[SOCKET] Token from param or currentAuthToken: ${token ? 'YES' : 'NO/UNDEFINED'}`);
     if (token) {
-      console.log(`[SOCKET] Token Preview: ${token.substring(0, 20)}...`);
+      // console.log(`[SOCKET] Token Preview: ${token.substring(0, 20)}...`);
     }
 
     if (!token) {
       try {
         token = await AsyncStorage.getItem(Config.TOKEN_KEY);
-        console.log(`[SOCKET] Token retrieved from storage: ${token ? 'YES' : 'NO'}`);
+        // console.log(`[SOCKET] Token retrieved from storage: ${token ? 'YES' : 'NO'}`);
         if (token) {
-          console.log(`[SOCKET] Token Preview: ${token.substring(0, 20)}...`);
+          // console.log(`[SOCKET] Token Preview: ${token.substring(0, 20)}...`);
         }
       } catch (error) {
         console.log(
@@ -66,59 +66,59 @@ const connectSocket = async (authToken?: string): Promise<void> => {
     // mount or on a raw notification click) produces a tokenless / stale-token
     // socket and the server "Authentication error: Token missing".
     if (!currentAuthToken) {
-      console.log(
-        `⚠️ ${DEBUG_PREFIX} No auth token available - socket connection deferred until token is restored`,
-      );
+      // console.log(
+      //   `⚠️ ${DEBUG_PREFIX} No auth token available - socket connection deferred until token is restored`,
+      // );
       isConnecting = false;
       return;
     }
 
     if (token) {
-      console.log(`${DEBUG_PREFIX} Token loaded (length: ${token.length})`);
-      console.log(
-        `${DEBUG_PREFIX} Token preview: ${token.substring(0, 20)}...`,
-      );
+      // console.log(`${DEBUG_PREFIX} Token loaded (length: ${token.length})`);
+      // console.log(
+      //   `${DEBUG_PREFIX} Token preview: ${token.substring(0, 20)}...`,
+      // );
       console.log(`[SOCKET] Auth object sent to socket contains token: YES`);
       socketClient.setToken(token);
     } else {
-      console.log(
-        `⚠️ ${DEBUG_PREFIX} No token available - will try without token`,
-      );
-      console.log(`[SOCKET] Auth object sent to socket contains token: NO`);
+      // console.log(
+      //   `⚠️ ${DEBUG_PREFIX} No token available - will try without token`,
+      // );
+      // console.log(`[SOCKET] Auth object sent to socket contains token: NO`);
       socketClient.setToken(null);
     }
 
     const socket = await socketClient.getSocket();
 
-    console.log(
-      `[SOCKET_OWNER] connect proceeding — instanceId=${socketClient.getInstanceId()} ` +
-        `socketId=${socket.id ?? 'null'} connected=${socket.connected} ` +
-        `transport=${socket.io.engine?.transport?.name ?? 'null'}`,
-    );
+    // console.log(
+    //   `[SOCKET_OWNER] connect proceeding — instanceId=${socketClient.getInstanceId()} ` +
+    //     `socketId=${socket.id ?? 'null'} connected=${socket.connected} ` +
+    //     `transport=${socket.io.engine?.transport?.name ?? 'null'}`,
+    // );
     const setupListeners = () => {
-      console.log(`${DEBUG_PREFIX} Registering listeners...`);
+      // console.log(`${DEBUG_PREFIX} Registering listeners...`);
 
       socket.on('connect', () => {
-        console.log(`✅ ${DEBUG_PREFIX} Socket Connected - ID: ${socket.id}`);
-        console.log(`   Connection Status: CONNECTED`);
-        console.log(`   Transport: ${socket.io.engine?.transport?.name}`);
+        // console.log(`✅ ${DEBUG_PREFIX} Socket Connected - ID: ${socket.id}`);
+        // console.log(`   Connection Status: CONNECTED`);
+        // console.log(`   Transport: ${socket.io.engine?.transport?.name}`);
         connectionChangeCallbacks.forEach(cb => cb(true));
       });
 
       //  GLOBAL DEBUG LISTENER (VERY IMPORTANT)
       socket.onAny((eventName: string, ...args: any[]) => {
-        console.log(`🧠 [GLOBAL SOCKET EVENT] → ${eventName}`);
-        console.log(`📦 DATA:`, JSON.stringify(args?.[0], null, 2));
+        // console.log(`🧠 [GLOBAL SOCKET EVENT] → ${eventName}`);
+        // console.log(`📦 DATA:`, JSON.stringify(args?.[0], null, 2));
       });
 
       socket.on('disconnect', (reason: string) => {
-        console.log(
-          `⚠️ ${DEBUG_PREFIX} Socket Disconnected - Reason: ${reason}`,
-        );
-        console.log(`   Connection Status: DISCONNECTED`);
+        // console.log(
+        //   `⚠️ ${DEBUG_PREFIX} Socket Disconnected - Reason: ${reason}`,
+        // );
+        // console.log(`   Connection Status: DISCONNECTED`);
         // Stop ringtone if socket disconnects while ringing
         if (ringtoneManager.isRingtonePlaying()) {
-          console.log(`${DEBUG_PREFIX} Socket disconnected during ringing - stopping ringtone`);
+          // console.log(`${DEBUG_PREFIX} Socket disconnected during ringing - stopping ringtone`);
           ringtoneManager.stopRingtone();
         }
         // A disconnect invalidates any prior `register`; a reconnect must
@@ -128,52 +128,52 @@ const connectSocket = async (authToken?: string): Promise<void> => {
       });
 
       socket.on('connect_error', (error: Error) => {
-        console.log(
-          `❌ ${DEBUG_PREFIX} Socket Connect Error: ${error.message}`,
-        );
+        // console.log(
+        //   `❌ ${DEBUG_PREFIX} Socket Connect Error: ${error.message}`,
+        // );
         errorCallbacks.forEach(cb => cb(error));
       });
 
       socket.on(AuthEvents.AUTH_REQUIRED, () => {
-        console.log(
-          `${DEBUG_PREFIX} Auth Required event - sending token via authenticate`,
-        );
+        // console.log(
+        //   `${DEBUG_PREFIX} Auth Required event - sending token via authenticate`,
+        // );
         if (currentAuthToken) {
           socket.emit('authenticate', { token: currentAuthToken });
-          console.log(
-            `${DEBUG_PREFIX} Token emitted (preview: ${currentAuthToken.substring(
-              0,
-              10,
-            )}...)`,
-          );
+          // console.log(
+          //   `${DEBUG_PREFIX} Token emitted (preview: ${currentAuthToken.substring(
+          //     0,
+          //     10,
+          //   )}...)`,
+          // );
         }
       });
 
       socket.on(AuthEvents.AUTH_SUCCESS, (data: unknown) => {
-        console.log(`${DEBUG_PREFIX} Auth Success:`, data);
+        // console.log(`${DEBUG_PREFIX} Auth Success:`, data);
       });
 
       socket.on(AuthEvents.AUTH_FAILED, (error: unknown) => {
-        console.log(`${DEBUG_PREFIX} Auth Failed:`, error);
+        // console.log(`${DEBUG_PREFIX} Auth Failed:`, error);
       });
 
       socket.on('reconnect_attempt', (attemptNumber: number) => {
-        console.log(
-          `${DEBUG_PREFIX} Reconnecting... Attempt: ${attemptNumber}`,
-        );
+        // console.log(
+        //   `${DEBUG_PREFIX} Reconnecting... Attempt: ${attemptNumber}`,
+        // );
       });
 
       socket.on('reconnect', (attemptNumber: number) => {
-        console.log(
-          `${DEBUG_PREFIX} Socket Reconnected after ${attemptNumber} attempts`,
-        );
+        // console.log(
+        //   `${DEBUG_PREFIX} Socket Reconnected after ${attemptNumber} attempts`,
+        // );
       });
 
       socket.io.on('reconnect_failed', () => {
-        console.log(`❌ ${DEBUG_PREFIX} Reconnect failed after max attempts`);
+        // console.log(`❌ ${DEBUG_PREFIX} Reconnect failed after max attempts`);
       });
 
-      console.log(`${DEBUG_PREFIX} All listeners registered successfully`);
+      // console.log(`${DEBUG_PREFIX} All listeners registered successfully`);
     };
 
     // socketClient.setupSocketEvents() already registers its own `connect`
@@ -186,12 +186,12 @@ const connectSocket = async (authToken?: string): Promise<void> => {
     const socketWithMarker = socket as unknown as Record<string, boolean>;
     if (!socketWithMarker[SM_NOTIFIER_KEY]) {
       socketWithMarker[SM_NOTIFIER_KEY] = true;
-      console.log(`${DEBUG_PREFIX} No notifier on this socket, setting up...`);
+      // console.log(`${DEBUG_PREFIX} No notifier on this socket, setting up...`);
       setupListeners();
     } else {
-      console.log(
-        `${DEBUG_PREFIX} Notifier already attached to this socket, skipping setup`,
-      );
+      // console.log(
+      //   `${DEBUG_PREFIX} Notifier already attached to this socket, skipping setup`,
+      // );
     }
 
     if (!socket.connected) {
@@ -199,13 +199,13 @@ const connectSocket = async (authToken?: string): Promise<void> => {
       console.log(`${DEBUG_PREFIX} socket.connect() called`);
     }
   } catch (error) {
-    console.log(`❌ ${DEBUG_PREFIX} Socket Connect Error:`, error);
-    console.log(`[SOCKET] Connect Error`);
+    // console.log(`❌ ${DEBUG_PREFIX} Socket Connect Error:`, error);
+    // console.log(`[SOCKET] Connect Error`);
     isConnecting = false;
     throw error;
   }
 
-  console.log(`[SOCKET] Socket Connection Attempt Complete`);
+  // console.log(`[SOCKET] Socket Connection Attempt Complete`);
   setTimeout(() => {
     isConnecting = false;
   }, 5000);
@@ -232,20 +232,20 @@ const disconnectSocket = async (): Promise<void> => {
   // is never silently skipped (which previously left the app with no socket
   // and no recovery path).
   isConnecting = false;
-  console.log(
-    `[SOCKET_OWNER] disconnect called — instanceId=${socketClient.getInstanceId()} ` +
-      `stack:\n${new Error().stack}`,
-  );
+  // console.log(
+  //   `[SOCKET_OWNER] disconnect called — instanceId=${socketClient.getInstanceId()} ` +
+  //     `stack:\n${new Error().stack}`,
+  // );
   socketClient.disconnectSocket();
   currentAuthToken = null;
-  console.log(`❌ ${DEBUG_PREFIX} Socket manually disconnected`);
+  // console.log(`❌ ${DEBUG_PREFIX} Socket manually disconnected`);
   connectionChangeCallbacks.forEach(cb => cb(false));
 };
 
 const setAuthToken = (token: string): void => {
   currentAuthToken = token;
-  console.log(`${DEBUG_PREFIX} Auth token updated`);
-  console.log(`   Token preview: ${token.substring(0, 10)}...`);
+  // console.log(`${DEBUG_PREFIX} Auth token updated`);
+  // console.log(`   Token preview: ${token.substring(0, 10)}...`);
 };
 
 const getAuthToken = (): string | null => {
@@ -265,39 +265,39 @@ const emit = async <T = unknown>(
   const isSocketConnected = socket.connected;
   const timestamp = new Date().toISOString();
 
-  console.log(
-    `📤 ${DEBUG_PREFIX} [SOCKET FLOW TRACE] EMIT: "${event}" [${timestamp}]`,
-  );
-  console.log(
-    `   [SOCKET_OWNER] instanceId=${socketClient.getInstanceId()} ` +
-      `socketId=${socket.id ?? 'null'} connected=${isSocketConnected} ` +
-      `transport=${socket.io.engine?.transport?.name ?? 'null'}`,
-  );
-  console.log(`   🔍 Data:`, JSON.stringify(data, null, 2));
-  console.log(`   🔍 Data keys:`, data ? Object.keys(data as object) : 'none');
-  console.log(
-    `   🔍 Connection Status: ${
-      isSocketConnected ? 'CONNECTED ✅' : 'NOT CONNECTED ❌'
-    }`,
-  );
+  // console.log(
+  //   `📤 ${DEBUG_PREFIX} [SOCKET FLOW TRACE] EMIT: "${event}" [${timestamp}]`,
+  // );
+  // console.log(
+  //   `   [SOCKET_OWNER] instanceId=${socketClient.getInstanceId()} ` +
+  //     `socketId=${socket.id ?? 'null'} connected=${isSocketConnected} ` +
+  //     `transport=${socket.io.engine?.transport?.name ?? 'null'}`,
+  // );
+  // console.log(`   🔍 Data:`, JSON.stringify(data, null, 2));
+  // console.log(`   🔍 Data keys:`, data ? Object.keys(data as object) : 'none');
+  // console.log(
+  //   `   🔍 Connection Status: ${
+  //     isSocketConnected ? 'CONNECTED ✅' : 'NOT CONNECTED ❌'
+  //   }`,
+  // );
 
   if (!isSocketConnected) {
-    console.warn(
-      `⚠️ ${DEBUG_PREFIX} WARNING: Emitting on disconnected socket! Event: "${event}"`,
-    );
-    console.warn(
-      `   ⚠️ ${DEBUG_PREFIX} EMIT WILL BE SKIPPED - no data sent to server`,
-    );
+    // console.warn(
+    //   `⚠️ ${DEBUG_PREFIX} WARNING: Emitting on disconnected socket! Event: "${event}"`,
+    // );
+    // console.warn(
+    //   `   ⚠️ ${DEBUG_PREFIX} EMIT WILL BE SKIPPED - no data sent to server`,
+    // );
     return;
   }
 
-  console.log('i am here');
+  // console.log('i am here');
   // Important: emit() must NOT register new listeners.
   // Listener registration belongs only in dedicated socket lifecycle/setup code.
 
   socket.emit(event, data);
-  console.log(`✅ ${DEBUG_PREFIX} Emitted successfully: "${event}"`);
-  console.log(`   [EMIT COMPLETE] "${event}"`);
+  // console.log(`✅ ${DEBUG_PREFIX} Emitted successfully: "${event}"`);
+  // console.log(`   [EMIT COMPLETE] "${event}"`);
 };
 
 const emitWithAck = async <T = unknown, R = unknown>(
@@ -309,27 +309,27 @@ const emitWithAck = async <T = unknown, R = unknown>(
   const isSocketConnected = socket.connected;
   const timestamp = new Date().toISOString();
 
-  console.log(
-    `📤 ${DEBUG_PREFIX} [SOCKET FLOW TRACE] EMIT WITH ACK: "${event}" [${timestamp}]`,
-  );
-  console.log(
-    `   [SOCKET_OWNER] instanceId=${socketClient.getInstanceId()} ` +
-      `socketId=${socket.id ?? 'null'} connected=${isSocketConnected} ` +
-      `transport=${socket.io.engine?.transport?.name ?? 'null'}`,
-  );
-  console.log(`   🔍 Data:`, JSON.stringify(data, null, 2));
-  console.log(`   🔍 Data keys:`, data ? Object.keys(data as object) : 'none');
-  console.log(`   Timeout: ${timeout ? timeout + 'ms' : 'default'}`);
-  console.log(
-    `   🔍 Connection Status: ${
-      isSocketConnected ? 'CONNECTED ✅' : 'NOT CONNECTED ❌'
-    }`,
-  );
+  // console.log(
+  //   `📤 ${DEBUG_PREFIX} [SOCKET FLOW TRACE] EMIT WITH ACK: "${event}" [${timestamp}]`,
+  // );
+  // console.log(
+  //   `   [SOCKET_OWNER] instanceId=${socketClient.getInstanceId()} ` +
+  //     `socketId=${socket.id ?? 'null'} connected=${isSocketConnected} ` +
+  //     `transport=${socket.io.engine?.transport?.name ?? 'null'}`,
+  // );
+  // console.log(`   🔍 Data:`, JSON.stringify(data, null, 2));
+  // console.log(`   🔍 Data keys:`, data ? Object.keys(data as object) : 'none');
+  // console.log(`   Timeout: ${timeout ? timeout + 'ms' : 'default'}`);
+  // console.log(
+  //   `   🔍 Connection Status: ${
+  //     isSocketConnected ? 'CONNECTED ✅' : 'NOT CONNECTED ❌'
+  //   }`,
+  // );
 
   if (!isSocketConnected) {
-    console.warn(
-      `⚠️ ${DEBUG_PREFIX} WARNING: Emitting on disconnected socket! Event: "${event}"`,
-    );
+    // console.warn(
+    //   `⚠️ ${DEBUG_PREFIX} WARNING: Emitting on disconnected socket! Event: "${event}"`,
+    // );
     throw new Error(
       `${DEBUG_PREFIX} Socket not connected, cannot emit: ${event}`,
     );
@@ -337,10 +337,10 @@ const emitWithAck = async <T = unknown, R = unknown>(
 
   return new Promise((resolve, reject) => {
     const ack = (response: R) => {
-      console.log(
-        `📥 ${DEBUG_PREFIX} [ACK RECEIVED] for "${event}":`,
-        JSON.stringify(response, null, 2),
-      );
+      // console.log(
+      //   `📥 ${DEBUG_PREFIX} [ACK RECEIVED] for "${event}":`,
+      //   JSON.stringify(response, null, 2),
+      // );
       resolve(response);
     };
 
@@ -349,7 +349,7 @@ const emitWithAck = async <T = unknown, R = unknown>(
     } else {
       socket.emit(event, data, ack);
     }
-    console.log(`✅ ${DEBUG_PREFIX} [EMIT WITH ACK SENT] "${event}"`);
+    // console.log(`✅ ${DEBUG_PREFIX} [EMIT WITH ACK SENT] "${event}"`);
   });
 };
 
@@ -449,9 +449,9 @@ const reconnect = async (token?: string): Promise<void> => {
   currentAuthToken = token || currentAuthToken;
 
   if (!currentAuthToken) {
-    console.log(
-      `⚠️ ${DEBUG_PREFIX} reconnect: no auth token - deferring connection`,
-    );
+    // console.log(
+    //   `⚠️ ${DEBUG_PREFIX} reconnect: no auth token - deferring connection`,
+    // );
     return;
   }
 
@@ -464,20 +464,20 @@ const reconnect = async (token?: string): Promise<void> => {
   // socket=null) and then got skipped by the isConnecting guard, leaving a
   // dead socket with no recovery (emit just skips when !connected).
   if (existing && existing.connected) {
-    console.log(
-      `[SOCKET_OWNER] reconnect: preserving connected socket — ` +
-        `instanceId=${socketClient.getInstanceId()} socketId=${existing.id}`,
-    );
+    // console.log(
+    //   `[SOCKET_OWNER] reconnect: preserving connected socket — ` +
+    //     `instanceId=${socketClient.getInstanceId()} socketId=${existing.id}`,
+    // );
     socketClient.setToken(currentAuthToken);
     existing.emit('authenticate', { token: currentAuthToken });
     return;
   }
 
   // No usable socket yet (first connect, or it was genuinely dropped) -> connect.
-  console.log(
-    `[SOCKET_OWNER] reconnect: no connected socket, connecting — ` +
-      `instanceId=${socketClient.getInstanceId()}`,
-  );
+  // console.log(
+  //   `[SOCKET_OWNER] reconnect: no connected socket, connecting — ` +
+  //     `instanceId=${socketClient.getInstanceId()}`,
+  // );
   await connectSocket(currentAuthToken);
 };
 

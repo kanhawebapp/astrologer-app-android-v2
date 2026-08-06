@@ -65,15 +65,16 @@ class MainActivity : ReactActivity() {
     val callerName = intent.getStringExtra("extra_caller_name") ?: ""
     val callerId = intent.getStringExtra("extra_caller_id") ?: ""
     val callerAvatar = intent.getStringExtra("extra_caller_avatar") ?: ""
-
+val callTime = intent.getStringExtra("extra_call_time") ?: ""
     // Complete chat request payload forwarded from the notification.
     // These fields are required by the JS ChatRequestCard flow and must be
     // carried through so background/killed Accept/Reject behaves exactly like
     // foreground. No values are fabricated here; missing extras stay "".
     val sessionId = intent.getStringExtra("extra_session_id") ?: ""
 
-    Log.d("TRACE_NATIVE_3", "extra_room_id=$roomId")
-    Log.d("TRACE_NATIVE_3", "extra_session_id=$sessionId")
+ Log.d("TRACE_NATIVE_3", "extra_room_id=$roomId")
+Log.d("TRACE_NATIVE_3", "extra_session_id=$sessionId")
+Log.d("TRACE_NATIVE_3", "extra_call_time=$callTime")
 
     val userId = intent.getStringExtra("extra_user_id") ?: ""
     val astrologerId = intent.getStringExtra("extra_astrologer_id") ?: ""
@@ -89,33 +90,44 @@ class MainActivity : ReactActivity() {
     Log.d("TRACE_NATIVE_2", "extra_session_id = $sessionId")
 
     Log.d(
-      "MainActivity",
-      "WRITING_PREFS action=$action " +
-        "extras=[roomId=$roomId, callId=$callId, callerName=$callerName, callerId=$callerId, " +
-        "callerAvatar=$callerAvatar, sessionId=$sessionId, userId=$userId, astrologerId=$astrologerId, " +
-        "userName=$userName, maximumTime=$maximumTime, pricePerMinute=$pricePerMinute, " +
-        "userProfilePic=$userProfilePic, astrologerName=$astrologerName, " +
-        "astrologerProfilePic=$astrologerProfilePic, issue=$issue]"
-    )
+    "MainActivity",
+    "WRITING_PREFS action=$action " +
+        "extras=[roomId=$roomId, " +
+        "callId=$callId, " +
+        "callerName=$callerName, " +
+        "callerId=$callerId, " +
+        "callerAvatar=$callerAvatar, " +
+        "callTime=$callTime, " +
+        "sessionId=$sessionId, " +
+        "userId=$userId, " +
+        "astrologerId=$astrologerId, " +
+        "userName=$userName, " +
+        "maximumTime=$maximumTime, " +
+        "pricePerMinute=$pricePerMinute, " +
+        "userProfilePic=$userProfilePic, " +
+        "astrologerName=$astrologerName, " +
+        "astrologerProfilePic=$astrologerProfilePic, " +
+        "issue=$issue]"
+)
 
-    val dataMap = buildDataMap(
-      roomId,
-      callId,
-      callerName,
-      callerId,
-      callerAvatar,
-      sessionId,
-      userId,
-      astrologerId,
-      userName,
-      maximumTime,
-      pricePerMinute,
-      userProfilePic,
-      astrologerName,
-      astrologerProfilePic,
-      issue
-    )
-
+   val dataMap = buildDataMap(
+    roomId,
+    callId,
+    callerName,
+    callerId,
+    callerAvatar,
+    callTime,
+    sessionId,
+    userId,
+    astrologerId,
+    userName,
+    maximumTime,
+    pricePerMinute,
+    userProfilePic,
+    astrologerName,
+    astrologerProfilePic,
+    issue
+)
     Log.d("TRACE_NATIVE_2", "pending_data = $dataMap")
 
     Log.d("TRACE_NATIVE_3", dataMap.toString())
@@ -130,12 +142,13 @@ class MainActivity : ReactActivity() {
     Log.d("MainActivity", "Stored pending action: $action for roomId: $roomId")
   }
 
-  private fun buildDataMap(
+ private fun buildDataMap(
     roomId: String,
     callId: String,
     callerName: String,
     callerId: String,
     callerAvatar: String,
+    callTime: String,
     sessionId: String,
     userId: String,
     astrologerId: String,
@@ -146,7 +159,7 @@ class MainActivity : ReactActivity() {
     astrologerName: String,
     astrologerProfilePic: String,
     issue: String
-  ): String {
+): String {
     // Use JSONObject so string values are safely escaped into valid JSON.
     return JSONObject()
       .put("roomId", roomId)
@@ -154,6 +167,7 @@ class MainActivity : ReactActivity() {
       .put("callerName", callerName)
       .put("callerId", callerId)
       .put("callerAvatar", callerAvatar)
+      .put("callTime", callTime)
       .put("sessionId", sessionId)
       .put("userId", userId)
       .put("astrologerId", astrologerId)

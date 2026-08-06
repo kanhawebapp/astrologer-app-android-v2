@@ -160,19 +160,19 @@ export const SocketAuthBridge: React.FC = () => {
 
   const prevTokenRef = useRef<string | null>(null);
 
-  console.log(
-    '[SocketAuthBridge] token:',
-    token ? token.substring(0, 10) + '...' : 'null',
-  );
+  // console.log(
+  //   '[SocketAuthBridge] token:',
+  //   token ? token.substring(0, 10) + '...' : 'null',
+  // );
 
   useEffect(() => {
     const reconnect = async () => {
       try {
-        console.log('=========================='); 
-        console.log('[SocketAuthBridge]');
-        console.log('Previous Token:', !!prevTokenRef.current);
-        console.log('Current Token :', !!token);
-        console.log('==========================');
+        // console.log('==========================');
+        // console.log('[SocketAuthBridge]');
+        // console.log('Previous Token:', !!prevTokenRef.current);
+        // console.log('Current Token :', !!token);
+        // console.log('==========================');
 
         // logout
         if (!token) {
@@ -182,25 +182,25 @@ export const SocketAuthBridge: React.FC = () => {
 
         // first login OR token changed
         if (prevTokenRef.current !== token) {
-          console.log('🔥 Token changed -> reconnect socket');
+          // console.log('🔥 Token changed -> reconnect socket');
 
           prevTokenRef.current = token;
 
           await socketManager.reconnect(token);
 
-          console.log('✅ Socket Connected');
+          // console.log('✅ Socket Connected');
 
           await chatSocketService.setupListeners();
-          console.log('✅ Chat listeners attached');
+          // console.log('✅ Chat listeners attached');
 
           await callSocketService.setupListeners();
-          console.log('✅ Call listeners attached');
+          // console.log('✅ Call listeners attached');
         }
       } catch (err) {
-        console.log(
-          '❌ reconnect failed, trying connectSocket()',
-          err,
-        );
+        // console.log(
+        //   '❌ reconnect failed, trying connectSocket()',
+        //   err,
+        // );
 
         try {
           await connectSocket();
@@ -208,7 +208,7 @@ export const SocketAuthBridge: React.FC = () => {
           await chatSocketService.setupListeners();
           await callSocketService.setupListeners();
         } catch (e) {
-          console.log('❌ connectSocket also failed', e);
+          // console.log('❌ connectSocket also failed', e);
         }
       }
     };

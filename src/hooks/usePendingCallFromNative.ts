@@ -47,6 +47,7 @@ export const usePendingCallFromNative = () => {
 
     try {
       const pending = await CallNotificationModule.getPendingAction();
+      console.log("🚀 Pending =", JSON.stringify(pending, null, 2));
       if (!mountedRef.current || !pending?.action) {
         return;
       }
@@ -164,6 +165,13 @@ export const usePendingCallFromNative = () => {
   };
 
   const handleAcceptCall = async (data: Record<string, any>) => {
+
+    console.log("🔥 handleAcceptCall");
+console.log(JSON.stringify(data, null, 2));
+
+console.log("maximumTime ===", data.maximumTime);
+console.log("callTime ===", data.callTime);
+
     const roomId = data.roomId || data.room_id;
     const callId = data.callId || data.call_id;
     const callerName =

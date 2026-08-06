@@ -56,32 +56,32 @@ class WebRTCService {
     if (this.localStream) {
       const tracks = this.localStream.getTracks();
       if (tracks.some(track => track.readyState === 'live')) {
-        console.log(
-          `${DEBUG_PREFIX} Reusing existing local stream (${tracks.length} tracks)`,
-        );
+        // console.log(
+        //   `${DEBUG_PREFIX} Reusing existing local stream (${tracks.length} tracks)`,
+        // );
         return this.localStream;
       }
-      console.log(
-        `${DEBUG_PREFIX} Existing local stream has no live tracks - requesting a new one`,
-      );
+      // console.log(
+      //   `${DEBUG_PREFIX} Existing local stream has no live tracks - requesting a new one`,
+      // );
     }
 
     // Serialize concurrent getUserMedia requests so a second caller waits for
     // the first instead of triggering a second (conflicting) mic capture.
     if (this.pendingLocalStreamPromise) {
-      console.log(
-        `${DEBUG_PREFIX} getUserMedia already in progress - awaiting shared promise`,
-      );
+      // console.log(
+      //   `${DEBUG_PREFIX} getUserMedia already in progress - awaiting shared promise`,
+      // );
       return this.pendingLocalStreamPromise;
     }
 
     this.pendingLocalStreamPromise = (async () => {
-      console.log(`${DEBUG_PREFIX} Getting local audio stream...`);
+      // console.log(`${DEBUG_PREFIX} Getting local audio stream...`);
       const stream = await mediaDevices.getUserMedia(this.audioConstraints);
-      console.log(
-        `${DEBUG_PREFIX} Local stream obtained, tracks:`,
-        stream.getTracks().length,
-      );
+      // console.log(
+      //   `${DEBUG_PREFIX} Local stream obtained, tracks:`,
+      //   stream.getTracks().length,
+      // );
       this.localStream = stream;
       return stream;
     })();
@@ -89,7 +89,7 @@ class WebRTCService {
     try {
       return await this.pendingLocalStreamPromise;
     } catch (error) {
-      console.log(`${DEBUG_PREFIX} Failed to get local stream:`, error);
+      // console.log(`${DEBUG_PREFIX} Failed to get local stream:`, error);
       throw error;
     } finally {
       this.pendingLocalStreamPromise = null;
@@ -110,7 +110,7 @@ class WebRTCService {
     onRemoteTrack?: (event: any) => void,
   ): RTCPeerConnection {
     if (this.pc && !this.isPcClosed()) {
-      console.log(`${DEBUG_PREFIX} Reusing existing peer connection`);
+      // console.log(`${DEBUG_PREFIX} Reusing existing peer connection`);
       return this.pc;
     }
 
@@ -118,13 +118,13 @@ class WebRTCService {
       // The stored pc is already closed (e.g. a deferred cleanup closed it)
       // but was not nulled. Drop it so a fresh connection is created instead
       // of reusing a dead one.
-      console.log(
-        `${DEBUG_PREFIX} Existing peer connection is closed - discarding and recreating`,
-      );
+      // console.log(
+      //   `${DEBUG_PREFIX} Existing peer connection is closed - discarding and recreating`,
+      // );
       this.pc = null;
     }
 
-    console.log(`${DEBUG_PREFIX} Creating new RTCPeerConnection`);
+    // console.log(`${DEBUG_PREFIX} Creating new RTCPeerConnection`);
     const pc = new RTCPeerConnection(iceConfig);
     this.pc = pc;
 
@@ -135,7 +135,7 @@ class WebRTCService {
     // fire time crashed with "Cannot read property 'connectionState' of null".
     if (this.localStream) {
       this.localStream.getTracks().forEach(track => {
-        console.log(`${DEBUG_PREFIX} Adding track:`, track.kind);
+        // console.log(`${DEBUG_PREFIX} Adding track:`, track.kind);
         pc.addTrack(track, this.localStream!);
       });
     }
@@ -145,16 +145,16 @@ class WebRTCService {
         return;
       }
       if (event.candidate) {
-        console.log(`${DEBUG_PREFIX} New ICE candidate:`, {
-          candidate: event.candidate.candidate,
-          sdpMid: event.candidate.sdpMid,
-          sdpMLineIndex: event.candidate.sdpMLineIndex,
-        });
+        // console.log(`${DEBUG_PREFIX} New ICE candidate:`, {
+        //   candidate: event.candidate.candidate,
+        //   sdpMid: event.candidate.sdpMid,
+        //   sdpMLineIndex: event.candidate.sdpMLineIndex,
+        // });
         if (onIceCandidate) {
           onIceCandidate(event.candidate);
         }
       } else {
-        console.log(`${DEBUG_PREFIX} ICE gathering complete`);
+        // console.log(`${DEBUG_PREFIX} ICE gathering complete`);
       }
     };
 
@@ -165,22 +165,22 @@ class WebRTCService {
         (pc as any).signalingState === 'closed' ||
         pc.connectionState === 'closed'
       ) {
-        console.log(
-          `${DEBUG_PREFIX} Ignoring remote track from closed peer connection`,
-        );
+        // console.log(
+        //   `${DEBUG_PREFIX} Ignoring remote track from closed peer connection`,
+        // );
         return;
       }
-      console.log(`${DEBUG_PREFIX} Received remote track:`, {
-        kind: event.track.kind,
-        streams: event.streams?.length || 0,
-      });
+      // console.log(`${DEBUG_PREFIX} Received remote track:`, {
+      //   kind: event.track.kind,
+      //   streams: event.streams?.length || 0,
+      // });
       if (event.streams && event.streams[0]) {
         const remoteStream = event.streams[0];
         this.remoteStream = remoteStream;
-        console.log(
-          `${DEBUG_PREFIX} Remote stream set with tracks:`,
-          remoteStream.getTracks().length,
-        );
+        // console.log(
+        //   `${DEBUG_PREFIX} Remote stream set with tracks:`,
+        //   remoteStream.getTracks().length,
+        // );
         if (onRemoteTrack) {
           onRemoteTrack(event);
         }
@@ -192,11 +192,11 @@ class WebRTCService {
         return;
       }
       const state = pc.connectionState;
-      console.log(
-        `${DEBUG_PREFIX} Connection state changed: ${state} (pc active: ${
-          this.pc === pc
-        })`,
-      );
+      // console.log(
+      //   `${DEBUG_PREFIX} Connection state changed: ${state} (pc active: ${
+      //     this.pc === pc
+      //   })`,
+      // );
     };
 
     (pc as any).oniceconnectionstatechange = () => {
@@ -204,11 +204,11 @@ class WebRTCService {
         return;
       }
       const state = pc.iceConnectionState;
-      console.log(
-        `${DEBUG_PREFIX} ICE connection state changed: ${state} (pc active: ${
-          this.pc === pc
-        })`,
-      );
+      // console.log(
+      //   `${DEBUG_PREFIX} ICE connection state changed: ${state} (pc active: ${
+      //     this.pc === pc
+      //   })`,
+      // );
     };
 
     return pc;
@@ -219,19 +219,19 @@ class WebRTCService {
       throw new Error('PeerConnection not created or already closed');
     }
     const rtcDesc = new RTCSessionDescription(description);
-    console.log(`${DEBUG_PREFIX} Setting remote description:`, rtcDesc.type);
+    // console.log(`${DEBUG_PREFIX} Setting remote description:`, rtcDesc.type);
     await this.pc.setRemoteDescription(rtcDesc);
-    console.log(`${DEBUG_PREFIX} ✅ Remote description set successfully`);
+    // console.log(`${DEBUG_PREFIX} ✅ Remote description set successfully`);
   }
 
   async createAnswer(): Promise<{type: string; sdp: string}> {
     if (!this.pc || this.isPcClosed()) {
       throw new Error('PeerConnection not created or already closed');
     }
-    console.log(`${DEBUG_PREFIX} Creating answer...`);
+    // console.log(`${DEBUG_PREFIX} Creating answer...`);
     const answer = await this.pc.createAnswer();
     await this.pc.setLocalDescription(answer);
-    console.log(`${DEBUG_PREFIX} Answer created and set as local description`);
+    // console.log(`${DEBUG_PREFIX} Answer created and set as local description`);
     return {
       type: answer.type,
       sdp: answer.sdp,
@@ -255,42 +255,42 @@ class WebRTCService {
       throw new Error('PeerConnection not created or already closed');
     }
     const rtcDesc = new RTCSessionDescription(description);
-    console.log(`${DEBUG_PREFIX} Setting local description:`, rtcDesc.type);
+    // console.log(`${DEBUG_PREFIX} Setting local description:`, rtcDesc.type);
     await this.pc.setLocalDescription(rtcDesc);
-    console.log(`${DEBUG_PREFIX} ✅ Local description set successfully`);
+    // console.log(`${DEBUG_PREFIX} ✅ Local description set successfully`);
   }
 
   async addIceCandidate(candidate: any): Promise<void> {
-    console.log(
-      `${DEBUG_PREFIX} addIceCandidate called, pc exists: ${!!this
-        .pc}, pc closed: ${this.isPcClosed()}`,
-    );
+    // console.log(
+    //   `${DEBUG_PREFIX} addIceCandidate called, pc exists: ${!!this
+    //     .pc}, pc closed: ${this.isPcClosed()}`,
+    // );
 
     // Queue if peer connection doesn't exist yet
     if (!this.pc || this.isPcClosed()) {
-      console.log(
-        `${DEBUG_PREFIX} Peer connection not ready, queuing ICE candidate`,
-      );
+      // console.log(
+      //   `${DEBUG_PREFIX} Peer connection not ready, queuing ICE candidate`,
+      // );
       this.queuedIceCandidates.push(candidate);
       return;
     }
 
     const remoteDesc = (this.pc as any).remoteDescription;
     if (!remoteDesc) {
-      console.log(
-        `${DEBUG_PREFIX} Remote description not ready, queuing ICE candidate`,
-      );
+      // console.log(
+      //   `${DEBUG_PREFIX} Remote description not ready, queuing ICE candidate`,
+      // );
       this.queuedIceCandidates.push(candidate);
       return;
     }
 
     try {
       const iceCandidate = new RTCIceCandidate(candidate);
-      console.log(`${DEBUG_PREFIX} Adding ICE candidate`);
+      // console.log(`${DEBUG_PREFIX} Adding ICE candidate`);
       await this.pc.addIceCandidate(iceCandidate);
-      console.log(`${DEBUG_PREFIX} ICE candidate added`);
+      // console.log(`${DEBUG_PREFIX} ICE candidate added`);
     } catch (error) {
-      console.log(`${DEBUG_PREFIX} Error adding ICE candidate:`, error);
+      // console.log(`${DEBUG_PREFIX} Error adding ICE candidate:`, error);
     }
   }
 
@@ -303,20 +303,20 @@ class WebRTCService {
       return;
     }
 
-    console.log(
-      `${DEBUG_PREFIX} Processing ${this.queuedIceCandidates.length} queued ICE candidates`,
-    );
+    // console.log(
+    //   `${DEBUG_PREFIX} Processing ${this.queuedIceCandidates.length} queued ICE candidates`,
+    // );
 
     for (const candidate of this.queuedIceCandidates) {
       try {
         const iceCandidate = new RTCIceCandidate(candidate);
         await this.pc.addIceCandidate(iceCandidate);
-        console.log(`${DEBUG_PREFIX} Queued ICE candidate added`);
+        // console.log(`${DEBUG_PREFIX} Queued ICE candidate added`);
       } catch (error) {
-        console.log(
-          `${DEBUG_PREFIX} Error adding queued ICE candidate:`,
-          error,
-        );
+        // console.log(
+        //   `${DEBUG_PREFIX} Error adding queued ICE candidate:`,
+        //   error,
+        // );
       }
     }
 
@@ -358,24 +358,24 @@ class WebRTCService {
   }
 
   async cleanup(source?: string, force: boolean = false): Promise<void> {
-    console.log(
-      `${DEBUG_PREFIX} Cleaning up WebRTC resources` +
-        `${source ? ` [trigger: ${source}]` : ''}` +
-        `${force ? ' (forced)' : ''}`,
-    );
+    // console.log(
+    //   `${DEBUG_PREFIX} Cleaning up WebRTC resources` +
+    //     `${source ? ` [trigger: ${source}]` : ''}` +
+    //     `${force ? ' (forced)' : ''}`,
+    // );
 
     if (!force && this.negotiationInProgress) {
-      console.log(
-        `${DEBUG_PREFIX} Deferring cleanup during offer/answer negotiation` +
-          `${source ? ` [trigger: ${source}]` : ''}`,
-      );
+      // console.log(
+      //   `${DEBUG_PREFIX} Deferring cleanup during offer/answer negotiation` +
+      //     `${source ? ` [trigger: ${source}]` : ''}`,
+      // );
       this.pendingCleanupAfterNegotiation = true;
       return;
     }
 
     if (this.localStream) {
       this.localStream.getTracks().forEach(track => {
-        console.log(`${DEBUG_PREFIX} Stopping track:`, track.kind);
+        // console.log(`${DEBUG_PREFIX} Stopping track:`, track.kind);
         track.stop();
       });
       this.localStream = null;
@@ -383,13 +383,13 @@ class WebRTCService {
 
     const pc = this.pc;
     if (pc) {
-      console.log(
-        `${DEBUG_PREFIX} Destroying RTCPeerConnection (connection=${
-          pc.connectionState
-        }, ice=${pc.iceConnectionState}, signaling=${
-          (pc as any).signalingState
-        })`,
-      );
+      // console.log(
+      //   `${DEBUG_PREFIX} Destroying RTCPeerConnection (connection=${
+      //     pc.connectionState
+      //   }, ice=${pc.iceConnectionState}, signaling=${
+      //     (pc as any).signalingState
+      //   })`,
+      // );
       // Detach every handler BEFORE close(). react-native-webrtc fires
       // connectionstatechange -> 'closed' and iceconnectionstatechange ->
       // 'closed' asynchronously after close(); with this.pc already nulled,
@@ -402,24 +402,24 @@ class WebRTCService {
       try {
         pc.close();
       } catch (e) {
-        console.log(`${DEBUG_PREFIX} Error closing RTCPeerConnection:`, e);
+        // console.log(`${DEBUG_PREFIX} Error closing RTCPeerConnection:`, e);
       }
       this.pc = null;
     } else {
-      console.log(
-        `${DEBUG_PREFIX} No peer connection to destroy${
-          source ? ` [trigger: ${source}]` : ''
-        }`,
-      );
+      // console.log(
+      //   `${DEBUG_PREFIX} No peer connection to destroy${
+      //     source ? ` [trigger: ${source}]` : ''
+      //   }`,
+      // );
     }
 
     this.remoteStream = null;
     this.queuedIceCandidates = [];
-    console.log(
-      `${DEBUG_PREFIX} Cleanup complete${
-        source ? ` [trigger: ${source}]` : ''
-      }`,
-    );
+    // console.log(
+    //   `${DEBUG_PREFIX} Cleanup complete${
+    //     source ? ` [trigger: ${source}]` : ''
+    //   }`,
+    // );
   }
 
   async toggleMute(): Promise<boolean> {
@@ -428,7 +428,7 @@ class WebRTCService {
       if (audioTracks.length > 0) {
         const track = audioTracks[0];
         track.enabled = !track.enabled;
-        console.log(`${DEBUG_PREFIX} Mute toggled, enabled:`, track.enabled);
+        // console.log(`${DEBUG_PREFIX} Mute toggled, enabled:`, track.enabled);
         return !track.enabled;
       }
     }
@@ -441,7 +441,7 @@ class WebRTCService {
       if (audioTracks.length > 0) {
         const track = audioTracks[0];
         track.enabled = enabled;
-        console.log(`${DEBUG_PREFIX} Mute set to:`, enabled);
+        // console.log(`${DEBUG_PREFIX} Mute set to:`, enabled);
         return true;
       }
     }
@@ -465,15 +465,15 @@ class WebRTCService {
           InCallManager.setForceSpeakerphoneOn(false);
         }
         this._speakerOn = newSpeakerState;
-        console.log(
-          `${DEBUG_PREFIX} Audio route set to SPEAKER:`,
-          newSpeakerState,
-        );
+        // console.log(
+        //   `${DEBUG_PREFIX} Audio route set to SPEAKER:`,
+        //   newSpeakerState,
+        // );
         return newSpeakerState;
       }
       return false;
     } catch (e) {
-      console.log(`${DEBUG_PREFIX} Error toggling audio route:`, e);
+      // console.log(`${DEBUG_PREFIX} Error toggling audio route:`, e);
       return false;
     }
   }

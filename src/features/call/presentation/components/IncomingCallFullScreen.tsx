@@ -32,6 +32,7 @@ import { BlurView } from '@react-native-community/blur';
 import { LinearGradient } from 'react-native-linear-gradient';
 import { callActionBridge } from '../../../../services/call/callActionBridge';
 import { setAcceptTrigger } from '../../../../services/call/callAcceptTrigger';
+import { socketClient } from '../../../../services/socket';
 
 const DEBUG_PREFIX = '[IncomingCallFullScreen]';
 
@@ -425,6 +426,27 @@ export const IncomingCallFullScreen = forwardRef<IncomingCallFullScreenRef>((pro
         localStream.getTracks().length,
       );
 
+
+      // 👇 YAHAN ADD KARO
+const socket = await socketClient.getSocket();
+
+console.log('[KILL MODE] socket.connected =', socket.connected);
+console.log('[KILL MODE] socket.id =', socket.id);
+
+const state = store.getState();
+
+console.log('[KILL MODE] auth token =', !!state.auth.token);
+console.log('[KILL MODE] userId =', state.auth.user?.id);
+console.log('[KILL MODE] roomId =', currentRoomId);
+console.log('[KILL MODE] callTime =', state.call.callTime);
+
+console.log("Redux callTime =", store.getState().call.callTime);
+
+// Agar route params use ho rahe hain to
+console.log("Navigation callTime =", (props as any)?.route?.params?.callTime);
+
+console.log("Participant =", participantRef.current);
+
       await callSocketEmitters.joinCall(currentRoomId);
       console.log(`${DEBUG_PREFIX} join_call emitted`);
 
@@ -434,15 +456,16 @@ export const IncomingCallFullScreen = forwardRef<IncomingCallFullScreenRef>((pro
           const astroId = (state.auth.user as any)?.id;
           const callTimeInSeconds = state.call.callTime;
           const callTimeInMinutes = callTimeInSeconds / 60;
+          console.log("callTimeInSeconds>>>",callTimeInSeconds)
 
           if (callTimeInSeconds <= 0) {
             // A zero/negative duration is treated by the server as an invalid
             // call and can cause an immediate call_ended_by_user. This happens
             // in kill mode when the notification payload lacked maximumTime and
             // no authoritative socket incoming_call refresh arrived in time.
-            console.warn(
-              `${DEBUG_PREFIX} ⚠️ callTime is ${callTimeInSeconds}s (<=0). Accepting with 0 duration - server may end the call immediately. Check notification payload maximumTime.`,
-            );
+            // console.warn(
+            //   `${DEBUG_PREFIX} ⚠️ callTime is ${callTimeInSeconds}s (<=0). Accepting with 0 duration - server may end the call immediately. Check notification payload maximumTime.`,
+            // );
           }
           console.log(
             `${DEBUG_PREFIX} Emitting callAcceptedByAstrologer room=${currentRoomId} callTimeSeconds=${callTimeInSeconds} callTimeMinutes=${callTimeInMinutes}`,

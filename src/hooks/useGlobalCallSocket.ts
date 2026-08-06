@@ -21,10 +21,10 @@ export const useGlobalCallSocket = () => {
   // after hydration and re-runs setupListeners.
   const token = useSelector((state: RootState) => state.auth.token);
 
-  console.log('[useGlobalCallSocket] effect');
+  // console.log('[useGlobalCallSocket] effect');
 
   const handleIncomingCall = useCallback((data: any) => {
-    console.log(`${DEBUG_PREFIX} Received incoming call`, data);
+    // console.log(`${DEBUG_PREFIX} Received incoming call`, data);
     // Redux already set by handler
   }, []);
 
@@ -33,22 +33,22 @@ export const useGlobalCallSocket = () => {
       const {roomId, candidate} = payload;
       roomIdRef.current = roomId;
 
-      console.log(`${DEBUG_PREFIX} Received ICE candidate`);
+      // console.log(`${DEBUG_PREFIX} Received ICE candidate`);
 
       // Queue if remote description not ready
       if (!remoteDescriptionReadyRef.current) {
-        console.log(
-          `${DEBUG_PREFIX} Queueing ICE candidate - remote description not ready`,
-        );
+        // console.log(
+        //   `${DEBUG_PREFIX} Queueing ICE candidate - remote description not ready`,
+        // );
         queuedCandidatesRef.current.push(candidate);
         return;
       }
 
       try {
         await webrtcService.addIceCandidate(candidate);
-        console.log(`${DEBUG_PREFIX} ICE candidate added`);
+        // console.log(`${DEBUG_PREFIX} ICE candidate added`);
       } catch (error) {
-        console.log(`${DEBUG_PREFIX} Error adding ICE candidate:`, error);
+        // console.log(`${DEBUG_PREFIX} Error adding ICE candidate:`, error);
       }
     },
     [],
@@ -56,10 +56,10 @@ export const useGlobalCallSocket = () => {
 
   const handleCallEndedByUser = useCallback(
     (data: any) => {
-      console.log(
-        `${DEBUG_PREFIX} Call ended by user [CALL END TRIGGER: call_ended_by_user]`,
-        data,
-      );
+      // console.log(
+      //   `${DEBUG_PREFIX} Call ended by user [CALL END TRIGGER: call_ended_by_user]`,
+      //   data,
+      // );
       remoteDescriptionReadyRef.current = false;
       queuedCandidatesRef.current = [];
       ringtoneManager.stopRingtone();
@@ -72,10 +72,10 @@ export const useGlobalCallSocket = () => {
 
   const handleCallEndedByAstrologer = useCallback(
     (data: any) => {
-      console.log(
-        `${DEBUG_PREFIX} Call ended by astrologer (self?) [CALL END TRIGGER: call_ended_by_astrologer]`,
-        data,
-      );
+      // console.log(
+      //   `${DEBUG_PREFIX} Call ended by astrologer (self?) [CALL END TRIGGER: call_ended_by_astrologer]`,
+      //   data,
+      // );
       remoteDescriptionReadyRef.current = false;
       queuedCandidatesRef.current = [];
       ringtoneManager.stopRingtone();
@@ -86,15 +86,15 @@ export const useGlobalCallSocket = () => {
   );
 
   const handlePeerJoined = useCallback((data: any) => {
-    console.log(`${DEBUG_PREFIX} Peer joined`, data);
+    // console.log(`${DEBUG_PREFIX} Peer joined`, data);
   }, []);
 
   useEffect(() => {
     // Auth gate: defer listener setup until the token is restored.
     if (!token) {
-      console.log(
-        `${DEBUG_PREFIX} Auth token not available yet - deferring call socket listener setup until hydration`,
-      );
+      // console.log(
+      //   `${DEBUG_PREFIX} Auth token not available yet - deferring call socket listener setup until hydration`,
+      // );
       return;
     }
 
@@ -105,7 +105,7 @@ export const useGlobalCallSocket = () => {
     isMounted.current = true;
     isInitialized.current = true;
 
-    console.log(`${DEBUG_PREFIX} Initializing global call socket listeners...`);
+    // console.log(`${DEBUG_PREFIX} Initializing global call socket listeners...`);
 
     // callSocketService.setCallbacks({
     //   onIncomingCall: handleIncomingCall,
@@ -125,17 +125,17 @@ export const useGlobalCallSocket = () => {
     callSocketService
       .setupListeners()
       .then(() => {
-        console.log(`${DEBUG_PREFIX} Call socket listeners setup complete`);
+        // console.log(`${DEBUG_PREFIX} Call socket listeners setup complete`);
       })
       .catch((error: Error) => {
-        console.log(`${DEBUG_PREFIX} Failed to setup call listeners:`, error);
+        // console.log(`${DEBUG_PREFIX} Failed to setup call listeners:`, error);
       });
 
     return () => {
       isMounted.current = false;
       // Stop ringtone on hook cleanup (e.g., navigation away)
       ringtoneManager.stopRingtone();
-      console.log(`${DEBUG_PREFIX} Cleanup called`);
+      // console.log(`${DEBUG_PREFIX} Cleanup called`);
     };
   }, [
     token,

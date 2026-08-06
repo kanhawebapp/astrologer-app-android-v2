@@ -34,9 +34,9 @@ const getAuthToken = (): string | null => {
     const token = store.getState().auth.token;
     return token || null;
   } catch (error) {
-    console.log('=== GraphQL Token Fetch Error ===');
-    console.log('Error:', error instanceof Error ? error.message : 'Unknown error');
-    console.log('================================');
+    // console.log('=== GraphQL Token Fetch Error ===');
+    // console.log('Error:', error instanceof Error ? error.message : 'Unknown error');
+    // console.log('================================');
     return null;
   }
 };
@@ -45,13 +45,13 @@ const resolveToken = (manualToken?: string): string | null => {
   const token = manualToken ?? getAuthToken();
   
   if (token) {
-    console.log('=== GraphQL Client Token Resolved ===');
-    console.log('Source:', manualToken ? 'MANUAL' : 'REDUX_STORE');
-    console.log('Token:', `${token.substring(0, 20)}...`);
-    console.log('==================================');
+    // console.log('=== GraphQL Client Token Resolved ===');
+    // console.log('Source:', manualToken ? 'MANUAL' : 'REDUX_STORE');
+    // console.log('Token:', `${token.substring(0, 20)}...`);
+    // console.log('==================================');
   } else {
-    console.log('=== GraphQL Client: NO TOKEN AVAILABLE ===');
-    console.log('==========================================');
+    // console.log('=== GraphQL Client: NO TOKEN AVAILABLE ===');
+    // console.log('==========================================');
   }
   
   return token;
@@ -64,12 +64,12 @@ export async function graphqlRequest<T = unknown>({
 }: GraphQLRequestOptions): Promise<T> {
   const resolvedToken = resolveToken(token);
   
-  console.log('[GRAPHQL] Request Started');
-  console.log(`[GRAPHQL] Token Source: ${token ? 'MANUAL' : resolvedToken ? 'REDUX_STORE' : 'NONE'}`);
+  // console.log('[GRAPHQL] Request Started');
+  // console.log(`[GRAPHQL] Token Source: ${token ? 'MANUAL' : resolvedToken ? 'REDUX_STORE' : 'NONE'}`);
   if (resolvedToken) {
-    console.log(`[GRAPHQL] Token Preview: ${resolvedToken.substring(0, 20)}...`);
+    // console.log(`[GRAPHQL] Token Preview: ${resolvedToken.substring(0, 20)}...`);
   }
-  console.log(`[GRAPHQL] Authorization Header Attached: ${!!resolvedToken}`);
+  // console.log(`[GRAPHQL] Authorization Header Attached: ${!!resolvedToken}`);
   
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -123,9 +123,9 @@ export async function graphqlRequest<T = unknown>({
 
     return result.data;
   } catch (error) {
-    console.log('=== GRAPHQL CATCH ERROR ===');
-    console.log('Error:', error instanceof Error ? error.message : error);
-    console.log('===========================');
+    // console.log('=== GRAPHQL CATCH ERROR ===');
+    // console.log('Error:', error instanceof Error ? error.message : error);
+    // console.log('===========================');
 
     if (error instanceof GraphQLClientError) {
       throw error;

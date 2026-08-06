@@ -109,6 +109,15 @@ const handleChatRequest = (data: Record<string, any>): void => {
 };
 
 const handleCallRequest = (data: Record<string, any>): void => {
+
+  console.log("========== CALL REQUEST ==========");
+console.log("Full data =", JSON.stringify(data, null, 2));
+
+console.log("callTime =", data.callTime);
+console.log("call_time =", data.call_time);
+console.log("maximumTime =", data.maximumTime);
+console.log("maximum_time =", data.maximum_time);
+
   const receiverId = data.receiverId || data.receiver_id || data.receiverid;
   const callerId = data.callerId || data.caller_id;
   const roomId = data.room_id || data.roomId;
@@ -154,7 +163,10 @@ const handleCallRequest = (data: Record<string, any>): void => {
   store.dispatch(setCallState('ringing'));
   store.dispatch(setError(null));
   store.dispatch(setCallTime(Number(callTime) * 60));
-
+console.log(
+  "Redux after dispatch =",
+  store.getState().call.callTime,
+);
   ringtoneManager.startRingtone();
 
   console.log(

@@ -28,14 +28,14 @@ const processedChatRequests: Set<string> = new Set();
 
 const createTypingHandler = (eventType: 'start' | 'stop') => {
   return (data: any) => {
-    console.log(
-      `[chatSocketService] 📥 EVENT: "${
-        eventType === 'start'
-          ? ChatSocketEvents.TYPING_START
-          : ChatSocketEvents.TYPING_STOP
-      }"`,
-      data,
-    );
+    // console.log(
+    //   `[chatSocketService] 📥 EVENT: "${
+    //     eventType === 'start'
+    //       ? ChatSocketEvents.TYPING_START
+    //       : ChatSocketEvents.TYPING_STOP
+    //   }"`,
+    //   data,
+    // );
     callbackManager.invokeCallbacks(
       eventType === 'start' ? 'onTypingStart' : 'onTypingStop',
       data,
@@ -70,21 +70,21 @@ const setupNewChatRequestHandler = () => {
     }
 
 
-    console.log(
-      `[chatSocketService] 📥 [SOCKET FLOW TRACE] EVENT: "${ChatSocketEvents.NEW_CHAT_REQUEST}"`,
-    );
-    console.log(`   🔍 Raw payload:`, JSON.stringify(data, null, 2));
-    console.log(`   🔍 Raw keys:`, data ? Object.keys(data) : 'none');
+    // console.log(
+    //   `[chatSocketService] 📥 [SOCKET FLOW TRACE] EVENT: "${ChatSocketEvents.NEW_CHAT_REQUEST}"`,
+    // );
+    // console.log(`   🔍 Raw payload:`, JSON.stringify(data, null, 2));
+    // console.log(`   🔍 Raw keys:`, data ? Object.keys(data) : 'none');
 
     const normalized = normalizeChatRequest(data);
     if (!normalized) {
-      console.log(
-        `[chatSocketService] ❌ normalizeChatRequest returned null for new_chat_request!`,
-      );
-      console.log(
-        `   🔍 Raw data that failed:`,
-        JSON.stringify(data, null, 2),
-      );
+      // console.log(
+      //   `[chatSocketService] ❌ normalizeChatRequest returned null for new_chat_request!`,
+      // );
+      // console.log(
+      //   `   🔍 Raw data that failed:`,
+      //   JSON.stringify(data, null, 2),
+      // );
       return;
     }
 
@@ -93,20 +93,20 @@ const setupNewChatRequestHandler = () => {
     const dedupeKey = `new_request_${normalized.roomId}_${normalized.sessionId}`;
 
     if (debounceManager.isDuplicate(dedupeKey, processedChatRequests)) {
-      console.log(
-        `[chatSocketService] ⏭️ Skipping duplicate request: ${dedupeKey}`,
-      );
+      // console.log(
+      //   `[chatSocketService] ⏭️ Skipping duplicate request: ${dedupeKey}`,
+      // );
       return;
     }
 
     if (!debounceManager.shouldProcess(dedupeKey)) {
-      console.log(
-        `[chatSocketService] ⏭️ Skipping debounced request: ${dedupeKey}`,
-      );
+      // console.log(
+      //   `[chatSocketService] ⏭️ Skipping debounced request: ${dedupeKey}`,
+      // );
       return;
     }
 
-    console.log(`[chatSocketService] ✅ Storing user data globally`);
+    // console.log(`[chatSocketService] ✅ Storing user data globally`);
     store.dispatch(
       setChatUser({
         userId: normalized.userId,
@@ -116,12 +116,12 @@ const setupNewChatRequestHandler = () => {
     );
     
     // Store full raw data for debugging
-    console.log(`[chatSocketService] ✅ Storing full chat request data globally`);
+    // console.log(`[chatSocketService] ✅ Storing full chat request data globally`);
     store.dispatch(
       setChatRequest(data),
     );
 
-    console.log(`[chatSocketService] ✅ Invoking onNewChatRequest callback`);
+    // console.log(`[chatSocketService] ✅ Invoking onNewChatRequest callback`);
     callbackManager.invokeCallbacks('onNewChatRequest', normalized);
 
     roomSessionManager.setRoomSession(normalized.roomId, {
@@ -151,31 +151,31 @@ const setupChatStartedHandler = () => {
       }
     }
 
-    console.log(
-      `[chatSocketService] 📥 [SOCKET FLOW TRACE] EVENT: "${ChatSocketEvents.CHAT_STARTED_ASTROLOGER}"`,
-    );
-    console.log(
-      `   🔍 [BEFORE_NORMALIZATION] Raw payload:`,
-      JSON.stringify(data, null, 2),
-    );
-    console.log(
-      `   🔍 [BEFORE_NORMALIZATION] Raw keys:`,
-      data ? Object.keys(data) : 'none',
-    );
+    // console.log(
+    //   `[chatSocketService] 📥 [SOCKET FLOW TRACE] EVENT: "${ChatSocketEvents.CHAT_STARTED_ASTROLOGER}"`,
+    // );
+    // console.log(
+    //   `   🔍 [BEFORE_NORMALIZATION] Raw payload:`,
+    //   JSON.stringify(data, null, 2),
+    // );
+    // console.log(
+    //   `   🔍 [BEFORE_NORMALIZATION] Raw keys:`,
+    //   data ? Object.keys(data) : 'none',
+    // );
 
     const rawRoomId =
       data?.room_id || data?.roomId || data?.roomID || data?.roomid || '';
-    console.log(
-      `   🔍 [BEFORE_NORMALIZATION] Extracted room_id: "${rawRoomId}"`,
-    );
+    // console.log(
+    //   `   🔍 [BEFORE_NORMALIZATION] Extracted room_id: "${rawRoomId}"`,
+    // );
 
     const rootState = store.getState() as RootState;
     const activeSessionFromStore = rootState.chat.activeSession;
 
     if (activeSessionFromStore?.roomId === rawRoomId) {
-      console.log(
-        `[chatSocketService] ⏭️ [GUARD] Active session already exists for roomId: ${rawRoomId}. Timer must NOT be reset. Skipping event.`,
-      );
+      // console.log(
+      //   `[chatSocketService] ⏭️ [GUARD] Active session already exists for roomId: ${rawRoomId}. Timer must NOT be reset. Skipping event.`,
+      // );
       return;
     }
 
@@ -183,10 +183,10 @@ const setupChatStartedHandler = () => {
       ? roomSessionManager.getRoomSession(rawRoomId)
       : undefined;
     if (roomSessionFallback) {
-      console.log(
-        `   🔍 [BEFORE_NORMALIZATION] Found roomSessionMap entry:`,
-        roomSessionFallback,
-      );
+      // console.log(
+      //   `   🔍 [BEFORE_NORMALIZATION] Found roomSessionMap entry:`,
+      //   roomSessionFallback,
+      // );
     }
 
     const { isValid, normalized, error } = normalizeSocketEvent(
@@ -194,24 +194,24 @@ const setupChatStartedHandler = () => {
       data,
     );
 
-    console.log(`   🔍 [AFTER_NORMALIZATION] Validation result:`, {
-      isValid,
-      error,
-    });
-    console.log(
-      `   🔍 [AFTER_NORMALIZATION] Normalized object:`,
-      JSON.stringify(normalized, null, 2),
-    );
+    // console.log(`   🔍 [AFTER_NORMALIZATION] Validation result:`, {
+    //   isValid,
+    //   error,
+    // });
+    // console.log(
+    //   `   🔍 [AFTER_NORMALIZATION] Normalized object:`,
+    //   JSON.stringify(normalized, null, 2),
+    // );
 
     if (!isValid || !normalized || !isValidRoomId(normalized?.room_id)) {
-      console.log(
-        `[chatSocketService] ❌ [VALIDATION_FAILED] chat_started_astrologer validation FAILED!`,
-      );
-      console.log(`   🔍 Error: ${error}`);
-      console.log(
-        `   🔍 [AFTER_NORMALIZATION] Raw data that failed:`,
-        JSON.stringify(data, null, 2),
-      );
+      // console.log(
+      //   `[chatSocketService] ❌ [VALIDATION_FAILED] chat_started_astrologer validation FAILED!`,
+      // );
+      // console.log(`   🔍 Error: ${error}`);
+      // console.log(
+      //   `   🔍 [AFTER_NORMALIZATION] Raw data that failed:`,
+      //   JSON.stringify(data, null, 2),
+      // );
       return;
     }
 
@@ -268,19 +268,19 @@ const setupChatStartedHandler = () => {
       '';
 
     if (!finalSessionId) {
-      console.log(
-        `[chatSocketService] ❌ [MISSING_CRITICAL] session_id missing after all fallbacks!`,
-      );
+      // console.log(
+      //   `[chatSocketService] ❌ [MISSING_CRITICAL] session_id missing after all fallbacks!`,
+      // );
     }
     if (!finalSenderId) {
-      console.log(
-        `[chatSocketService] ❌ [MISSING_CRITICAL] sender_id missing after all fallbacks!`,
-      );
+      // console.log(
+      //   `[chatSocketService] ❌ [MISSING_CRITICAL] sender_id missing after all fallbacks!`,
+      // );
     }
     if (!finalReceiverId) {
-      console.log(
-        `[chatSocketService] ❌ [MISSING_CRITICAL] receiver_id missing after all fallbacks!`,
-      );
+      // console.log(
+      //   `[chatSocketService] ❌ [MISSING_CRITICAL] receiver_id missing after all fallbacks!`,
+      // );
     }
 
     const enhancedNormalized = {
@@ -294,10 +294,10 @@ const setupChatStartedHandler = () => {
       userId: finalReceiverId,
     };
 
-    console.log(
-      `   🔍 [AFTER_ENHANCEMENT] Enhanced normalized data:`,
-      JSON.stringify(enhancedNormalized, null, 2),
-    );
+    // console.log(
+    //   `   🔍 [AFTER_ENHANCEMENT] Enhanced normalized data:`,
+    //   JSON.stringify(enhancedNormalized, null, 2),
+    // );
 
     const criticalMissing = [];
     if (!enhancedNormalized.room_id) criticalMissing.push('room_id');
@@ -306,31 +306,31 @@ const setupChatStartedHandler = () => {
     if (!enhancedNormalized.receiver_id) criticalMissing.push('receiver_id');
 
     if (criticalMissing.length > 0) {
-      console.log(
-        `[chatSocketService] ❌ [CRITICAL_MISSING_FIELDS] Cannot dispatch - missing: ${criticalMissing.join(
-          ', ',
-        )}`,
-      );
-      console.log(
-        `   🔍 All fallback sources exhausted. Original data:`,
-        JSON.stringify(data, null, 2),
-      );
+      // console.log(
+      //   `[chatSocketService] ❌ [CRITICAL_MISSING_FIELDS] Cannot dispatch - missing: ${criticalMissing.join(
+      //     ', ',
+      //   )}`,
+      // );
+      // console.log(
+      //   `   🔍 All fallback sources exhausted. Original data:`,
+      //   JSON.stringify(data, null, 2),
+      // );
       return;
     }
 
-    console.log(
-      `[chatSocketService] ✅ [BEFORE_DISPATCH] All critical fields validated.`,
-      {
-        room_id: enhancedNormalized.room_id,
-        session_id: enhancedNormalized.session_id,
-        sender_id: enhancedNormalized.sender_id,
-        receiver_id: enhancedNormalized.receiver_id,
-      },
-    );
+    // console.log(
+    //   `[chatSocketService] ✅ [BEFORE_DISPATCH] All critical fields validated.`,
+    //   {
+    //     room_id: enhancedNormalized.room_id,
+    //     session_id: enhancedNormalized.session_id,
+    //     sender_id: enhancedNormalized.sender_id,
+    //     receiver_id: enhancedNormalized.receiver_id,
+    //   },
+    // );
 
-    console.log(
-      `[chatSocketService] ✅ [AFTER_DISPATCH] Invoking onChatStarted callback`,
-    );
+    // console.log(
+    //   `[chatSocketService] ✅ [AFTER_DISPATCH] Invoking onChatStarted callback`,
+    // );
     callbackManager.invokeCallbacks('onChatStarted', enhancedNormalized);
   };
 };
@@ -374,7 +374,7 @@ const setupReceiveMessageHandler = () => {
       replyTo: data?.replyTo || null,
     };
 
-    console.log('✅ FINAL MESSAGE:', finalMessage);
+    // console.log('✅ FINAL MESSAGE:', finalMessage);
 
     callbackManager.invokeCallbacks('onReceiveMessage', finalMessage);
   };
@@ -393,11 +393,11 @@ const setupChatCancelByUserHandler = () => {
       }
     }
 
-    console.log(
-      `[chatSocketService] 📥 [SOCKET FLOW TRACE] EVENT: "${ChatSocketEvents.CHAT_CANCEL_BY_USER}"`,
-    );
-    console.log(`   🔍 Raw payload:`, JSON.stringify(data, null, 2));
-    console.log(`   🔍 Raw keys:`, data ? Object.keys(data) : 'none');
+    // console.log(
+    //   `[chatSocketService] 📥 [SOCKET FLOW TRACE] EVENT: "${ChatSocketEvents.CHAT_CANCEL_BY_USER}"`,
+    // );
+    // console.log(`   🔍 Raw payload:`, JSON.stringify(data, null, 2));
+    // console.log(`   🔍 Raw keys:`, data ? Object.keys(data) : 'none');
 
     const rootState = store.getState() as RootState;
     const activeSession = rootState.chat.activeSession;
@@ -407,11 +407,11 @@ const setupChatCancelByUserHandler = () => {
 
     const roomId = incomingRoomId || fallbackRoomId;
 
-    console.log('[CHAT CANCEL]', {
-      incomingRoomId,
-      fallbackRoomId,
-      resolvedRoomId: roomId,
-    });
+    // console.log('[CHAT CANCEL]', {
+    //   incomingRoomId,
+    //   fallbackRoomId,
+    //   resolvedRoomId: roomId,
+    // });
 
     const normalizedData = {
       ...data,
@@ -426,15 +426,15 @@ const setupChatCancelByUserHandler = () => {
       message: data?.message || 'User has cancelled the chat request',
     };
 
-    console.log(
-      `   ✅ Normalized data:`,
-      JSON.stringify(normalizedData, null, 2),
-    );
+    // console.log(
+    //   `   ✅ Normalized data:`,
+    //   JSON.stringify(normalizedData, null, 2),
+    // );
 
     if (!normalizedData.room_id && activeSession) {
-      console.log(
-        `[chatSocketService] ⚠️ No room_id in payload, using activeSession fallback`,
-      );
+      // console.log(
+      //   `[chatSocketService] ⚠️ No room_id in payload, using activeSession fallback`,
+      // );
       normalizedData.room_id = activeSession.roomId;
       normalizedData.session_id = activeSession.sessionId;
     }
@@ -571,8 +571,8 @@ export const setupEventHandlers = async (): Promise<void> => {
 
 
   socket.onAny((event, data) => {
-    console.log('🧠 EVENT:', event);
-    console.log('📦 DATA:', data);
+    // console.log('🧠 EVENT:', event);
+    // console.log('📦 DATA:', data);
   });
 };
 
@@ -602,7 +602,7 @@ export const removeEventHandlers = async (): Promise<void> => {
       socket.off(event);
     });
   } catch (error) {
-    console.log('Error removing event handlers:', error);
+    // console.log('Error removing event handlers:', error);
   }
 };
 

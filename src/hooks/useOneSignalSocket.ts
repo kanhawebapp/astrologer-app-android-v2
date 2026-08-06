@@ -32,7 +32,7 @@ interface SyncState {
  * - Emit `app_state` on AppState changes while connected.
  */
 export const useOneSignalSocket = (): void => {
-  console.log(`${DEBUG_PREFIX} >>> HOOK EXECUTING (mounted)`);
+  // console.log(`${DEBUG_PREFIX} >>> HOOK EXECUTING (mounted)`);
   const isAuthenticated = useSelector(
     (state: RootState) => state.auth.isAuthenticated,
   );
@@ -54,55 +54,55 @@ export const useOneSignalSocket = (): void => {
   const mountedRef = useRef<boolean>(true);
  
   const tryRegister = useCallback(() => {
-    console.log(
-      `${DEBUG_PREFIX} tryRegister() called`,
-      {
-        mounted: mountedRef.current,
-        authenticated: stateRef.current.isAuthenticated,
-        astrologerId: !!stateRef.current.astrologerId,
-        connected: socketConnectedRef.current,
-        playerId: !!playerIdRef.current,
-      },
-    );
+    // console.log(
+    //   `${DEBUG_PREFIX} tryRegister() called`,
+    //   {
+    //     mounted: mountedRef.current,
+    //     authenticated: stateRef.current.isAuthenticated,
+    //     astrologerId: !!stateRef.current.astrologerId,
+    //     connected: socketConnectedRef.current,
+    //     playerId: !!playerIdRef.current,
+    //   },
+    // );
     if (!mountedRef.current) {  
       return;
     }   
     
-    console.log("profileprofileprofileprofi le---",profile)
+    // console.log("profileprofileprofileprofi le---",profile)
  
     const {isAuthenticated: authenticated, astrologerId: astrologer} =
       stateRef.current;
     const connected = socketConnectedRef.current;
     const playerId = playerIdRef.current;
-   console.log("PlayerIdplayerIdplayerIdplayerId---",playerId)
+   // console.log("PlayerIdplayerIdplayerIdplayerId---",playerId)
     const canRegister =
       authenticated && connected && !!astrologer && !!playerId;
 
     if (!canRegister) {
-      console.log(`${DEBUG_PREFIX} Register deferred`, {
-        authenticated,
-        connected,
-        astrologerId: !!astrologer,
-        playerId: !!playerId,
-      });
+      // console.log(`${DEBUG_PREFIX} Register deferred`, {
+      //   authenticated,
+      //   connected,
+      //   astrologerId: !!astrologer,
+      //   playerId: !!playerId,
+      // });
       return;
     }
 
     const combo = `${astrologer}|${playerId}`;
 
     if (lastRegisteredComboRef.current === combo) {
-      console.log(
-        `${DEBUG_PREFIX} Register skipped (combination already registered)`,
-      );
+      // console.log(
+      //   `${DEBUG_PREFIX} Register skipped (combination already registered)`,
+      // );
       return;
     }
 
     lastRegisteredComboRef.current = combo;
 
-    console.log(`[Register] Emitting "${REGISTER_EVENT}"`, {
-      astrologerId: astrologer,
-      playerId,
-    });
+    // console.log(`[Register] Emitting "${REGISTER_EVENT}"`, {
+    //   astrologerId: astrologer,
+    //   playerId,
+    // });
 
     socketManager.emit(REGISTER_EVENT, {
       astrologerId: astrologer,
@@ -114,27 +114,27 @@ export const useOneSignalSocket = (): void => {
 
   // Initialize OneSignal (idempotent within the service).
   useEffect(() => {
-    console.log(`${DEBUG_PREFIX} useEffect[init] running`);
+    // console.log(`${DEBUG_PREFIX} useEffect[init] running`);
     oneSignalService.init();
   }, []);
 
   // Socket connection lifecycle -> register / reset.
   useEffect(() => {
-    console.log(`${DEBUG_PREFIX} useEffect[socket] running`);
+    // console.log(`${DEBUG_PREFIX} useEffect[socket] running`);
     mountedRef.current = true;
 
     const unsubscribe = socketManager.onConnectionChange(connected => {
       socketConnectedRef.current = connected;
 
       if (connected) {
-        console.log(`${DEBUG_PREFIX} Socket connected -> attempt register`);
+        // console.log(`${DEBUG_PREFIX} Socket connected -> attempt register`);
         tryRegister();
       } else {
         // Reset so a reconnect always re-emits `register`.
         lastRegisteredComboRef.current = null;
-        console.log(
-          `${DEBUG_PREFIX} Socket disconnected -> reset register state`,
-        );
+        // console.log(
+        //   `${DEBUG_PREFIX} Socket disconnected -> reset register state`,
+        // );
       }
     });
 
@@ -143,7 +143,7 @@ export const useOneSignalSocket = (): void => {
     tryRegister();
 
     return () => {
-      console.log(`${DEBUG_PREFIX} useEffect[socket] cleanup`);
+      // console.log(`${DEBUG_PREFIX} useEffect[socket] cleanup`);
       unsubscribe();
       mountedRef.current = false;
     };
@@ -151,14 +151,14 @@ export const useOneSignalSocket = (): void => {
 
   // OneSignal push subscription changes -> register.
   useEffect(() => {
-    console.log(`${DEBUG_PREFIX} useEffect[onesignal] running`);
+    // console.log(`${DEBUG_PREFIX} useEffect[onesignal] running`);
     const unsubscribe = oneSignalService.onSubscriptionChange(playerId => {
       playerIdRef.current = playerId;
 
       if (playerId) {
-        console.log(`${DEBUG_PREFIX} Player id available -> attempt register`);
+        // console.log(`${DEBUG_PREFIX} Player id available -> attempt register`);
       } else {
-        console.log(`${DEBUG_PREFIX} Player id null (permission denied)`);
+        // console.log(`${DEBUG_PREFIX} Player id null (permission denied)`);
       }
 
       tryRegister();
@@ -168,47 +168,47 @@ export const useOneSignalSocket = (): void => {
     tryRegister();
 
     return () => {
-      console.log(`${DEBUG_PREFIX} useEffect[onesignal] cleanup`);
+      // console.log(`${DEBUG_PREFIX} useEffect[onesignal] cleanup`);
       unsubscribe();
     };
   }, [tryRegister]);
 
   // Authentication / astrologer changes -> register or lockout.
   useEffect(() => {
-    console.log(`${DEBUG_PREFIX} useEffect[auth] running`, {
-      isAuthenticated,
-      astrologerId,
-    });
+    // console.log(`${DEBUG_PREFIX} useEffect[auth] running`, {
+    //   isAuthenticated,
+    //   astrologerId,
+    // });
     if (!isAuthenticated) {
       // Logout: prevent future register emits until next login.
       lastRegisteredComboRef.current = null;
-      console.log(
-        `${DEBUG_PREFIX} Not authenticated -> lock register until login`,
-      );
+      // console.log(
+      //   `${DEBUG_PREFIX} Not authenticated -> lock register until login`,
+      // );
       return;
     }
 
-    console.log(`${DEBUG_PREFIX} Auth state changed`, {astrologerId});
+    // console.log(`${DEBUG_PREFIX} Auth state changed`, {astrologerId});
     tryRegister();
   }, [isAuthenticated, astrologerId, tryRegister]);
 
   // AppState changes -> emit `app_state` while connected.
   useEffect(() => {
-    console.log(`${DEBUG_PREFIX} useEffect[appstate] running`);
+    // console.log(`${DEBUG_PREFIX} useEffect[appstate] running`);
     const subscription = AppState.addEventListener(
       'change',
       (nextState: AppStateStatus) => {
         if (socketManager.isConnected()) {
-          console.log(`[AppState] Emitting "${APP_STATE_EVENT}"`, {
-            state: nextState,
-          });
+          // console.log(`[AppState] Emitting "${APP_STATE_EVENT}"`, {
+          //   state: nextState,
+          // });
           socketManager.emit(APP_STATE_EVENT, {state: nextState});
         }
       },
     );
 
     return () => {
-      console.log(`${DEBUG_PREFIX} useEffect[appstate] cleanup`);
+      // console.log(`${DEBUG_PREFIX} useEffect[appstate] cleanup`);
       subscription.remove();
     };
   }, []);
