@@ -1,5 +1,6 @@
 import React, {useEffect, useRef} from 'react';
-import {useRoute, RouteProp} from '@react-navigation/native';
+import {useRoute, useNavigation, RouteProp} from '@react-navigation/native';
+import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState, AppDispatch} from '../../../../store';
 import {
@@ -28,6 +29,8 @@ type IncomingCallFullscreenRoute = RouteProp<
 // without waiting for GraphQL/profile loading.
 export const IncomingCallFullscreen: React.FC = () => {
   const route = useRoute<IncomingCallFullscreenRoute>();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const dispatch = useDispatch<AppDispatch>();
   const callState = useSelector((state: RootState) => state.call.callState);
   const roomId = useSelector((state: RootState) => state.call.roomId);
@@ -81,6 +84,38 @@ export const IncomingCallFullscreen: React.FC = () => {
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // When the ringing call ends without being accepted (in-app/native reject,
+  // auto-reject timeout, caller cancel/end), the store no longer reflects a
+  // ringing call and this screen renders null. Pop the screen so the user
+  // returns to the previous screen/MainTabs instead of a blank/white screen.
+  // The accept flow transitions ringing -> connecting -> connected and replaces
+  // this screen with CallScreen, so it is never popped by accept.
+  useEffect(() => {
+    if (
+      (callState === 'idle' || callState === 'ended') &&
+      navigation.isFocused()
+    ) {
+      console.log(
+        `${DEBUG_PREFIX} call inactive (callState=${callState}) - going back to restore previous screen`,
+      );
+      navigation.goBack();
+    }
+  }, [callState, navigation]);
+
+  // Log every navigation action that removes this screen (reject/white-screen
+  // debugging aid).
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('beforeRemove', e => {
+      console.log(
+        `${DEBUG_PREFIX} beforeRemove type=${e.data.action.type} payload=${JSON.stringify(
+          e.data.action.payload ?? null,
+        )}`,
+      );
+    });
+
+    return unsubscribe;
+  }, [navigation]);
 
   // Allow a future call on the same roomId to re-navigate.
   useEffect(() => {

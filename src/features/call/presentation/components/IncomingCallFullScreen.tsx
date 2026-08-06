@@ -453,6 +453,22 @@ console.log("Participant =", participantRef.current);
       setTimeout(async () => {
         try {
           const state = store.getState();
+          if (
+            state.call.callState === 'idle' ||
+            state.call.callState === 'ended'
+          ) {
+            // The call ended (reject/caller-cancel/auto-reject) while the
+            // accept was still in flight; the incoming-call screen has already
+            // been popped. Abort so we don't emit acceptCall or dispatch
+            // navigation.replace from an unmounted screen (which would fall
+            // back to replacing the focused route).
+            console.log(
+              `${DEBUG_PREFIX} Call inactive (callState=${state.call.callState}) before accept completed - aborting accept`,
+            );
+            acceptingRef.current = false;
+            setAccepting(false);
+            return;
+          }
           const astroId = (state.auth.user as any)?.id;
           const callTimeInSeconds = state.call.callTime;
           const callTimeInMinutes = callTimeInSeconds / 60;
@@ -522,7 +538,19 @@ console.log("Participant =", participantRef.current);
   const handleReject = useCallback(async () => {
     const currentRoomId = roomIdRef.current;
 
+    console.log(
+      `[REJECT FLOW] Reject pressed - room=${currentRoomId} callState=${store.getState().call.callState}`,
+    );
+
     if (!currentRoomId || rejectingRef.current || acceptingRef.current) {
+      console.log(
+        `${DEBUG_PREFIX} Reject validation failed - roomId:`,
+        !!currentRoomId,
+        'rejecting:',
+        rejectingRef.current,
+        'accepting:',
+        acceptingRef.current,
+      );
       return;
     }
 
@@ -537,7 +565,15 @@ console.log("Participant =", participantRef.current);
     } catch (error) {
       console.log(`${DEBUG_PREFIX} Error rejecting call:`, error);
     }
+
+    console.log(
+      `[REJECT FLOW] Cleanup before resetCall - callState=${store.getState().call.callState}`,
+    );
+    webrtcService.cleanup('reject_call');
     dispatch(resetCall());
+    console.log(
+      `[REJECT FLOW] After resetCall - callState=${store.getState().call.callState}`,
+    );
   }, [dispatch]);
 
   useEffect(() => {
