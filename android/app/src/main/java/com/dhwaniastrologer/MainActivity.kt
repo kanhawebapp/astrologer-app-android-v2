@@ -89,6 +89,17 @@ val callTime = intent.getStringExtra("extra_call_time") ?: ""
       "INTENT_RECEIVED action=$action roomId=$roomId callId=$callId sessionId=$sessionId ts=${System.currentTimeMillis()}"
     )
 
+    if (action == "com.dhwaniastrologer.REJECT_CALL") {
+      Log.d("ANDROID_CALL_REJECT", "action=REJECT_CALL")
+      Log.d(
+        "ANDROID_CALL_REJECT",
+        "notificationId=${intent.getStringExtra("extra_notification_id")}",
+      )
+      Log.d("ANDROID_CALL_REJECT", "callId=${intent.getStringExtra("extra_call_id")}")
+      Log.d("ANDROID_CALL_REJECT", "idd=${intent.getStringExtra("extra_idd")}")
+      Log.d("ANDROID_CALL_REJECT", "room_id=${intent.getStringExtra("extra_room_id")}")
+    }
+
  Log.d("TRACE_NATIVE_3", "extra_room_id=$roomId")
 Log.d("TRACE_NATIVE_3", "extra_session_id=$sessionId")
 Log.d("TRACE_NATIVE_3", "extra_call_time=$callTime")

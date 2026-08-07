@@ -87,7 +87,12 @@ class CallNotificationServiceExtension : INotificationServiceExtension {
             "Branch check: notificationType == call_request ? ${notificationType == "call_request"}"
         )
 
-        val notificationKey = buildNotificationKey(additionalData, notification.title, notification.body)
+        val notificationKey = buildNotificationKey(notification)
+
+        android.util.Log.d(
+            "CallNotificationDedupe",
+            "received notificationId=${notification.notificationId} dedupeKey=$notificationKey"
+        )
 
         val roomIdForLog = firstNonEmpty(
             additionalData?.optString("roomId", ""),
@@ -115,15 +120,46 @@ class CallNotificationServiceExtension : INotificationServiceExtension {
                 "request branch entered (call_request/chat_request). isAppInForeground=$inForeground"
             )
 
+            android.util.Log.d("ANDROID_CALL_PAYLOAD", "notificationId=${notification.notificationId}")
+            android.util.Log.d("ANDROID_CALL_PAYLOAD", "type=$notificationType")
+            android.util.Log.d(
+                "ANDROID_CALL_PAYLOAD",
+                "callTime=${firstNonEmpty(additionalData?.optString("callTime", ""), additionalData?.optString("call_time", ""))}"
+            )
+            android.util.Log.d(
+                "ANDROID_CALL_PAYLOAD",
+                "callerId=${firstNonEmpty(additionalData?.optString("callerId", ""), additionalData?.optString("caller_id", ""))}"
+            )
+            android.util.Log.d(
+                "ANDROID_CALL_PAYLOAD",
+                "idd=${firstNonEmpty(additionalData?.optString("idd", ""), additionalData?.optString("id", ""))}"
+            )
+            android.util.Log.d(
+                "ANDROID_CALL_PAYLOAD",
+                "receiverId=${firstNonEmpty(additionalData?.optString("receiverId", ""), additionalData?.optString("receiver_id", ""), additionalData?.optString("receiverid", ""))}"
+            )
+            android.util.Log.d(
+                "ANDROID_CALL_PAYLOAD",
+                "room_id=${firstNonEmpty(additionalData?.optString("roomId", ""), additionalData?.optString("room_id", ""))}"
+            )
+            android.util.Log.d(
+                "ANDROID_CALL_PAYLOAD",
+                "userName=${firstNonEmpty(additionalData?.optString("userName", ""), additionalData?.optString("user_name", ""))}"
+            )
+
             val requestType = if (normalizedType == "chat") "chat_request" else "call_request"
+
+            val sdkNotificationId = notification.notificationId
 
             val dedupeStore = CallHandledStore(event.context)
             val isNew = dedupeStore.isNew(notificationKey)
 
+            android.util.Log.d("CallNotificationDedupe", "notificationId=$sdkNotificationId")
+            android.util.Log.d("CallNotificationDedupe", "roomId=$roomIdForLog")
             android.util.Log.d(
                 "CallNotificationDedupe",
-                if (isNew) "NEW notification accepted key=$notificationKey"
-                else "DUPLICATE NOTIFICATION IGNORED key=$notificationKey"
+                if (isNew) "first occurrence -> processing"
+                else "duplicate -> SKIPPED"
             )
 
             android.util.Log.d(
@@ -133,6 +169,10 @@ class CallNotificationServiceExtension : INotificationServiceExtension {
 
             if (!isNew) {
                 event.preventDefault()
+                android.util.Log.d(
+                    "CallNotificationDedupe",
+                    "notificationId=$sdkNotificationId SKIPPED (not posting custom notification)"
+                )
                 android.util.Log.d(
                     "CallExtension",
                     "DUPLICATE NOTIFICATION: preventDefault() called, returning without showCustomNotification(). customNotificationPosted=false"
@@ -260,6 +300,16 @@ class CallNotificationServiceExtension : INotificationServiceExtension {
         )
 
         android.util.Log.d("TRACE_NATIVE_1", "final roomId = $roomId")
+
+        android.util.Log.d(
+            "CallNotificationDedupe",
+            "final room_id=$roomId notificationId=${osNotification.notificationId}"
+        )
+
+        val idd = firstNonEmpty(
+            additionalData?.optString("idd", ""),
+            additionalData?.optString("id", "")
+        )
 
         val callId = firstNonEmpty(
             additionalData?.optString("callId", ""),
@@ -394,6 +444,7 @@ class CallNotificationServiceExtension : INotificationServiceExtension {
             putExtra("extra_notification_id", notificationKey)
             putExtra("extra_room_id", roomId)
             putExtra("extra_call_id", callId)
+            putExtra("extra_idd", idd)
             putExtra("extra_caller_name", callerName)
             putExtra("extra_caller_id", callerId)
             putExtra("extra_caller_avatar", callerAvatar)
@@ -417,6 +468,7 @@ class CallNotificationServiceExtension : INotificationServiceExtension {
             putExtra("extra_notification_id", notificationKey)
             putExtra("extra_room_id", roomId)
             putExtra("extra_call_id", callId)
+            putExtra("extra_idd", idd)
             putExtra("extra_caller_name", callerName)
             putExtra("extra_caller_id", callerId)
             putExtra("extra_caller_avatar", callerAvatar)
@@ -450,6 +502,11 @@ class CallNotificationServiceExtension : INotificationServiceExtension {
         )
 
         val notificationId = notificationKey.hashCode() and 0x7fffffff
+
+        android.util.Log.d(
+            "ANDROID_CALL_ROOM",
+            "final room_id=$roomId notificationId=${osNotification.notificationId}"
+        )
         createNotificationChannel(context)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && requestType != "chat_request") {
@@ -609,12 +666,10 @@ class CallNotificationServiceExtension : INotificationServiceExtension {
         return ""
     }
 
-    private fun buildNotificationKey(
-        additionalData: JSONObject?,
-        title: String?,
-        body: String?
-    ): String {
+    private fun buildNotificationKey(notification: INotification): String {
+        val additionalData = notification.additionalData
         val uniqueId = firstNonEmpty(
+            notification.notificationId,
             additionalData?.optString("notificationId", ""),
             additionalData?.optString("notification_id", ""),
             additionalData?.optString("callId", ""),
@@ -627,7 +682,8 @@ class CallNotificationServiceExtension : INotificationServiceExtension {
         if (uniqueId.isNotEmpty()) {
             return "id:$uniqueId"
         }
-        val combined = "${additionalData?.toString() ?: ""}|${title ?: ""}|${body ?: ""}"
+        val rawPayload = notification.rawPayload
+        val combined = "${rawPayload ?: additionalData?.toString() ?: ""}|${notification.title ?: ""}|${notification.body ?: ""}"
         return "hash:${sha256Hex(combined)}"
     }
 

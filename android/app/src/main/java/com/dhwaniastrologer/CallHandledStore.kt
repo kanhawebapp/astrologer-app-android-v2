@@ -28,6 +28,12 @@ class CallHandledStore(context: Context) {
      *   (i.e. it is a NEW event). The key's timestamp is (re)stored in that
      *   case. Returns false when the key is already recorded and still fresh
      *   (i.e. it is a DUPLICATE).
+     *
+     * The write uses [SharedPreferences.Editor.commit] instead of apply() so
+     * the record is flushed to disk synchronously. In killed-app mode the
+     * process that handled the first delivery can be terminated right after
+     * this callback; the duplicate delivery may arrive in a brand new process
+     * and must still find the persisted timestamp.
      */
     fun isNew(key: String, ttlMs: Long = DEFAULT_TTL_MS): Boolean {
         val now = System.currentTimeMillis()
@@ -35,7 +41,7 @@ class CallHandledStore(context: Context) {
         if (recordedAt != -1L && now - recordedAt < ttlMs) {
             return false
         }
-        prefs.edit().putLong(TS_PREFIX + key, now).apply()
+        prefs.edit().putLong(TS_PREFIX + key, now).commit()
         prune(now, ttlMs)
         return true
     }
