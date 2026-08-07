@@ -22,7 +22,7 @@ import type {
 } from '../features/chat/domain/chatTypes';
 import { hardResetChatFlow } from '../features/chat/data/chatSlice';
 
-const DEBUG_PREFIX = '[useGlobalChatSocket]';
+// const DEBUG_PREFIX = '[useGlobalChatSocket]';
 
 export const useGlobalChatSocket = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -37,7 +37,7 @@ export const useGlobalChatSocket = () => {
   const socketInitializedRef = useRef<{ initialized: boolean }>({
     initialized: false,
   });
-  console.log("SETTING CHAT LISTENERS");
+  // console.log("SETTING CHAT LISTENERS");
 
   const latestNewChatRequestSessionIdRef = useRef<string | null>(null);
 
@@ -217,7 +217,7 @@ export const useGlobalChatSocket = () => {
         : data;
 
       if (!request) {
-        console.log(`${DEBUG_PREFIX} Empty chat request received`);
+        // console.log(`${DEBUG_PREFIX} Empty chat request received`);
         return;
       }
 
@@ -230,9 +230,9 @@ export const useGlobalChatSocket = () => {
 
       // Validate required fields
       if (!roomId || !sessionId || !userId || !astrologerId) {
-        console.log(
-          `${DEBUG_PREFIX} Invalid chat request payload. Ignoring.`,
-        );
+        // console.log(
+        //   `${DEBUG_PREFIX} Invalid chat request payload. Ignoring.`,
+        // );
         return;
       }
 
@@ -265,9 +265,9 @@ export const useGlobalChatSocket = () => {
       dispatch(setLatestRequest(request));
       dispatch(addChatRequest(request));
 
-      console.log(
-        `${DEBUG_PREFIX} Chat request accepted for astrologer ${loggedInAstrologerId}`,
-      );
+      // console.log(
+      //   `${DEBUG_PREFIX} Chat request accepted for astrologer ${loggedInAstrologerId}`,
+      // );
     },
     [dispatch],
   );
@@ -275,21 +275,21 @@ export const useGlobalChatSocket = () => {
 
   const handleChatStarted = useCallback(
     (data: ActiveChatSession) => {
-      console.log(`📥 ${DEBUG_PREFIX} Received: "chat_started_astrologer"`);
-      console.log(`   Room ID: ${data.roomId}`);
-      console.log(`   User: ${data.userName}`);
+      // console.log(`📥 ${DEBUG_PREFIX} Received: "chat_started_astrologer"`);
+      // console.log(`   Room ID: ${data.roomId}`);
+      // console.log(`   User: ${data.userName}`);
 
       if (isMounted.current) {
         dispatch(setActiveSession(data));
-        console.log(`${DEBUG_PREFIX} Active session set in Redux`);
+        // console.log(`${DEBUG_PREFIX} Active session set in Redux`);
       }
     },
     [dispatch],
   );
 
-  const handleReceiveMessage = useCallback((data: ChatMessage) => {
-    console.log(`📥 ${DEBUG_PREFIX} Received: "receive_message"`);
-    console.log(`   Message: ${data.text?.substring(0, 50)}...`);
+  const handleReceiveMessage = useCallback((_data: ChatMessage) => {
+    // console.log(`📥 ${DEBUG_PREFIX} Received: "receive_message"`);
+    // console.log(`   Message: ${_data.text?.substring(0, 50)}...`);
   }, []);
 
   // const handleCompletedChat = useCallback(
@@ -307,7 +307,7 @@ export const useGlobalChatSocket = () => {
 
 const handleCompletedChat = useCallback(
   (data: { sessionId: string; roomId: string }) => {
-    console.log(`${DEBUG_PREFIX} completed_chat`, data);
+    // console.log(`${DEBUG_PREFIX} completed_chat`, data);
 
     if (!isMounted.current) {
       return;
@@ -330,8 +330,8 @@ const handleCompletedChat = useCallback(
 
   const handleLeaveChat = useCallback(
     (data: { sessionId: string; roomId: string; reason: string }) => {
-      console.log(`📥 ${DEBUG_PREFIX} Received: "leave_chat"`);
-      console.log(`   Reason: ${data.reason}`);
+      // console.log(`📥 ${DEBUG_PREFIX} Received: "leave_chat"`);
+      // console.log(`   Reason: ${data.reason}`);
       if (isMounted.current) {
         // Align with manual End Chat behavior:
         // set Redux to ENDED so ChatViewModel's existing navigation effect runs.
@@ -346,8 +346,8 @@ const handleCompletedChat = useCallback(
 
   const handleChatRejectAuto = useCallback(
     (data: { sessionId: string; roomId: string; reason: string }) => {
-      console.log(`📥 ${DEBUG_PREFIX} Received: "chat_reject_auto"`);
-      console.log(`   Reason: ${data.reason}`);
+      // console.log(`📥 ${DEBUG_PREFIX} Received: "chat_reject_auto"`);
+      // console.log(`   Reason: ${data.reason}`);
       if (isMounted.current) {
         dispatch(removeChatRequest(data.sessionId));
         dispatch(setError(data.reason || 'Chat request auto-rejected'));
@@ -400,7 +400,7 @@ const handleCompletedChat = useCallback(
     status: string;
     message: string;
   }) => {
-    console.log(`${DEBUG_PREFIX} chat_cancel_by_user`, data);
+    // console.log(`${DEBUG_PREFIX} chat_cancel_by_user`, data);
 
     if (!isMounted.current) {
       return;
@@ -425,13 +425,13 @@ const handleCompletedChat = useCallback(
   
   useEffect(() => {
     isMounted.current = true;
-    console.log(`${DEBUG_PREFIX} Hook initialized / effect run`);
+    // console.log(`${DEBUG_PREFIX} Hook initialized / effect run`);
 
     // Auth gate: defer listener setup until the token is restored.
     if (!token) {
-      console.log(
-        `${DEBUG_PREFIX} Auth token not available yet - deferring chat socket listener setup until hydration`,
-      );
+      // console.log(
+      //   `${DEBUG_PREFIX} Auth token not available yet - deferring chat socket listener setup until hydration`,
+      // );
       return;
     }
 
@@ -440,17 +440,17 @@ const handleCompletedChat = useCallback(
     // If the token changes or listeners were never initialized, allow setup.
     // Otherwise, skip to avoid duplicated socket listeners.
     if (socketInitializedRef.current.initialized) {
-      console.log(
-        `${DEBUG_PREFIX} Chat socket listeners already initialized for app lifecycle, skipping`,
-      );
+      // console.log(
+      //   `${DEBUG_PREFIX} Chat socket listeners already initialized for app lifecycle, skipping`,
+      // );
       return;
     }
 
     socketInitializedRef.current.initialized = true;
 
-    console.log(
-      `${DEBUG_PREFIX} Initializing global chat socket listeners... (once)`,
-    );
+    // console.log(
+    //   `${DEBUG_PREFIX} Initializing global chat socket listeners... (once)`,
+    // );
 
     // Bind latest callbacks for safety, but do NOT re-setup socket listeners.
     latestCallbacksRef.current = {
@@ -483,15 +483,15 @@ const handleCompletedChat = useCallback(
     chatSocketService
       .setupListeners()
       .then(() => {
-        console.log(`${DEBUG_PREFIX} Socket listeners setup complete`);
+        // console.log(`${DEBUG_PREFIX} Socket listeners setup complete`);
       })
-      .catch(error => {
-        console.log(`${DEBUG_PREFIX} Failed to setup listeners:`, error);
+      .catch(_error => {
+        // console.log(`${DEBUG_PREFIX} Failed to setup listeners:`, _error);
       });
 
     return () => {
       isMounted.current = false;
-      console.log(`${DEBUG_PREFIX} Cleanup called`);
+      // console.log(`${DEBUG_PREFIX} Cleanup called`);
       // Do not tear down socket listeners here; ChatSocketService is a singleton.
       // Just clear local mounted state to prevent dispatching from stale callbacks.
     };

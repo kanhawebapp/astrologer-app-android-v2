@@ -50,7 +50,7 @@ export const useAuth = () => {
 
 
   const restore = useCallback(async () => {
-    console.log('[AUTH STEP 3] restoreSession Started');
+    // console.log('[AUTH STEP 3] restoreSession Started');
     return dispatch(restoreSession()).unwrap();
   }, [dispatch]);
 

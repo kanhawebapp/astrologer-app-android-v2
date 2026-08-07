@@ -202,9 +202,9 @@ async function getStoredToken(): Promise<string | null> {
     const AsyncStorage =
       require('@react-native-async-storage/async-storage').default;
     const token = await AsyncStorage.getItem(Config.TOKEN_KEY);
-    console.log('[ASYNCSTORAGE] Read token from Config.TOKEN_KEY:', token ? 'YES' : 'NO');
+    // console.log('[ASYNCSTORAGE] Read token from Config.TOKEN_KEY:', token ? 'YES' : 'NO');
     if (token) {
-      console.log(`[ASYNCSTORAGE] Token Preview: ${token.substring(0, 20)}...`);
+      // console.log(`[ASYNCSTORAGE] Token Preview: ${token.substring(0, 20)}...`);
     }
     return token;
   } catch {

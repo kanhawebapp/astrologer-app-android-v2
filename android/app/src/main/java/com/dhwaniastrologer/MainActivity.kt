@@ -84,6 +84,11 @@ val callTime = intent.getStringExtra("extra_call_time") ?: ""
     // foreground. No values are fabricated here; missing extras stay "".
     val sessionId = intent.getStringExtra("extra_session_id") ?: ""
 
+    Log.d(
+      "MainActivity",
+      "INTENT_RECEIVED action=$action roomId=$roomId callId=$callId sessionId=$sessionId ts=${System.currentTimeMillis()}"
+    )
+
  Log.d("TRACE_NATIVE_3", "extra_room_id=$roomId")
 Log.d("TRACE_NATIVE_3", "extra_session_id=$sessionId")
 Log.d("TRACE_NATIVE_3", "extra_call_time=$callTime")
@@ -146,6 +151,28 @@ Log.d("TRACE_NATIVE_3", "extra_call_time=$callTime")
 
     Log.d("TRACE_NATIVE_5", dataMap.toString())
 
+    val extraNotificationId = intent.getStringExtra("extra_notification_id") ?: ""
+    val dedupeId = firstNonEmpty(extraNotificationId, callId, sessionId)
+    val stableKey = if (dedupeId.isNotEmpty()) {
+      "$dedupeId:$action"
+    } else {
+      "hash:${(roomId + callId + sessionId + callerId + callTime).hashCode()}:$action"
+    }
+
+    val dedupeStore = CallHandledStore(this)
+    val isNew = dedupeStore.isNew(stableKey)
+    Log.d(
+      "MainActivity",
+      "ACTION_DEDUPE action=$action key=$stableKey isNew=$isNew"
+    )
+    if (!isNew) {
+      Log.d(
+        "MainActivity",
+        "DUPLICATE ACTION IGNORED action=$action key=$stableKey"
+      )
+      return
+    }
+
     prefs.edit()
       .putString("pending_action", action)
       .putString("pending_data", dataMap)
@@ -191,5 +218,14 @@ Log.d("TRACE_NATIVE_3", "extra_call_time=$callTime")
       .put("astrologerProfilePic", astrologerProfilePic)
       .put("issue", issue)
       .toString()
+  }
+
+  private fun firstNonEmpty(vararg values: String?): String {
+    for (value in values) {
+      if (value != null && value.isNotEmpty()) {
+        return value
+      }
+    }
+    return ""
   }
 }

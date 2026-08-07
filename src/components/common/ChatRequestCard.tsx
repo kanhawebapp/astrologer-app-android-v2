@@ -177,13 +177,13 @@ export const ChatRequestCard: React.FC<ChatRequestCardProps> = memo(() => {
   }, [latestRequest, dispatch, closeCard]);
 
   const handleAccept = useCallback(async () => {
-    console.log('[ACCEPT TRACE 3] handleAccept entered');
-    console.log({
-      accepting,
-      rejecting,
-      isAnimating: isAnimatingRef.current,
-      latestRequest,
-    });
+    // console.log('[ACCEPT TRACE 3] handleAccept entered');
+    // console.log({
+    //   accepting,
+    //   rejecting,
+    //   isAnimating: isAnimatingRef.current,
+    //   latestRequest,
+    // });
     const traceId = getOrCreateTraceId();
     const stateBefore = (require('../../store').store as any).getState?.();
     const functionEntered = 'ChatRequestCard.handleAccept()';
@@ -197,17 +197,17 @@ export const ChatRequestCard: React.FC<ChatRequestCardProps> = memo(() => {
       reduxStateBefore: stateBefore,
     });
 
-    if (!latestRequest) console.log('[ACCEPT TRACE BLOCK] latestRequest missing');
-    if (accepting) console.log('[ACCEPT TRACE BLOCK] accepting');
-    if (rejecting) console.log('[ACCEPT TRACE BLOCK] rejecting');
-    if (isAnimatingRef.current) console.log('[ACCEPT TRACE BLOCK] animating');
+    // if (!latestRequest) console.log('[ACCEPT TRACE BLOCK] latestRequest missing');
+    // if (accepting) console.log('[ACCEPT TRACE BLOCK] accepting');
+    // if (rejecting) console.log('[ACCEPT TRACE BLOCK] rejecting');
+    // if (isAnimatingRef.current) console.log('[ACCEPT TRACE BLOCK] animating');
     if (!latestRequest || accepting || rejecting || isAnimatingRef.current) {
-      console.log('[ChatRequestCard] handleAccept() EARLY RETURN guard: !latestRequest=', !latestRequest, 'accepting=', accepting, 'rejecting=', rejecting, 'isAnimating=', isAnimatingRef.current);
+      // console.log('[ChatRequestCard] handleAccept() EARLY RETURN guard: !latestRequest=', !latestRequest, 'accepting=', accepting, 'rejecting=', rejecting, 'isAnimating=', isAnimatingRef.current);
       return;
     }
 
     if (!latestRequest?.roomId) {
-      console.warn('[ChatRequestCard] Invalid roomId, cannot navigate');
+      // console.warn('[ChatRequestCard] Invalid roomId, cannot navigate');
       dispatch(removeChatRequest(latestRequest.sessionId));
       return;
     }
@@ -286,14 +286,14 @@ export const ChatRequestCard: React.FC<ChatRequestCardProps> = memo(() => {
           reduxStateAfter: reduxAfterActiveSession,
         });
 
-        console.log('[ChatRequestCard] BEFORE navigation.navigate("ChatScreen")');
+        // console.log('[ChatRequestCard] BEFORE navigation.navigate("ChatScreen")');
         navigation.navigate('ChatScreen', {
           roomId: latestRequest.roomId,
           userId: latestRequest.userId,
           userName: latestRequest.userName,
           maximumTime: latestRequest.maximumTime,
         });
-        console.log('[ChatRequestCard] AFTER navigation.navigate("ChatScreen")');
+        // console.log('[ChatRequestCard] AFTER navigation.navigate("ChatScreen")');
 
         logTrace({
           traceId,
@@ -324,17 +324,17 @@ export const ChatRequestCard: React.FC<ChatRequestCardProps> = memo(() => {
           },
         });
 
-        console.log('[ChatRequestCard] BEFORE chatSocketService.acceptChatAstrologer()', { sessionId: latestRequest.sessionId, roomId: latestRequest.roomId });
-        console.log('[ACCEPT TRACE 4] emitting accept');
-        console.log({
-          sessionId: latestRequest.sessionId,
-          roomId: latestRequest.roomId,
-        });
+        // console.log('[ChatRequestCard] BEFORE chatSocketService.acceptChatAstrologer()', { sessionId: latestRequest.sessionId, roomId: latestRequest.roomId });
+        // console.log('[ACCEPT TRACE 4] emitting accept');
+        // console.log({
+        //   sessionId: latestRequest.sessionId,
+        //   roomId: latestRequest.roomId,
+        // });
         await chatSocketService.acceptChatAstrologer(
           latestRequest.sessionId,
           latestRequest.roomId,
         );
-        console.log('[ChatRequestCard] AFTER chatSocketService.acceptChatAstrologer() resolved');
+        // console.log('[ChatRequestCard] AFTER chatSocketService.acceptChatAstrologer() resolved');
       } catch (error) {
         logTrace({
           traceId: traceIdForTimeout,
@@ -359,14 +359,14 @@ export const ChatRequestCard: React.FC<ChatRequestCardProps> = memo(() => {
 
 
   const handleReject = useCallback(async () => {
-    console.log('[ChatRequestCard] handleReject() START');
-    console.log('[ChatRequestCard] [DEBUG] reject latestRequest.sessionId=', latestRequest?.sessionId ?? 'undefined', 'rejecting=', rejecting, 'accepting=', accepting);
+    // console.log('[ChatRequestCard] handleReject() START');
+    // console.log('[ChatRequestCard] [DEBUG] reject latestRequest.sessionId=', latestRequest?.sessionId ?? 'undefined', 'rejecting=', rejecting, 'accepting=', accepting);
     if (!latestRequest || rejecting || accepting) {
-      console.log('[ChatRequestCard] handleReject() EARLY RETURN guard: !latestRequest=', !latestRequest, 'rejecting=', rejecting, 'accepting=', accepting);
+      // console.log('[ChatRequestCard] handleReject() EARLY RETURN guard: !latestRequest=', !latestRequest, 'rejecting=', rejecting, 'accepting=', accepting);
       return;
     }
 
-    console.log('[ChatRequestCard] handleReject() PASSED guards -> proceeding to reject');
+    // console.log('[ChatRequestCard] handleReject() PASSED guards -> proceeding to reject');
     setRejecting(true);
 
     if (timerRef.current) {
@@ -377,14 +377,14 @@ export const ChatRequestCard: React.FC<ChatRequestCardProps> = memo(() => {
     closeCard();
 
     try {
-      console.log('[ChatRequestCard] BEFORE chatSocketService.rejectChat()', { sessionId: latestRequest.sessionId, roomId: latestRequest.roomId });
+      // console.log('[ChatRequestCard] BEFORE chatSocketService.rejectChat()', { sessionId: latestRequest.sessionId, roomId: latestRequest.roomId });
       await chatSocketService.rejectChat(
         latestRequest.sessionId,
         latestRequest.roomId,
       );
-      console.log('[ChatRequestCard] AFTER chatSocketService.rejectChat() resolved');
-    } catch (e) {
-      console.log(e);
+      // console.log('[ChatRequestCard] AFTER chatSocketService.rejectChat() resolved');
+    } catch {
+      // console.log(e);
     } finally {
 
       dispatch(removeChatRequest(latestRequest.sessionId));
@@ -425,19 +425,19 @@ export const ChatRequestCard: React.FC<ChatRequestCardProps> = memo(() => {
   // registered handlers via the trigger, guaranteeing a single business
   // logic path identical to physically tapping the buttons.
   useEffect(() => {
-    console.log(`[ChatRequestCard] registerChatTriggers() RUN (captured sessionId=${latestRequest?.sessionId ?? 'undefined'}, chatStatus=${chatStatus})`);
-    console.log('[ACCEPT TRACE 1] register');
-    console.log({
-      sessionId: latestRequest?.sessionId,
-      roomId: latestRequest?.roomId,
-    });
+    // console.log(`[ChatRequestCard] registerChatTriggers() RUN (captured sessionId=${latestRequest?.sessionId ?? 'undefined'}, chatStatus=${chatStatus})`);
+    // console.log('[ACCEPT TRACE 1] register');
+    // console.log({
+    //   sessionId: latestRequest?.sessionId,
+    //   roomId: latestRequest?.roomId,
+    // });
     setAcceptChatTrigger(() => {
-      console.log('[ACCEPT TRACE 2] trigger invoked');
-      console.log(`[ChatRequestCard] registered ACCEPT trigger invoked (captured sessionId=${latestRequest?.sessionId ?? 'undefined'})`);
+      // console.log('[ACCEPT TRACE 2] trigger invoked');
+      // console.log(`[ChatRequestCard] registered ACCEPT trigger invoked (captured sessionId=${latestRequest?.sessionId ?? 'undefined'})`);
       handleAccept();
     });
     setRejectChatTrigger(() => {
-      console.log(`[ChatRequestCard] registered REJECT trigger invoked (captured sessionId=${latestRequest?.sessionId ?? 'undefined'})`);
+      // console.log(`[ChatRequestCard] registered REJECT trigger invoked (captured sessionId=${latestRequest?.sessionId ?? 'undefined'})`);
       handleReject();
     });
     return () => {

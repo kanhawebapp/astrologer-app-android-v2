@@ -56,26 +56,25 @@ class CallNotificationServiceExtension : INotificationServiceExtension {
             "onNotificationReceived() invoked. notification=$notification additionalData=${additionalData.toString()}"
         )
 
-        val typeFromAdditionalData = additionalData?.optString("type")
-        val notificationTypeFromAdditionalData = additionalData?.optString("notificationType")
-        val requestTypeFromAdditionalData = additionalData?.optString("requestType")
-
-        val notificationType =
-            typeFromAdditionalData ?: notificationTypeFromAdditionalData ?: requestTypeFromAdditionalData
+        val notificationType = firstNonEmpty(
+            additionalData?.optString("type", ""),
+            additionalData?.optString("notificationType", ""),
+            additionalData?.optString("requestType", "")
+        )
 
         android.util.Log.d(
             "CallExtension",
-            "Parsed additionalData types: type=$typeFromAdditionalData notificationType=$notificationTypeFromAdditionalData requestType=$requestTypeFromAdditionalData => notificationType=$notificationType"
+            "Parsed additionalData types: notificationType=$notificationType"
         )
 
-        val normalizedType = when (notificationType?.lowercase()) {
+        val normalizedType = when (notificationType.lowercase()) {
             "call",
             "call_request" -> "call"
 
             "chat",
             "chat_request" -> "chat"
 
-            else -> notificationType?.lowercase() ?: ""
+            else -> notificationType.lowercase()
         }
 
         android.util.Log.d(
@@ -88,16 +87,58 @@ class CallNotificationServiceExtension : INotificationServiceExtension {
             "Branch check: notificationType == call_request ? ${notificationType == "call_request"}"
         )
 
+        val notificationKey = buildNotificationKey(additionalData, notification.title, notification.body)
+
+        val roomIdForLog = firstNonEmpty(
+            additionalData?.optString("roomId", ""),
+            additionalData?.optString("room_id", "")
+        )
+        val callIdForLog = firstNonEmpty(
+            additionalData?.optString("callId", ""),
+            additionalData?.optString("call_id", "")
+        )
+        val sessionIdForLog = firstNonEmpty(
+            additionalData?.optString("sessionId", ""),
+            additionalData?.optString("session_id", ""),
+            additionalData?.optString("chatRequestId", ""),
+            additionalData?.optString("chat_request_id", "")
+        )
+
         if (normalizedType == "call" || normalizedType == "chat") {
             val inForeground = isAppInForeground(event.context)
             android.util.Log.d(
                 "CallExtension",
-                "ENTERED: CallStyle branch (requestType=$requestTypeFromAdditionalData notificationType=$notificationType). InForeground=$inForeground"
+                "ENTERED: CallStyle branch (notificationType=$notificationType). InForeground=$inForeground"
             )
             android.util.Log.d(
                 "CallExtension",
                 "request branch entered (call_request/chat_request). isAppInForeground=$inForeground"
             )
+
+            val requestType = if (normalizedType == "chat") "chat_request" else "call_request"
+
+            val dedupeStore = CallHandledStore(event.context)
+            val isNew = dedupeStore.isNew(notificationKey)
+
+            android.util.Log.d(
+                "CallNotificationDedupe",
+                if (isNew) "NEW notification accepted key=$notificationKey"
+                else "DUPLICATE NOTIFICATION IGNORED key=$notificationKey"
+            )
+
+            android.util.Log.d(
+                "CallExtension",
+                "NOTIFICATION_RECEIVED notificationId=$notificationKey callId=$callIdForLog sessionId=$sessionIdForLog roomId=$roomIdForLog requestType=$requestType duplicate=${!isNew} foreground=$inForeground"
+            )
+
+            if (!isNew) {
+                event.preventDefault()
+                android.util.Log.d(
+                    "CallExtension",
+                    "DUPLICATE NOTIFICATION: preventDefault() called, returning without showCustomNotification(). customNotificationPosted=false"
+                )
+                return
+            }
 
             if (inForeground) {
                 android.util.Log.d(
@@ -111,7 +152,7 @@ class CallNotificationServiceExtension : INotificationServiceExtension {
                 )
                 android.util.Log.d(
                     "CallExtension",
-                    "Returning without showCustomNotification() due to foreground request."
+                    "Returning without showCustomNotification() due to foreground request. customNotificationPosted=false"
                 )
                 return
             }
@@ -122,14 +163,13 @@ class CallNotificationServiceExtension : INotificationServiceExtension {
 
             android.util.Log.d("CallExtension", "About to call showCustomNotification().")
 
-            val callerName = notification.title
-                ?: notification.additionalData?.optString("callerName")
-                ?: notification.additionalData?.optString("caller_name")
-                ?: notification.additionalData?.optString("userName")
-                ?: notification.additionalData?.optString("user_name")
-                ?: "Unknown Caller"
-
-            val requestType = if (normalizedType == "chat") "chat_request" else "call_request"
+            val callerName = firstNonEmpty(
+                notification.title,
+                additionalData?.optString("callerName", ""),
+                additionalData?.optString("caller_name", ""),
+                additionalData?.optString("userName", ""),
+                additionalData?.optString("user_name", "")
+            ).ifEmpty { "Unknown Caller" }
 
             val (title, body, acceptLabel, rejectLabel) = if (normalizedType == "chat") {
                 Quad(
@@ -147,36 +187,27 @@ class CallNotificationServiceExtension : INotificationServiceExtension {
                 )
             }
 
-            // preventDefault() has already been called, so if the custom
-            // rendering throws for any reason the default OneSignal
-            // notification is the only way the user still sees the incoming
-            // call. Fall back to notification.display() instead of dropping it.
             try {
                 showCustomNotification(
                     event.context,
                     notification,
+                    notificationKey,
                     requestType,
                     title,
                     body,
                     acceptLabel,
                     rejectLabel
                 )
-                android.util.Log.d("CallExtension", "Returned from showCustomNotification().")
+                android.util.Log.d(
+                    "CallExtension",
+                    "Returned from showCustomNotification(). customNotificationPosted=true"
+                )
             } catch (e: Exception) {
                 android.util.Log.e(
                     "CallExtension",
-                    "showCustomNotification() failed, falling back to default notification",
+                    "showCustomNotification() failed. preventDefault() was already called so no default notification is displayed (avoids duplicate notifications). customNotificationPosted=false",
                     e
                 )
-                try {
-                    notification.display()
-                } catch (displayError: Exception) {
-                    android.util.Log.e(
-                        "CallExtension",
-                        "Fallback notification.display() also failed",
-                        displayError
-                    )
-                }
             }
         } else {
             android.util.Log.d(
@@ -197,6 +228,7 @@ class CallNotificationServiceExtension : INotificationServiceExtension {
     private fun showCustomNotification(
         context: Context,
         osNotification: com.onesignal.notifications.INotification,
+        notificationKey: String,
         requestType: String?,
         title: String,
         body: String,
@@ -222,78 +254,94 @@ class CallNotificationServiceExtension : INotificationServiceExtension {
         android.util.Log.d("TRACE_NATIVE_1", "sessionId(raw camel) = ${additionalData?.optString("sessionId")}")
         android.util.Log.d("TRACE_NATIVE_1", "session_id(raw snake) = ${additionalData?.optString("session_id")}")
 
-        // Chat request payload fields. These are forwarded verbatim from the
-        // real push payload so the JS ChatRequestCard can rebuild the EXACT
-        // same request state as the foreground socket "new_chat_request".
-        // No defaults are fabricated here; missing keys resolve to "" and the
-        // JS side (prepareRequestState) strictly rejects incomplete payloads.
-        fun chatField(vararg keys: String): String {
-            val obj = additionalData
-            if (obj == null) {
-                android.util.Log.d("TRACE_NATIVE_CHATFIELD", "RETURN EMPTY")
-                return ""
-            }
-            for (k in keys) {
-                val v = obj.optString(k, "")
-                android.util.Log.d("TRACE_NATIVE_CHATFIELD", "checking key=$k value='${obj.optString(k)}'")
-                if (v.isNotEmpty()) {
-                    android.util.Log.d("TRACE_NATIVE_CHATFIELD", "RETURN key=$k value='$v'")
-                    return v
-                }
-            }
-            android.util.Log.d("TRACE_NATIVE_CHATFIELD", "RETURN EMPTY")
-            return ""
-        }
-
-        val roomId = chatField("roomId", "room_id")
+        val roomId = firstNonEmpty(
+            additionalData?.optString("roomId", ""),
+            additionalData?.optString("room_id", "")
+        )
 
         android.util.Log.d("TRACE_NATIVE_1", "final roomId = $roomId")
 
-        // Calls store in roomId + callId. Chat_request payload may reuse roomId
-        // and provide sessionId/chatRequestId via additionalData.
-        val callId = additionalData?.optString("callId")
-            ?: additionalData?.optString("call_id")
-            ?: additionalData?.optString("sessionId")
-            ?: additionalData?.optString("session_id")
-            ?: additionalData?.optString("chatRequestId")
-            ?: additionalData?.optString("chat_request_id")
-            ?: ""
+        val callId = firstNonEmpty(
+            additionalData?.optString("callId", ""),
+            additionalData?.optString("call_id", ""),
+            additionalData?.optString("sessionId", ""),
+            additionalData?.optString("session_id", ""),
+            additionalData?.optString("chatRequestId", ""),
+            additionalData?.optString("chat_request_id", "")
+        )
 
-        val callerName = osNotification.title
-            ?: additionalData?.optString("callerName")
-            ?: additionalData?.optString("caller_name")
-            ?: additionalData?.optString("userName")
-            ?: additionalData?.optString("user_name")
-            ?: "Unknown Caller"
+        val callerName = firstNonEmpty(
+            osNotification.title,
+            additionalData?.optString("callerName", ""),
+            additionalData?.optString("caller_name", ""),
+            additionalData?.optString("userName", ""),
+            additionalData?.optString("user_name", "")
+        ).ifEmpty { "Unknown Caller" }
 
-        val callerId = additionalData?.optString("callerId")
-            ?: additionalData?.optString("caller_id")
-            ?: additionalData?.optString("userId")
-            ?: additionalData?.optString("user_id")
-            ?: ""
+        val callerId = firstNonEmpty(
+            additionalData?.optString("callerId", ""),
+            additionalData?.optString("caller_id", ""),
+            additionalData?.optString("userId", ""),
+            additionalData?.optString("user_id", "")
+        )
 
-        val callerAvatar = additionalData?.optString("caller_avatar")
-            ?: additionalData?.optString("user_avatar")
-            ?: ""
+        val callerAvatar = firstNonEmpty(
+            additionalData?.optString("callerAvatar", ""),
+            additionalData?.optString("caller_avatar", ""),
+            additionalData?.optString("userAvatar", ""),
+            additionalData?.optString("user_avatar", "")
+        )
 
-
-        val sessionId = chatField("sessionId", "session_id", "chatRequestId", "chat_request_id")
+        val sessionId = firstNonEmpty(
+            additionalData?.optString("sessionId", ""),
+            additionalData?.optString("session_id", ""),
+            additionalData?.optString("chatRequestId", ""),
+            additionalData?.optString("chat_request_id", "")
+        )
 
         android.util.Log.d("TRACE_NATIVE_1", "final sessionId = $sessionId")
 
-        val userId = chatField("userId", "user_id")
-        val astrologerId = chatField("astrologerId", "astrologer_id", "astro_id")
-        val userName = chatField("userName", "user_name")
-        val maximumTime = chatField("maximumTime", "maximum_time")
-        val callTime =
-    additionalData?.optString("callTime")
-        ?: additionalData?.optString("call_time")
-        ?: ""
-        val pricePerMinute = chatField("pricePerMinute", "price_per_minute")
-        val userProfilePic = chatField("userProfilePic", "user_profile_pic", "profilePic")
-        val astrologerName = chatField("astrologerName", "astrologer_name")
-        val astrologerProfilePic = chatField("astrologerProfilePic", "astrologer_profile_pic")
-        val issue = chatField("issue")
+        val userId = firstNonEmpty(
+            additionalData?.optString("userId", ""),
+            additionalData?.optString("user_id", "")
+        )
+        val astrologerId = firstNonEmpty(
+            additionalData?.optString("astrologerId", ""),
+            additionalData?.optString("astrologer_id", ""),
+            additionalData?.optString("astro_id", "")
+        )
+        val userName = firstNonEmpty(
+            additionalData?.optString("userName", ""),
+            additionalData?.optString("user_name", "")
+        )
+        val maximumTime = firstNonEmpty(
+            additionalData?.optString("maximumTime", ""),
+            additionalData?.optString("maximum_time", "")
+        )
+        val callTime = firstNonEmpty(
+            additionalData?.optString("callTime", ""),
+            additionalData?.optString("call_time", "")
+        )
+        val pricePerMinute = firstNonEmpty(
+            additionalData?.optString("pricePerMinute", ""),
+            additionalData?.optString("price_per_minute", "")
+        )
+        val userProfilePic = firstNonEmpty(
+            additionalData?.optString("userProfilePic", ""),
+            additionalData?.optString("user_profile_pic", ""),
+            additionalData?.optString("profilePic", "")
+        )
+        val astrologerName = firstNonEmpty(
+            additionalData?.optString("astrologerName", ""),
+            additionalData?.optString("astrologer_name", "")
+        )
+        val astrologerProfilePic = firstNonEmpty(
+            additionalData?.optString("astrologerProfilePic", ""),
+            additionalData?.optString("astrologer_profile_pic", "")
+        )
+        val issue = firstNonEmpty(
+            additionalData?.optString("issue", "")
+        )
 
         val prefs = context.getSharedPreferences("call_notification_prefs", Context.MODE_PRIVATE)
         val dataJson = JSONObject(mapOf(
@@ -343,63 +391,65 @@ class CallNotificationServiceExtension : INotificationServiceExtension {
 
         val acceptIntent = Intent(context, MainActivity::class.java).apply {
             action = acceptAction
-            putExtra("extra_room_id", roomId ?: "")
-            putExtra("extra_call_id", callId ?: "")
-            putExtra("extra_caller_name", callerName ?: "")
-            putExtra("extra_caller_id", callerId ?: "")
-            putExtra("extra_caller_avatar", callerAvatar ?: "")
-            putExtra("extra_session_id", sessionId ?: "")
-            putExtra("extra_user_id", userId ?: "")
-            putExtra("extra_astrologer_id", astrologerId ?: "")
-            putExtra("extra_user_name", userName ?: "")
-            putExtra("extra_maximum_time", maximumTime ?: "")
+            putExtra("extra_notification_id", notificationKey)
+            putExtra("extra_room_id", roomId)
+            putExtra("extra_call_id", callId)
+            putExtra("extra_caller_name", callerName)
+            putExtra("extra_caller_id", callerId)
+            putExtra("extra_caller_avatar", callerAvatar)
+            putExtra("extra_session_id", sessionId)
+            putExtra("extra_user_id", userId)
+            putExtra("extra_astrologer_id", astrologerId)
+            putExtra("extra_user_name", userName)
+            putExtra("extra_maximum_time", maximumTime)
             putExtra("extra_call_time", callTime)
-            putExtra("extra_price_per_minute", pricePerMinute ?: "")
-            putExtra("extra_user_profile_pic", userProfilePic ?: "")
-            putExtra("extra_astrologer_name", astrologerName ?: "")
-            putExtra("extra_astrologer_profile_pic", astrologerProfilePic ?: "")
-            putExtra("extra_issue", issue ?: "")
+            putExtra("extra_price_per_minute", pricePerMinute)
+            putExtra("extra_user_profile_pic", userProfilePic)
+            putExtra("extra_astrologer_name", astrologerName)
+            putExtra("extra_astrologer_profile_pic", astrologerProfilePic)
+            putExtra("extra_issue", issue)
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
         }
 
 
         val rejectIntent = Intent(context, MainActivity::class.java).apply {
             action = rejectAction
-            putExtra("extra_room_id", roomId ?: "")
-            putExtra("extra_call_id", callId ?: "")
-            putExtra("extra_caller_name", callerName ?: "")
-            putExtra("extra_caller_id", callerId ?: "")
-            putExtra("extra_caller_avatar", callerAvatar ?: "")
-            putExtra("extra_session_id", sessionId ?: "")
-            putExtra("extra_user_id", userId ?: "")
-            putExtra("extra_astrologer_id", astrologerId ?: "")
-            putExtra("extra_user_name", userName ?: "")
-            putExtra("extra_maximum_time", maximumTime ?: "")
+            putExtra("extra_notification_id", notificationKey)
+            putExtra("extra_room_id", roomId)
+            putExtra("extra_call_id", callId)
+            putExtra("extra_caller_name", callerName)
+            putExtra("extra_caller_id", callerId)
+            putExtra("extra_caller_avatar", callerAvatar)
+            putExtra("extra_session_id", sessionId)
+            putExtra("extra_user_id", userId)
+            putExtra("extra_astrologer_id", astrologerId)
+            putExtra("extra_user_name", userName)
+            putExtra("extra_maximum_time", maximumTime)
             putExtra("extra_call_time", callTime)
-            putExtra("extra_price_per_minute", pricePerMinute ?: "")
-            putExtra("extra_user_profile_pic", userProfilePic ?: "")
-            putExtra("extra_astrologer_name", astrologerName ?: "")
-            putExtra("extra_astrologer_profile_pic", astrologerProfilePic ?: "")
-            putExtra("extra_issue", issue ?: "")
+            putExtra("extra_price_per_minute", pricePerMinute)
+            putExtra("extra_user_profile_pic", userProfilePic)
+            putExtra("extra_astrologer_name", astrologerName)
+            putExtra("extra_astrologer_profile_pic", astrologerProfilePic)
+            putExtra("extra_issue", issue)
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
         }
 
 
         val acceptPendingIntent = PendingIntent.getActivity(
             context,
-            (roomId + "accept" + requestType).hashCode(),
+            ("$notificationKey:accept:$requestType").hashCode(),
             acceptIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
         val rejectPendingIntent = PendingIntent.getActivity(
             context,
-            (roomId + "reject" + requestType).hashCode(),
+            ("$notificationKey:reject:$requestType").hashCode(),
             rejectIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val notificationId = (roomId.hashCode() % Int.MAX_VALUE)
+        val notificationId = notificationKey.hashCode() and 0x7fffffff
         createNotificationChannel(context)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && requestType != "chat_request") {
@@ -547,6 +597,47 @@ class CallNotificationServiceExtension : INotificationServiceExtension {
             )
             val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             manager.createNotificationChannel(channel)
+        }
+    }
+
+    private fun firstNonEmpty(vararg values: String?): String {
+        for (value in values) {
+            if (value != null && value.isNotEmpty()) {
+                return value
+            }
+        }
+        return ""
+    }
+
+    private fun buildNotificationKey(
+        additionalData: JSONObject?,
+        title: String?,
+        body: String?
+    ): String {
+        val uniqueId = firstNonEmpty(
+            additionalData?.optString("notificationId", ""),
+            additionalData?.optString("notification_id", ""),
+            additionalData?.optString("callId", ""),
+            additionalData?.optString("call_id", ""),
+            additionalData?.optString("sessionId", ""),
+            additionalData?.optString("session_id", ""),
+            additionalData?.optString("chatRequestId", ""),
+            additionalData?.optString("chat_request_id", "")
+        )
+        if (uniqueId.isNotEmpty()) {
+            return "id:$uniqueId"
+        }
+        val combined = "${additionalData?.toString() ?: ""}|${title ?: ""}|${body ?: ""}"
+        return "hash:${sha256Hex(combined)}"
+    }
+
+    private fun sha256Hex(input: String): String {
+        return try {
+            val digest = java.security.MessageDigest.getInstance("SHA-256")
+            digest.digest(input.toByteArray(Charsets.UTF_8))
+                .joinToString("") { byte -> String.format("%02x", byte.toInt() and 0xff) }
+        } catch (e: Exception) {
+            input.hashCode().toString()
         }
     }
 }

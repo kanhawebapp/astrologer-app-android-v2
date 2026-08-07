@@ -30,10 +30,10 @@ export const useWallet = () => {
     dispatch(fetchWalletData());
   }, [dispatch]);
 
-  console.log('🔥 useWallet mounted');
+  // console.log('🔥 useWallet mounted');
 
   useEffect(() => {
-    console.log('🔥 useWallet mounted (useEffect)');
+    // console.log('🔥 useWallet mounted (useEffect)');
     loadWalletData();
   }, [loadWalletData]);
 

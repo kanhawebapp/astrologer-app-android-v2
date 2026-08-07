@@ -24,9 +24,9 @@ class RingtoneManager {
    * @param timeoutMs - Auto-stop timeout in milliseconds (default: 30s)
    */
   startRingtone(timeoutMs: number = DEFAULT_RING_TIMEOUT_MS): void {
-    console.log(`${DEBUG_PREFIX} startRingtone() called, isPlaying:`, this.isPlaying);
+    // console.log(`${DEBUG_PREFIX} startRingtone() called, isPlaying:`, this.isPlaying);
     if (this.isPlaying) {
-      console.log(`${DEBUG_PREFIX} Skipping ringtone start - already playing`);
+      // console.log(`${DEBUG_PREFIX} Skipping ringtone start - already playing`);
       return;
     }
 
@@ -34,7 +34,7 @@ class RingtoneManager {
 
     try {
       startIncomingRing();
-      console.log(`${DEBUG_PREFIX} Incoming ringtone started`);
+      // console.log(`${DEBUG_PREFIX} Incoming ringtone started`);
     } catch (e) {
       console.log(`${DEBUG_PREFIX} Error starting ringtone:`, e);
       this.isPlaying = false;
@@ -44,7 +44,7 @@ class RingtoneManager {
     // Auto-stop after timeout to prevent stuck ringtone
     this.timeoutTimer = setTimeout(() => {
       if (this.isPlaying) {
-        console.log(`${DEBUG_PREFIX} Ringtone timeout (${timeoutMs}ms) reached, stopping`);
+        // console.log(`${DEBUG_PREFIX} Ringtone timeout (${timeoutMs}ms) reached, stopping`);
         this.stopRingtone();
       }
     }, timeoutMs);
@@ -55,9 +55,9 @@ class RingtoneManager {
    * If not playing, this is a no-op (safe to call multiple times).
    */
   stopRingtone(): void {
-    console.log(`${DEBUG_PREFIX} stopRingtone() called, isPlaying:`, this.isPlaying);
+    // console.log(`${DEBUG_PREFIX} stopRingtone() called, isPlaying:`, this.isPlaying);
     if (!this.isPlaying) {
-      console.log(`${DEBUG_PREFIX} Skipping ringtone stop - not currently playing`);
+      // console.log(`${DEBUG_PREFIX} Skipping ringtone stop - not currently playing`);
       return;
     }
 
@@ -71,7 +71,7 @@ class RingtoneManager {
 
     try {
       stopIncomingRing();
-      console.log(`${DEBUG_PREFIX} Incoming ringtone stopped`);
+      // console.log(`${DEBUG_PREFIX} Incoming ringtone stopped`);
     } catch (e) {
       console.log(`${DEBUG_PREFIX} Error stopping ringtone:`, e);
     }
@@ -96,7 +96,7 @@ class RingtoneManager {
       this.isPlaying = false;
       try {
         stopIncomingRing();
-        console.log(`${DEBUG_PREFIX} Incoming ringtone stopped (cleanup)`);
+        // console.log(`${DEBUG_PREFIX} Incoming ringtone stopped (cleanup)`);
       } catch (e) {
         console.log(`${DEBUG_PREFIX} Error stopping ringtone during cleanup:`, e);
       }

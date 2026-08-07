@@ -107,11 +107,11 @@ export const IncomingCallFullscreen: React.FC = () => {
   // debugging aid).
   useEffect(() => {
     const unsubscribe = navigation.addListener('beforeRemove', e => {
-      console.log(
-        `${DEBUG_PREFIX} beforeRemove type=${e.data.action.type} payload=${JSON.stringify(
-          e.data.action.payload ?? null,
-        )}`,
-      );
+      // console.log(
+      //   `${DEBUG_PREFIX} beforeRemove type=${e.data.action.type} payload=${JSON.stringify(
+      //     e.data.action.payload ?? null,
+      //   )}`,
+      // );
     });
 
     return unsubscribe;

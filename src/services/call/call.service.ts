@@ -4,7 +4,7 @@ import {Platform} from 'react-native';
 export const startIncomingRing = () => {
   try {
     InCallManager.startRingtone('_BUNDLE_');
-    console.log('🔔 Ring started');
+    // console.log('🔔 Ring started');
   } catch (e) {
     console.log('❌ Ring start error:', e);
   }
@@ -13,18 +13,18 @@ export const startIncomingRing = () => {
 export const stopIncomingRing = () => {
   try {
     InCallManager.stopRingtone();
-    console.log(
-      '[CallService] 🔕 Ring stopped via InCallManager.stopRingtone()',
-    );
+    // console.log(
+    //   '[CallService] 🔕 Ring stopped via InCallManager.stopRingtone()',
+    // );
   } catch (e) {
     console.log('[CallService] ❌ Ring stop error:', e);
   }
   // Also call stop() to ensure any ringback tones are stopped
   try {
     InCallManager.stop();
-    console.log(
-      '[CallService] 🔕 InCallManager.stop() called for complete stop',
-    );
+    // console.log(
+    //   '[CallService] 🔕 InCallManager.stop() called for complete stop',
+    // );
   } catch (e) {
     console.log('[CallService] ❌ InCallManager.stop() error:', e);
   }

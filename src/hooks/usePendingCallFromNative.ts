@@ -20,7 +20,7 @@ import {
 import {socketManager} from '../services/socket/socketManager';
 import {navigationService} from '../services/navigation/navigationService';
 
-const DEBUG_PREFIX = '[PendingCallFromNative]';
+// const DEBUG_PREFIX = '[PendingCallFromNative]';
 
 // Cold start: the Decline tap launches the app and processPending() runs on
 // mount, but auth (restoreSession) hydrates asynchronously and the socket is
@@ -92,13 +92,13 @@ const withTimeout = <T>(
         clearTimeout(timeoutId);
         resolve(value);
       },
-      error => {
+      _error => {
         if (settled) {
           return;
         }
         settled = true;
         clearTimeout(timeoutId);
-        console.log(`${DEBUG_PREFIX} withTimeout: promise rejected`, error);
+        // console.log(`${DEBUG_PREFIX} withTimeout: promise rejected`, _error);
         resolve(null);
       },
     );
@@ -132,63 +132,85 @@ export const usePendingCallFromNative = () => {
       return;
     }
 
-    try {
-      const pending = await CallNotificationModule.getPendingAction();
-      console.log(
-        `[REJECT_FLOW] getPendingAction() resolved at ${new Date().toISOString()}`,
-      );
-      console.log("🚀 Pending =", JSON.stringify(pending, null, 2));
-      if (!mountedRef.current || !pending?.action) {
-        return;
-      }
+  
+try {
+  const pending = await CallNotificationModule.getPendingAction();
 
-      console.log('[TRACE 3] pending raw');
-      console.log(JSON.stringify(pending, null, 2));
+  // 🔴 Native se exact complete response
+  console.log(
+    '[NATIVE_CALL] 📦 COMPLETE PENDING =',
+    JSON.stringify(pending, null, 2),
+  );
 
-      processedRef.current = true;
-      console.log(
-        `${DEBUG_PREFIX} Processing pending action: ${pending.action}`,
-      );
-      console.log(
-        `${DEBUG_PREFIX} [DEBUG] pending.action read from native = "${pending.action}"`,
-      );
-      console.log(
-        `${DEBUG_PREFIX} [DEBUG] pending.data keys = ${Object.keys(
-          pending.data || {},
-        ).join(', ')}`,
-      );
+  // 🔴 Action
+  console.log(
+    '[NATIVE_CALL] 🎯 ACTION =',
+    pending?.action,
+  );
 
-      if (pending.action === 'call_request') {
-        console.log(`${DEBUG_PREFIX} [DEBUG] -> calling handleCallRequest`);
-        handleCallRequest(pending.data);
-      } else if (pending.action === 'com.dhwaniastrologer.ACCEPT_CALL') {
-        console.log(`${DEBUG_PREFIX} [DEBUG] -> calling handleAcceptCall`);
-        handleAcceptCall(pending.data);
-      } else if (pending.action === 'com.dhwaniastrologer.REJECT_CALL') {
-        console.log(`${DEBUG_PREFIX} [DEBUG] -> calling handleRejectRequest`);
-        await handleRejectRequest(pending.data);
-      } else if (pending.action === 'com.dhwaniastrologer.ACCEPT_CHAT') {
-        console.log(`${DEBUG_PREFIX} [DEBUG] -> calling handleAcceptChat`);
-        handleAcceptChat(pending.data);
-      } else if (pending.action === 'com.dhwaniastrologer.REJECT_CHAT') {
-        console.log(`${DEBUG_PREFIX} [DEBUG] -> calling handleRejectChat`);
-        handleRejectChat(pending.data);
-      } else {
-        console.log(
-          `${DEBUG_PREFIX} [DEBUG] -> NO HANDLER for action "${pending.action}"`,
-        );
-      }
+  // 🔴 Native data
+  console.log(
+    '[NATIVE_CALL] 📋 DATA =',
+    JSON.stringify(pending?.data, null, 2),
+  );
 
-      try {
-        await CallNotificationModule.clearPendingAction();
-      } catch (e) {
-        console.log(`${DEBUG_PREFIX} clearPendingAction error:`, e);
-      }
-    } catch (e) {
-      console.log(`${DEBUG_PREFIX} Error reading pending action:`, e);
-    } finally {
-      processingRef.current = false;
-    }
+  // 🔴 Room ID ke dono possible keys
+  console.log(
+    '[NATIVE_CALL] 🏠 data.roomId =',
+    pending?.data?.roomId,
+  );
+
+  
+
+  
+
+  if (!mountedRef.current || !pending?.action) {
+    return;
+  }
+
+  processedRef.current = true;
+
+  if (pending.action === 'call_request') {
+    handleCallRequest(pending.data);
+
+  } else if (pending.action === 'com.dhwaniastrologer.ACCEPT_CALL') {
+    handleAcceptCall(pending.data);
+
+  } else if (pending.action === 'com.dhwaniastrologer.REJECT_CALL') {
+    console.log(
+      '[NATIVE_REJECT] 🔴 Going to handleRejectRequest with data =',
+      JSON.stringify(pending.data, null, 2),
+    );
+
+    await handleRejectRequest(pending.data);
+
+  } else if (pending.action === 'com.dhwaniastrologer.ACCEPT_CHAT') {
+    handleAcceptChat(pending.data);
+
+  } else if (pending.action === 'com.dhwaniastrologer.REJECT_CHAT') {
+    handleRejectChat(pending.data);
+  }
+
+  try {
+    await CallNotificationModule.clearPendingAction();
+  } catch (error) {
+    console.log(
+      '[NATIVE_CALL] ❌ clearPendingAction failed =',
+      error,
+    );
+  }
+
+} catch (error) {
+  console.log(
+    '[NATIVE_CALL] ❌ getPendingAction failed =',
+    error,
+  );
+
+} finally {
+  processingRef.current = false;
+}
+
+
   };
 
   const handleCallRequest = (data: Record<string, any>): void => {
@@ -212,7 +234,7 @@ export const usePendingCallFromNative = () => {
 
     const astroId = store.getState().auth.user?.id;
     if (receiverId && astroId && receiverId !== astroId) {
-      console.log(`${DEBUG_PREFIX} call_request: receiver mismatch, ignoring`);
+      // console.log(`${DEBUG_PREFIX} call_request: receiver mismatch, ignoring`);
       return;
     }
 
@@ -222,9 +244,9 @@ export const usePendingCallFromNative = () => {
       currentCallState === 'connecting' ||
       currentCallState === 'connected'
     ) {
-      console.log(
-        `${DEBUG_PREFIX} call_request: call UI already active, ignoring`,
-      );
+      // console.log(
+      //   `${DEBUG_PREFIX} call_request: call UI already active, ignoring`,
+      // );
       return;
     }
 
@@ -240,13 +262,13 @@ export const usePendingCallFromNative = () => {
 
     ringtoneManager.startRingtone();
 
-    console.log(
-      `${DEBUG_PREFIX} call_request: dispatched incoming call UI for room ${roomId}`,
-    );
+    // console.log(
+    //   `${DEBUG_PREFIX} call_request: dispatched incoming call UI for room ${roomId}`,
+    // );
 
-    console.log(
-      `${DEBUG_PREFIX} Pending call restored (call_request) for room ${roomId}`,
-    );
+    // console.log(
+    //   `${DEBUG_PREFIX} Pending call restored (call_request) for room ${roomId}`,
+    // );
     navigationService.navigateWhenReady('IncomingCallFullscreen', {
       roomId,
       callId,
@@ -257,12 +279,11 @@ export const usePendingCallFromNative = () => {
   };
 
   const handleAcceptCall = async (data: Record<string, any>) => {
+    // console.log("🔥 handleAcceptCall");
+    // console.log(JSON.stringify(data, null, 2));
 
-    console.log("🔥 handleAcceptCall");
-console.log(JSON.stringify(data, null, 2));
-
-console.log("maximumTime ===", data.maximumTime);
-console.log("callTime ===", data.callTime);
+    // console.log("maximumTime ===", data.maximumTime);
+    // console.log("callTime ===", data.callTime);
 
     const roomId = data.roomId || data.room_id;
     const callId = data.callId || data.call_id;
@@ -277,7 +298,7 @@ console.log("callTime ===", data.callTime);
       data.callTime || data.call_time || Number(data.maximumTime) || 0;
 
     if (!roomId) {
-      console.log(`${DEBUG_PREFIX} accept: missing roomId, ignoring`);
+      // console.log(`${DEBUG_PREFIX} accept: missing roomId, ignoring`);
       return;
     }
 
@@ -293,16 +314,16 @@ console.log("callTime ===", data.callTime);
     store.dispatch(setError(null));
     store.dispatch(setCallTime(Number(callTime) * 60));
 
-    console.log(
-      `${DEBUG_PREFIX} Pending call restored (ACCEPT_CALL) for room ${roomId}`,
-    );
-    console.log(
-      `${DEBUG_PREFIX} Pending call data: callTime(notif)=${JSON.stringify(
-        data.callTime ?? data.call_time ?? data.maximumTime ?? null,
-      )} resolvedCallTimeMin=${callTime} storedSeconds=${
-        Number(callTime) * 60
-      }`,
-    );
+    // console.log(
+    //   `${DEBUG_PREFIX} Pending call restored (ACCEPT_CALL) for room ${roomId}`,
+    // );
+    // console.log(
+    //   `${DEBUG_PREFIX} Pending call data: callTime(notif)=${JSON.stringify(
+    //     data.callTime ?? data.call_time ?? data.maximumTime ?? null,
+    //   )} resolvedCallTimeMin=${callTime} storedSeconds=${
+    //     Number(callTime) * 60
+    //   }`,
+    // );
 
     // Open the incoming call UI as soon as navigation is ready. The screen
     // registers the accept trigger that triggerAccept() below invokes, so the
@@ -316,9 +337,9 @@ console.log("callTime ===", data.callTime);
       callTime: Number(callTime),
     });
 
-    console.log(
-      `${DEBUG_PREFIX} accept: prepared call state for room ${roomId}, waiting for socket ready`,
-    );
+    // console.log(
+    //   `${DEBUG_PREFIX} accept: prepared call state for room ${roomId}, waiting for socket ready`,
+    // );
 
     // Guarantee the socket is connected AND the OneSignal `register` emit has
     // completed before starting the accept flow. Otherwise join_call /
@@ -334,7 +355,7 @@ console.log("callTime ===", data.callTime);
     // launch and the accepted call is silently dropped.
     await navigationService.waitUntilReady();
 
-    console.log(`${DEBUG_PREFIX} PendingCall accept starts`);
+    // console.log(`${DEBUG_PREFIX} PendingCall accept starts`);
 
     triggerAccept();
   };
@@ -346,18 +367,19 @@ console.log("callTime ===", data.callTime);
       return;
     }
 
-    const roomId = data.roomId || data.room_id;
+    const roomId = data.roomId;
+  console.log('[NATIVE_REJECT] 🔴 data.room_id =', roomId);
 
     if (!roomId) {
-      console.log(`${DEBUG_PREFIX} reject: missing roomId, ignoring`);
+      // console.log(`${DEBUG_PREFIX} reject: missing roomId, ignoring`);
       return;
     }
 
-    console.log(
-      `[REJECT_FLOW] handleRejectRequest entered at ${new Date().toISOString()} roomId=${roomId} callState=${
-        store.getState().call.callState
-      }`,
-    );
+    // console.log(
+    //   `[REJECT_FLOW] handleRejectRequest entered at ${new Date().toISOString()} roomId=${roomId} callState=${
+    //     store.getState().call.callState
+    //   }`,
+    // );
 
     ringtoneManager.stopRingtone();
 
@@ -368,39 +390,47 @@ console.log("callTime ===", data.callTime);
       (await waitForAuthUserId()) || data.astrologerId || data.astro_id;
 
     if (!astroId) {
-      console.log(
-        `${DEBUG_PREFIX} reject: astroId unavailable after auth wait, aborting reject emit`,
-      );
+      // console.log(
+      //   `${DEBUG_PREFIX} reject: astroId unavailable after auth wait, aborting reject emit`,
+      // );
       store.dispatch(setCallState('idle'));
       return;
     }
 
-    console.log(
-      `[REJECT_FLOW] astroId=${astroId} (auth hydrated after cold start)`,
-    );
+    // console.log(
+    //   `[REJECT_FLOW] astroId=${astroId} (auth hydrated after cold start)`,
+    // );
 
     // socketManager.emit() silently drops the packet when the socket is not
     // connected. Wait until it is connected (and registered) before sending
     // call_cancel_by_astrologer.
-    console.log(
-      `[REJECT_FLOW] Waiting for socket ready... connected=${socketManager.isConnected()} at ${new Date().toISOString()}`,
-    );
+    // console.log(
+    //   `[REJECT_FLOW] Waiting for socket ready... connected=${socketManager.isConnected()} at ${new Date().toISOString()}`,
+    // );
     await withTimeout(socketManager.ensureSocketReady(), 25000, () => {
-      console.log(
-        `${DEBUG_PREFIX} reject: socket not ready within 25s, proceeding anyway`,
-      );
+      // console.log(
+      //   `${DEBUG_PREFIX} reject: socket not ready within 25s, proceeding anyway`,
+      // );
     });
+  console.log(
+    '[NATIVE_REJECT] 🟢 Sending reject socket event with roomId =',
+    roomId,
+  );
 
-    console.log(
-      `[REJECT_FLOW] Emitting call_cancel_by_astrologer at ${new Date().toISOString()} roomId=${roomId} socketConnected=${socketManager.isConnected()}`,
-    );
+    // console.log(
+    //   `[REJECT_FLOW] Emitting call_cancel_by_astrologer at ${new Date().toISOString()} roomId=${roomId} socketConnected=${socketManager.isConnected()}`,
+    // );
     try {
       await callSocketEmitters.rejectCall(astroId, roomId);
+      // console.log(
+      //   `[REJECT_FLOW] call_cancel_by_astrologer emitted successfully roomId=${roomId}`,
+      // );
       console.log(
-        `[REJECT_FLOW] call_cancel_by_astrologer emitted successfully roomId=${roomId}`,
-      );
-    } catch (error) {
-      console.log(`${DEBUG_PREFIX} reject socket error:`, error);
+      '[NATIVE_REJECT] ✅ Reject emitted with roomId =',
+      roomId,
+    );
+    } catch {
+      // console.log(`${DEBUG_PREFIX} reject socket error:`, error);
     }
 
     store.dispatch(setCallState('idle'));
@@ -410,8 +440,8 @@ console.log("callTime ===", data.callTime);
     // Must behave exactly like pressing ChatRequestCard "Accept".
     // Business logic lives in ChatRequestCard handlers.
     ringtoneManager.stopRingtone();
-    console.log('[TRACE 3A] pending.data');
-    console.log(JSON.stringify(data, null, 2));
+    // console.log('[TRACE 3A] pending.data');
+    // console.log(JSON.stringify(data, null, 2));
     handleChatAcceptFromNative(data);
   };
 

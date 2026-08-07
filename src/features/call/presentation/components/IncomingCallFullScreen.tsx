@@ -110,7 +110,7 @@ export const IncomingCallFullScreen = forwardRef<IncomingCallFullScreenRef>((pro
   const navigation = useNavigation<NavigationProp>();
   const { theme } = useTheme();
 
-  console.log(`${DEBUG_PREFIX} mounted`);
+  // console.log(`${DEBUG_PREFIX} mounted`);
 
   const callStateData = useSelector((state: RootState) => state.call);
   if (!callStateData) {
@@ -372,9 +372,9 @@ export const IncomingCallFullScreen = forwardRef<IncomingCallFullScreenRef>((pro
   useEffect(() => {
     return () => {
       if (callState === 'ringing') {
-        console.log(
-          `${DEBUG_PREFIX} Component unmounting while ringing - stopping ringtone`,
-        );
+        // console.log(
+        //   `${DEBUG_PREFIX} Component unmounting while ringing - stopping ringtone`,
+        // );
         ringtoneManager.stopRingtone();
       }
     };
@@ -397,7 +397,7 @@ export const IncomingCallFullScreen = forwardRef<IncomingCallFullScreenRef>((pro
 
 
   const handleAccept = useCallback(async () => {
-    console.log('[Call Accept Flow] Accept pressed');
+    // console.log('[Call Accept Flow] Accept pressed');
 
     const currentRoomId = roomIdRef.current;
 
@@ -414,41 +414,41 @@ export const IncomingCallFullScreen = forwardRef<IncomingCallFullScreenRef>((pro
     }
 
     setAccepting(true);
-    console.log('[Call Accept Flow] Stopping ringtone...');
+    // console.log('[Call Accept Flow] Stopping ringtone...');
     ringtoneManager.stopRingtone();
-    console.log('[Call Accept Flow] Ringtone stopped successfully');
+    // console.log('[Call Accept Flow] Ringtone stopped successfully');
     Vibration.vibrate(50);
 
     try {
       const localStream = await webrtcService.getLocalStream();
-      console.log(
-        `${DEBUG_PREFIX} Local stream obtained, tracks:`,
-        localStream.getTracks().length,
-      );
+      // console.log(
+      //   `${DEBUG_PREFIX} Local stream obtained, tracks:`,
+      //   localStream.getTracks().length,
+      // );
 
 
       // 👇 YAHAN ADD KARO
 const socket = await socketClient.getSocket();
 
-console.log('[KILL MODE] socket.connected =', socket.connected);
-console.log('[KILL MODE] socket.id =', socket.id);
+// console.log('[KILL MODE] socket.connected =', socket.connected);
+// console.log('[KILL MODE] socket.id =', socket.id);
 
 const state = store.getState();
 
-console.log('[KILL MODE] auth token =', !!state.auth.token);
-console.log('[KILL MODE] userId =', state.auth.user?.id);
-console.log('[KILL MODE] roomId =', currentRoomId);
-console.log('[KILL MODE] callTime =', state.call.callTime);
+// console.log('[KILL MODE] auth token =', !!state.auth.token);
+// console.log('[KILL MODE] userId =', state.auth.user?.id);
+// console.log('[KILL MODE] roomId =', currentRoomId);
+// console.log('[KILL MODE] callTime =', state.call.callTime);
 
-console.log("Redux callTime =", store.getState().call.callTime);
+// console.log("Redux callTime =", store.getState().call.callTime);
 
 // Agar route params use ho rahe hain to
-console.log("Navigation callTime =", (props as any)?.route?.params?.callTime);
+// console.log("Navigation callTime =", (props as any)?.route?.params?.callTime);
 
-console.log("Participant =", participantRef.current);
+// console.log("Participant =", participantRef.current);
 
       await callSocketEmitters.joinCall(currentRoomId);
-      console.log(`${DEBUG_PREFIX} join_call emitted`);
+      // console.log(`${DEBUG_PREFIX} join_call emitted`);
 
       setTimeout(async () => {
         try {
@@ -472,7 +472,7 @@ console.log("Participant =", participantRef.current);
           const astroId = (state.auth.user as any)?.id;
           const callTimeInSeconds = state.call.callTime;
           const callTimeInMinutes = callTimeInSeconds / 60;
-          console.log("callTimeInSeconds>>>",callTimeInSeconds)
+          // console.log("callTimeInSeconds>>>",callTimeInSeconds)
 
           if (callTimeInSeconds <= 0) {
             // A zero/negative duration is treated by the server as an invalid
@@ -561,7 +561,7 @@ console.log("Participant =", participantRef.current);
     try {
       const astroId = (store.getState().auth.user as any)?.id;
       await callSocketEmitters.rejectCall(astroId || 'unknown', currentRoomId);
-      console.log(`${DEBUG_PREFIX} Call rejected`);
+      // console.log(`${DEBUG_PREFIX} Call rejected`);
     } catch (error) {
       console.log(`${DEBUG_PREFIX} Error rejecting call:`, error);
     }

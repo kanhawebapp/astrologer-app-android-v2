@@ -6,7 +6,7 @@ import {store, RootState} from '../store';
 import {handleRequestNotification} from './notificationRequestHandler';
 import {usePendingCallFromNative} from './usePendingCallFromNative';
 
-const DEBUG_PREFIX = '[NotificationClickRouter]';
+// const DEBUG_PREFIX = '[NotificationClickRouter]';
 
 export const useNotificationClickRouter = () => {
   const token = useSelector((state: RootState) => state.auth.token);
@@ -14,22 +14,22 @@ export const useNotificationClickRouter = () => {
   tokenRef.current = token;
 
   useEffect(() => {
-    console.log(`${DEBUG_PREFIX} Setting up notification click listener`);
+    // console.log(`${DEBUG_PREFIX} Setting up notification click listener`);
 
     const connectIfNeeded = () => {
       if (!socketManager.isConnected()) {
-        console.log(`${DEBUG_PREFIX} Socket not connected, connecting now`);
+        // console.log(`${DEBUG_PREFIX} Socket not connected, connecting now`);
         socketManager.connect();
       } else {
-        console.log(`${DEBUG_PREFIX} Socket already connected`);
+        // console.log(`${DEBUG_PREFIX} Socket already connected`);
       }
     };
 
     const unsubscribe = oneSignalService.onNotificationClick(event => {
-      console.log(`${DEBUG_PREFIX} Notification clicked`);
+      // console.log(`${DEBUG_PREFIX} Notification clicked`);
 
-      console.log('[TRACE 1] notification.additionalData');
-      console.log(JSON.stringify(event?.notification?.additionalData, null, 2));
+      // console.log('[TRACE 1] notification.additionalData');
+      // console.log(JSON.stringify(event?.notification?.additionalData, null, 2));
 
       const additionalData = (event?.notification?.additionalData ??
         {}) as Record<string, any>;
@@ -47,16 +47,16 @@ export const useNotificationClickRouter = () => {
       // state by tapping the push). Connecting before the token is restored
       // yields a tokenless socket ("Token missing"). Wait for hydration.
       if (!tokenRef.current) {
-        console.log(
-          `${DEBUG_PREFIX} Auth not hydrated yet - waiting for token before connecting`,
-        );
+        // console.log(
+        //   `${DEBUG_PREFIX} Auth not hydrated yet - waiting for token before connecting`,
+        // );
         const unsubscribeStore = store.subscribe(() => {
           const hydratedToken = (store.getState() as RootState).auth.token;
           if (hydratedToken) {
             unsubscribeStore();
-            console.log(
-              `${DEBUG_PREFIX} Auth hydrated - connecting socket + driving UI`,
-            );
+            // console.log(
+            //   `${DEBUG_PREFIX} Auth hydrated - connecting socket + driving UI`,
+            // );
             driveUI();
           }
         });
@@ -67,11 +67,10 @@ export const useNotificationClickRouter = () => {
     });
 
     return () => {
-      console.log(`${DEBUG_PREFIX} Cleaning up notification click listener`);
+      // console.log(`${DEBUG_PREFIX} Cleaning up notification click listener`);
       unsubscribe();
     };
   }, []);
 
   usePendingCallFromNative();
 };
-

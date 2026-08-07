@@ -10,22 +10,22 @@ export const useCallKeepIntegration = () => {
 
     const initCallKeep = async () => {
       try {
-        console.log(`${DEBUG_PREFIX} Setting up CallKeep`);
+        // console.log(`${DEBUG_PREFIX} Setting up CallKeep`);
         await setupCallKeep();
 
         if (!isMounted) {
           return;
         }
 
-        console.log(`${DEBUG_PREFIX} Adding CallKeep event listeners`);
+        // console.log(`${DEBUG_PREFIX} Adding CallKeep event listeners`);
 
         addCallKeepEventListeners(
           () => {
-            console.log(`${DEBUG_PREFIX} CallKeep answerCall received`);
+            // console.log(`${DEBUG_PREFIX} CallKeep answerCall received`);
             callActionBridge.accept();
           },
           () => {
-            console.log(`${DEBUG_PREFIX} CallKeep endCall received`);
+            // console.log(`${DEBUG_PREFIX} CallKeep endCall received`);
             callActionBridge.reject();
           },
         );
@@ -38,7 +38,7 @@ export const useCallKeepIntegration = () => {
 
     return () => {
       isMounted = false;
-      console.log(`${DEBUG_PREFIX} Cleaning up CallKeep listeners`);
+      // console.log(`${DEBUG_PREFIX} Cleaning up CallKeep listeners`);
       removeCallKeepEventListeners();
     };
   }, []);

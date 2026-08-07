@@ -31,10 +31,6 @@ const connectSocket = async (authToken?: string): Promise<void> => {
 
   isConnecting = true;
   // console.log(`🔄 ${DEBUG_PREFIX} Socket connect requested`);
-  console.log(
-    `[SOCKET_OWNER] connect called — instanceId=${socketClient.getInstanceId()} ` +
-      `stack:\n${new Error().stack}`,
-  );
 
   try {
     let token = authToken || currentAuthToken;
@@ -50,11 +46,9 @@ const connectSocket = async (authToken?: string): Promise<void> => {
         if (token) {
           // console.log(`[SOCKET] Token Preview: ${token.substring(0, 20)}...`);
         }
-      } catch (error) {
-        console.log(
-          `[SOCKET] Failed to retrieve token from storage:`,
-          error,
-        );
+      } catch {
+        // Failed to read the token from storage; fall through and try to
+        // connect without it (connectSocket defers if no token is available).
       }
     }
 
@@ -78,7 +72,6 @@ const connectSocket = async (authToken?: string): Promise<void> => {
       // console.log(
       //   `${DEBUG_PREFIX} Token preview: ${token.substring(0, 20)}...`,
       // );
-      console.log(`[SOCKET] Auth object sent to socket contains token: YES`);
       socketClient.setToken(token);
     } else {
       // console.log(
@@ -196,7 +189,6 @@ const connectSocket = async (authToken?: string): Promise<void> => {
 
     if (!socket.connected) {
       socket.connect();
-      console.log(`${DEBUG_PREFIX} socket.connect() called`);
     }
   } catch (error) {
     // console.log(`❌ ${DEBUG_PREFIX} Socket Connect Error:`, error);
@@ -364,10 +356,8 @@ const off = <T = unknown>(event: string, callback?: EventCallback<T>): void => {
   socketClient.getSocket().then(socket => {
     if (callback) {
       socket.off(event, callback);
-      console.log(`🔓 ${DEBUG_PREFIX} Listener removed for: "${event}"`);
     } else {
       socket.off(event);
-      console.log(`🔓 ${DEBUG_PREFIX} All listeners removed for: "${event}"`);
     }
   });
 };
@@ -436,10 +426,6 @@ const ensureSocketReady = async (): Promise<void> => {
 };
 
 const reset = async (): Promise<void> => {
-  console.log(
-    `[SOCKET_OWNER] reset called — instanceId=${socketClient.getInstanceId()} ` +
-      `stack:\n${new Error().stack}`,
-  );
   isConnecting = false;
   socketClient.reset();
   currentAuthToken = null;
