@@ -151,8 +151,24 @@ class CallNotificationServiceExtension : INotificationServiceExtension {
 
             val sdkNotificationId = notification.notificationId
 
+            val pid = android.os.Process.myPid()
+            val tid = android.os.Process.myTid()
+
+            android.util.Log.d(
+                "ANDROID_CALL_DEDUPE",
+                "RECEIVED notificationId=$sdkNotificationId key=$notificationKey pid=$pid tid=$tid"
+            )
+
             val dedupeStore = CallHandledStore(event.context)
             val isNew = dedupeStore.isNew(notificationKey)
+
+            android.util.Log.d(
+                "ANDROID_CALL_DEDUPE",
+                if (isNew)
+                    "MARKED_HANDLED notificationId=$sdkNotificationId key=$notificationKey pid=$pid tid=$tid"
+                else
+                    "DROPPED_DUPLICATE notificationId=$sdkNotificationId key=$notificationKey pid=$pid tid=$tid"
+            )
 
             android.util.Log.d("CallNotificationDedupe", "notificationId=$sdkNotificationId")
             android.util.Log.d("CallNotificationDedupe", "roomId=$roomIdForLog")
@@ -169,6 +185,10 @@ class CallNotificationServiceExtension : INotificationServiceExtension {
 
             if (!isNew) {
                 event.preventDefault()
+                android.util.Log.d(
+                    "ANDROID_CALL_DEDUPE",
+                    "DROPPED_DUPLICATE notificationId=$sdkNotificationId key=$notificationKey (preventDefault, no processing)"
+                )
                 android.util.Log.d(
                     "CallNotificationDedupe",
                     "notificationId=$sdkNotificationId SKIPPED (not posting custom notification)"
@@ -202,6 +222,11 @@ class CallNotificationServiceExtension : INotificationServiceExtension {
             android.util.Log.d("CallExtension", "event.preventDefault() returned (background).")
 
             android.util.Log.d("CallExtension", "About to call showCustomNotification().")
+
+            android.util.Log.d(
+                "ANDROID_CALL_DEDUPE",
+                "ACCEPTED notificationId=$sdkNotificationId key=$notificationKey pid=$pid tid=$tid -> showCustomNotification()"
+            )
 
             val callerName = firstNonEmpty(
                 notification.title,
