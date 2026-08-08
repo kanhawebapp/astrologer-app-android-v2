@@ -1,6 +1,7 @@
 package com.dhwaniastrologer
 
 import android.app.Activity
+import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -99,6 +100,8 @@ val callTime = intent.getStringExtra("extra_call_time") ?: ""
       Log.d("ANDROID_CALL_REJECT", "idd=${intent.getStringExtra("extra_idd")}")
       Log.d("ANDROID_CALL_REJECT", "room_id=${intent.getStringExtra("extra_room_id")}")
     }
+
+    dismissCustomCallNotification(action, intent)
 
  Log.d("TRACE_NATIVE_3", "extra_room_id=$roomId")
 Log.d("TRACE_NATIVE_3", "extra_session_id=$sessionId")
@@ -238,5 +241,29 @@ Log.d("TRACE_NATIVE_3", "extra_call_time=$callTime")
       }
     }
     return ""
+  }
+
+  private fun dismissCustomCallNotification(action: String, intent: Intent?) {
+    if (
+      action != "com.dhwaniastrologer.ACCEPT_CALL" &&
+      action != "com.dhwaniastrologer.REJECT_CALL"
+    ) {
+      return
+    }
+
+    val notificationKey = intent?.getStringExtra("extra_notification_id") ?: ""
+    if (notificationKey.isEmpty()) {
+      Log.d("ANDROID_CALL_DISMISS", "notificationId missing, custom notification not cancelled")
+      return
+    }
+
+    val notificationId = notificationKey.hashCode() and 0x7fffffff
+    val actionLabel = if (action == "com.dhwaniastrologer.ACCEPT_CALL") "ANSWER_CALL" else "REJECT_CALL"
+    Log.d("ANDROID_CALL_DISMISS", "action=$actionLabel notificationId=$notificationId")
+
+    val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    manager.cancel(notificationId)
+
+    Log.d("ANDROID_CALL_DISMISS", "custom notification cancelled")
   }
 }
