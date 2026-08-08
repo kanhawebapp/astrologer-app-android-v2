@@ -381,36 +381,64 @@ export const setupEventHandlers = async (): Promise<void> => {
     callCallbackManager.invokeCallbacks('onPeerJoined', data);
   });
 
-  socket.on(CallSocketEvents.CALL_ENDED_BY_USER, (data: any) => {
-    const eventRoomId = data?.room_id || data?.roomId;
-    const currentRoomId = store.getState().call.roomId;
-    if (eventRoomId && currentRoomId && eventRoomId !== currentRoomId) {
-      // A call-end event for a different room (e.g. stale replay after a
-      // reconnect) must never kill the currently active call.
+  
+  
+
+
+
+
+socket.on(CallSocketEvents.CALL_ENDED_BY_USER, (data: any) => {
+  // Socket is sending JSON string, not an object
+  let eventData: any = data;
+
+  if (typeof data === 'string') {
+    try {
+      eventData = JSON.parse(data);
+    } catch (error) {
       console.warn(
-        `${DEBUG_PREFIX} call_ended_by_user room mismatch (${eventRoomId} vs current ${currentRoomId}). Ignoring.`,
+        `${DEBUG_PREFIX} call_ended_by_user invalid JSON`,
+        data,
       );
       return;
     }
-    const pcStatus = webrtcService.getConnectionStatus();
-    const currentCallState = store.getState().call.callState;
-    // console.log(
-    //   `${DEBUG_PREFIX} 📥 EVENT: "${CallSocketEvents.CALL_ENDED_BY_USER}" [CALL END TRIGGER: call_ended_by_user]`,
-    //   data,
-    // );
-    // console.log(
-    //   `${DEBUG_PREFIX} [CALL END TRIGGER: call_ended_by_user] current callState=${currentCallState} peerConnection=${
-    //     pcStatus
-    //       ? `connection=${pcStatus.connectionState}, ice=${pcStatus.iceConnectionState}`
-    //       : 'null'
-    //   }`,
-    // );
-    store.dispatch(setCallState('ended'));
-    store.dispatch(setError('User ended the call'));
-    ringtoneManager.stopRingtone();
-    stopCallAudio();
-    callCallbackManager.invokeCallbacks('onCallEndedByUser', data);
-  });
+  }
+
+  // FIRST: validate room before processing anything else
+  const eventRoomId = eventData?.room_id || eventData?.roomId;
+  const currentRoomId = store.getState().call.roomId;
+
+  console.log('eventData >>>', eventData);
+  console.log('eventRoomId >>>', eventRoomId);
+  console.log('currentRoomId >>>', currentRoomId);
+
+  if (!eventRoomId || !currentRoomId || eventRoomId !== currentRoomId) {
+    console.warn(
+      `${DEBUG_PREFIX} call_ended_by_user ignored: room mismatch`,
+      {
+        eventRoomId,
+        currentRoomId,
+      },
+    );
+    return;
+  }
+
+  // Only SAME room reaches here
+  const pcStatus = webrtcService.getConnectionStatus();
+  const currentCallState = store.getState().call.callState;
+
+  store.dispatch(setCallState('ended'));
+  store.dispatch(setError('User ended the call'));
+
+  ringtoneManager.stopRingtone();
+  stopCallAudio();
+
+  callCallbackManager.invokeCallbacks(
+    'onCallEndedByUser',
+    eventData,
+  );
+});
+
+
 
   socket.on(CallSocketEvents.CALL_REJECTED, (data: any) => {
     const eventRoomId = data?.room_id || data?.roomId;

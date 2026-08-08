@@ -45,7 +45,7 @@ export const CallScreen: React.FC = () => {
   const [speakerOn, setSpeakerOnState] = React.useState(false);
   const { theme } = useTheme();
 
-  console.log(`${DEBUG_PREFIX} mounted`, { roomId, callerName });
+  // console.log(`${DEBUG_PREFIX} mounted`, { roomId, callerName });
 
   const { callState, callDuration, callTime, isMuted, isSpeakerOn, error } = useSelector(
     (state: RootState) => state.call,

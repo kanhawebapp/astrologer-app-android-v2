@@ -36,7 +36,7 @@ export const IncomingCallFullscreen: React.FC = () => {
   const roomId = useSelector((state: RootState) => state.call.roomId);
   const restoredRef = useRef(false);
 
-  console.log(`${DEBUG_PREFIX} mounted`);
+  // console.log(`${DEBUG_PREFIX} mounted`);
 
   // Reconcile the route params into the call store exactly once. If the call
   // state was already prepared (e.g. handleAcceptCall set 'ringing' before

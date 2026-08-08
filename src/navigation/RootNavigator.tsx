@@ -93,7 +93,7 @@ export const RootNavigator: React.FC = () => {
           component={IncomingCallFullscreen}
           options={{
             presentation: 'fullScreenModal',
-            animation: 'fade',
+            animation: 'none',
           }}
         />
         {isAuthenticated ? (
