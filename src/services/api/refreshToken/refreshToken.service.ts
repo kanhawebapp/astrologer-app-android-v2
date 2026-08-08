@@ -6,18 +6,18 @@ export const refreshTokenApi = {
   refreshAstrologerToken: async (
     token?: string,
   ) => {
-    console.log(
-      '====== REFRESH ASTROLOGER TOKEN REQUEST ======',
-    );
+    // console.log(
+    //   '====== REFRESH ASTROLOGER TOKEN REQUEST ======',
+    // );
 
-    console.log(
-      'Query:',
-      REFRESH_ASTROLOGER_TOKEN_MUTATION.trim(),
-    );
+    // console.log(
+    //   'Query:',
+    //   REFRESH_ASTROLOGER_TOKEN_MUTATION.trim(),
+    // );
 
-    console.log(
-      '==============================================',
-    );
+    // console.log(
+    //   '==============================================',
+    // );
 
     return graphqlRequest<RefreshAstrologerTokenData>({
       query: REFRESH_ASTROLOGER_TOKEN_MUTATION,
