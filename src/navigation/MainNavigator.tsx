@@ -167,8 +167,8 @@ export const MainNavigator: React.FC = () => {
 
 
   useEffect(() => {
-    console.log('Current Astro:', currentAstrologerId);
-    console.log('Session:', activeSession);
+    // console.log('Current Astro:', currentAstrologerId);
+    // console.log('Session:', activeSession);
 
     if (
       activeSession &&
