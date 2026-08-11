@@ -11,6 +11,7 @@ import {
   setActiveSession,
 } from '../../store/slices/chatSlice';
 import { chatSocketService } from '../../features/chat/data/chatSocketService';
+import { AUTO_REJECT_TIME_MS } from '../../features/chat/domain/chatEvents';
 import {
   getOrCreateTraceId,
   logTrace,
@@ -135,12 +136,19 @@ export const ChatRequestCard: React.FC<ChatRequestCardProps> = memo(() => {
 
     if (latestRequest) {
       isAnimatingRef.current = false;
-      const timerSeconds = latestRequest.maximumTime
-        ? latestRequest.maximumTime * 60
-        : 60;
+      // Fixed 30-second auto-dismiss window, aligned with the backend
+      // AUTO_REJECT_TIME_MS. Previously the countdown was maximumTime * 60.
+      const timerSeconds = AUTO_REJECT_TIME_MS / 1000;
       setCountdown(timerSeconds);
       const sessionId = latestRequest.sessionId;
       const roomId = latestRequest.roomId;
+
+      console.log(
+        `[ChatRequestCard] ChatRequestCard shown session=${sessionId} roomId=${roomId}`,
+      );
+      console.log(
+        `[ChatRequestCard] timer started (${timerSeconds}s) session=${sessionId}`,
+      );
 
       timerRef.current = setInterval(() => {
         setCountdown(prev => {
@@ -150,7 +158,15 @@ export const ChatRequestCard: React.FC<ChatRequestCardProps> = memo(() => {
               timerRef.current = null;
             }
 
+            console.log(
+              `[ChatRequestCard] timer expired (${timerSeconds}s) session=${sessionId}`,
+            );
+
             closeCard();
+
+            console.log(
+              `[ChatRequestCard] ChatRequestCard auto-dismissed session=${sessionId}`,
+            );
 
             setTimeout(async () => {
               try {
@@ -211,6 +227,10 @@ export const ChatRequestCard: React.FC<ChatRequestCardProps> = memo(() => {
       dispatch(removeChatRequest(latestRequest.sessionId));
       return;
     }
+
+    console.log(
+      `[ChatRequestCard] user accepted request session=${latestRequest.sessionId} roomId=${latestRequest.roomId}`,
+    );
 
     setAccepting(true);
 
@@ -364,6 +384,9 @@ export const ChatRequestCard: React.FC<ChatRequestCardProps> = memo(() => {
     }
 
     // console.log('[ChatRequestCard] handleReject() PASSED guards -> proceeding to reject');
+    console.log(
+      `[ChatRequestCard] user rejected request session=${latestRequest.sessionId} roomId=${latestRequest.roomId}`,
+    );
     setRejecting(true);
 
     if (timerRef.current) {
