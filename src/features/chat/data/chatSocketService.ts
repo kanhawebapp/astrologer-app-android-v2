@@ -88,11 +88,11 @@ class ChatSocketService {
   }
 
   async acceptChatAstrologer(
-    sessionId: string,
-    roomId?: string,
+    sessionId: string, roomId: string, userId: string,
   ): Promise<void> {
     const { store } = require('../../../store');
     const state = store.getState();
+    const astroId = state.auth.user?.id;
 
     // Instrumentation ONLY
     console.log('[CHAT_ACCEPT_TRACE] inside acceptChatAstrologer()');
@@ -117,8 +117,7 @@ class ChatSocketService {
     console.log('payload:', JSON.stringify({ sessionId, roomId }, null, 2));
 
     await socketManager.waitUntilConnected();
-    await chatSocketEmitters.acceptChatAstrologer(sessionId, roomId);
-
+await chatSocketEmitters.acceptChatAstrologer( sessionId, roomId, userId, astroId, );
     // Instrumentation ONLY
     console.log('[CHAT_ACCEPT_TRACE] after chat_accepted_astrologer emit');
     console.log('timestamp:', new Date().toISOString());

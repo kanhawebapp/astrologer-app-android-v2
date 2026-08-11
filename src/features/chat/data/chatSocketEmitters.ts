@@ -13,23 +13,39 @@ export class ChatSocketEmitters {
   }
 
 
-  async acceptChatAstrologer(
-    sessionId: string,
-    roomId?: string,
-  ): Promise<void> {
-    console.log('[ACCEPT TRACE 5] acceptChatAstrologer called');
-    console.log({ sessionId, roomId });
-    const emitPayload = {
-      sessionId,
-      room_id: roomId,
-    };
+ 
+async acceptChatAstrologer(
+  sessionId: string,
+  roomId: string,
+  userId: string,
+  astroId: string,
+): Promise<void> {
   
-    console.log('[ACCEPT TRACE 6] socket emit');
-    await socketManager.emit(ChatSocketEvents.CHAT_ACCEPTED_ASTROLOGER, emitPayload);
 
-    // console.log('[CHAT_ACCEPT_TRACE] after chat_accepted_astrologer emit');
-    // console.log('timestamp:', new Date().toISOString());
-  }
+  const emitPayload = {
+    sessionId,
+    room_id: roomId,
+    userId,
+    astroId,
+  };
+
+  console.log(
+    '[ACCEPT TRACE 6] FINAL SOCKET PAYLOAD:',
+    JSON.stringify(emitPayload, null, 2),
+  );
+
+
+  await socketManager.emit(
+    ChatSocketEvents.CHAT_ACCEPTED_ASTROLOGER,
+    emitPayload,
+  );
+
+  console.log(
+    '[ACCEPT TRACE 8] SOCKET EMIT COMPLETED',
+  );
+}
+
+
 
   async rejectChat(sessionId: string, roomId?: string): Promise<void> {
     console.log("i am here for chat reject newww")

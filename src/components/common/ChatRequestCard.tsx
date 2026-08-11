@@ -330,10 +330,7 @@ export const ChatRequestCard: React.FC<ChatRequestCardProps> = memo(() => {
         //   sessionId: latestRequest.sessionId,
         //   roomId: latestRequest.roomId,
         // });
-        await chatSocketService.acceptChatAstrologer(
-          latestRequest.sessionId,
-          latestRequest.roomId,
-        );
+        await chatSocketService.acceptChatAstrologer( latestRequest.sessionId, latestRequest.roomId, latestRequest.userId, );
         // console.log('[ChatRequestCard] AFTER chatSocketService.acceptChatAstrologer() resolved');
       } catch (error) {
         logTrace({
