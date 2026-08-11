@@ -246,7 +246,9 @@ Log.d("TRACE_NATIVE_3", "extra_call_time=$callTime")
   private fun dismissCustomCallNotification(action: String, intent: Intent?) {
     if (
       action != "com.dhwaniastrologer.ACCEPT_CALL" &&
-      action != "com.dhwaniastrologer.REJECT_CALL"
+      action != "com.dhwaniastrologer.REJECT_CALL" &&
+      action != "com.dhwaniastrologer.ACCEPT_CHAT" &&
+      action != "com.dhwaniastrologer.REJECT_CHAT"
     ) {
       return
     }
@@ -258,7 +260,12 @@ Log.d("TRACE_NATIVE_3", "extra_call_time=$callTime")
     }
 
     val notificationId = notificationKey.hashCode() and 0x7fffffff
-    val actionLabel = if (action == "com.dhwaniastrologer.ACCEPT_CALL") "ANSWER_CALL" else "REJECT_CALL"
+    val actionLabel = when (action) {
+      "com.dhwaniastrologer.ACCEPT_CALL" -> "ANSWER_CALL"
+      "com.dhwaniastrologer.REJECT_CALL" -> "REJECT_CALL"
+      "com.dhwaniastrologer.ACCEPT_CHAT" -> "ACCEPT_CHAT"
+      else -> "REJECT_CHAT"
+    }
     Log.d("ANDROID_CALL_DISMISS", "action=$actionLabel notificationId=$notificationId")
 
     val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
