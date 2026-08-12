@@ -181,7 +181,7 @@ export const SessionCard: React.FC<SessionCardProps> = React.memo(
               </AppText>
             )}
           </View>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={[
               styles.actionButton,
               {
@@ -202,7 +202,7 @@ export const SessionCard: React.FC<SessionCardProps> = React.memo(
                   : theme.colors.primary
               }
             />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       </TouchableOpacity>
     );

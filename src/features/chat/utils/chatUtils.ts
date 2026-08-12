@@ -114,60 +114,60 @@ export const normalizeSocketEvent = (
   const receiver_id =
     data.receiver_id || data.receiverId || data.receiverID || '';
 
-  console.log(`[normalizeSocketEvent] 🔍 [FIELD_EXTRACTION] Raw field values:`);
-  console.log(`   room_id: "${room_id || 'UNDEFINED'}"`);
-  console.log(`   session_id: "${session_id || 'UNDEFINED'}"`);
-  console.log(`   sender_id: "${sender_id || 'UNDEFINED'}"`);
-  console.log(`   receiver_id: "${receiver_id || 'UNDEFINED'}"`);
+  // console.log(`[normalizeSocketEvent] 🔍 [FIELD_EXTRACTION] Raw field values:`);
+  // console.log(`   room_id: "${room_id || 'UNDEFINED'}"`);
+  // console.log(`   session_id: "${session_id || 'UNDEFINED'}"`);
+  // console.log(`   sender_id: "${sender_id || 'UNDEFINED'}"`);
+  // console.log(`   receiver_id: "${receiver_id || 'UNDEFINED'}"`);
 
   // Log which source each field came from for debugging
-  console.log(`[normalizeSocketEvent] 🔍 [SOURCE_TRACE] Field origins:`);
-  console.log(
-    `   room_id from: ${
-      data.room_id
-        ? 'room_id'
-        : data.roomId
-        ? 'roomId'
-        : data.roomid
-        ? 'roomid'
-        : data.roomID
-        ? 'roomID'
-        : 'none'
-    }`,
-  );
-  console.log(
-    `   session_id from: ${
-      data.session_id
-        ? 'session_id'
-        : data.sessionId
-        ? 'sessionId'
-        : data.sessionID
-        ? 'sessionID'
-        : 'none'
-    }`,
-  );
-  console.log(
-    `   sender_id from: ${
-      data.sender_id
-        ? 'sender_id'
-        : data.senderId
-        ? 'senderId'
-        : data.senderID
-        ? 'senderID'
-        : 'none'
-    }`,
-  );
-  console.log(
-    `   receiver_id from: ${
-      data.receiver_id
-        ? 'receiver_id'
-        : data.receiverId
-        ? 'receiverId'
-        : data.receiverID
-        ? 'receiverID'
-        : 'none'
-    }`,
-  );
+  // console.log(`[normalizeSocketEvent] 🔍 [SOURCE_TRACE] Field origins:`);
+  // console.log(
+  //   `   room_id from: ${
+  //     data.room_id
+  //       ? 'room_id'
+  //       : data.roomId
+  //       ? 'roomId'
+  //       : data.roomid
+  //       ? 'roomid'
+  //       : data.roomID
+  //       ? 'roomID'
+  //       : 'none'
+  //   }`,
+  // );
+  // console.log(
+  //   `   session_id from: ${
+  //     data.session_id
+  //       ? 'session_id'
+  //       : data.sessionId
+  //       ? 'sessionId'
+  //       : data.sessionID
+  //       ? 'sessionID'
+  //       : 'none'
+  //   }`,
+  // );
+  // console.log(
+  //   `   sender_id from: ${
+  //     data.sender_id
+  //       ? 'sender_id'
+  //       : data.senderId
+  //       ? 'senderId'
+  //       : data.senderID
+  //       ? 'senderID'
+  //       : 'none'
+  //   }`,
+  // );
+  // console.log(
+  //   `   receiver_id from: ${
+  //     data.receiver_id
+  //       ? 'receiver_id'
+  //       : data.receiverId
+  //       ? 'receiverId'
+  //       : data.receiverID
+  //       ? 'receiverID'
+  //       : 'none'
+  //   }`,
+  // );
 
   // Validation for critical fields based on event type
   const isChatStartedEvent = eventName === 'chat_started_astrologer';
@@ -204,10 +204,10 @@ export const normalizeSocketEvent = (
     ...data,
   };
 
-  console.log(
-    `[normalizeSocketEvent] ✅ [AFTER_NORMALIZATION] Normalized event "${eventName}":`,
-    JSON.stringify(normalized, null, 2),
-  );
+  // console.log(
+  //   `[normalizeSocketEvent] ✅ [AFTER_NORMALIZATION] Normalized event "${eventName}":`,
+  //   JSON.stringify(normalized, null, 2),
+  // );
 
   return { isValid: true, normalized };
 };
