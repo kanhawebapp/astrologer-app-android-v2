@@ -66,6 +66,7 @@ import { IncomingCallFullscreen } from '../features/call/presentation/screens/In
 import { EditProfileScreen } from '../features/account/presentation/screens/EditProfile/EditProfileScreen';
 import { AllReviewScreen } from '../features/account/presentation/screens/AllReviewScreen';
 import { useAuth } from '../hooks/useAuth';
+import InternetProvider from '../components/NoInternet/InternetProvider';
 import { navigationService } from '../services/navigation/navigationService';
 import OfferScreen from '../features/account/presentation/screens/OfferSecreen';
 import SessionDetailScreen from '../features/sessions/presentation/screens/SessionDetailScreen';
@@ -101,18 +102,26 @@ export const RootNavigator: React.FC = () => {
             <Stack.Screen name="MainTabs" component={MainNavigator} />
             <Stack.Screen
               name="ChatScreen"
-              component={ChatScreen}
               options={{
                 presentation: 'card',
-              }}
-            />
+              }}>
+              {() => (
+                <InternetProvider>
+                  <ChatScreen />
+                </InternetProvider>
+              )}
+            </Stack.Screen>
             <Stack.Screen
               name="CallScreen"
-              component={CallScreen}
               options={{
                 presentation: 'card',
-              }}
-            />
+              }}>
+              {() => (
+                <InternetProvider>
+                  <CallScreen />
+                </InternetProvider>
+              )}
+            </Stack.Screen>
             <Stack.Screen
               name="EditProfile"
               component={EditProfileScreen}

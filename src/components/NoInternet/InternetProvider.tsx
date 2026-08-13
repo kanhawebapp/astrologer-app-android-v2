@@ -53,6 +53,7 @@
 // export default InternetProvider;
 
 import React, { useEffect, useState } from 'react';
+import { View, StyleSheet } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 import NoInternet from './NoInternet';
 
@@ -71,12 +72,27 @@ const InternetProvider = ({ children }) => {
     return unsubscribe;
   }, []);
 
-  if (!connected) {
-    return <NoInternet />;
-  }
-
-  return children;
+  return (
+    <View style={styles.container}>
+      {children}
+      {!connected && (
+        <View style={styles.overlay}>
+          <NoInternet onRetry={() => setConnected(true)} />
+        </View>
+      )}
+    </View>
+  );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 999,
+  },
+});
 
 export default InternetProvider;
 
