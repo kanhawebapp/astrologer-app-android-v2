@@ -51,6 +51,20 @@ export const CallScreen: React.FC = () => {
     (state: RootState) => state.call,
   );
 
+// console.log('TIMER UI >>>', {
+//   callTime,
+//   callDuration,
+//   minutes: Math.floor(callTime / 60),
+//   seconds: callTime % 60,
+// });
+
+  const formatRemainingTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+
+    return `${mins}:${String(secs).padStart(2, '0')}`;
+  };
+
   // Guard against the screen being removed by navigation (e.g. a background
   // Splash -> MainTabs transition during a killed-mode launch) while a call is
   // still active. The call UI must stay on top until the call is ended; the
@@ -221,7 +235,7 @@ export const CallScreen: React.FC = () => {
             </Text>
             {callTime > 0 && (
               <Text style={[styles.countdownText, { color: theme.colors.error }]}>
-                {Math.ceil(callTime / 60)}:{String(Math.ceil(callTime % 60)).padStart(2, '0')} remaining
+                {formatRemainingTime(callTime)} remaining
               </Text>
             )}
           </View>
