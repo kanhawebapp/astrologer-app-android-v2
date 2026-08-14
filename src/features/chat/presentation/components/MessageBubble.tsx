@@ -34,7 +34,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
 }) => {
   const { theme } = useTheme();
   const chatRequest = useSelector((state: RootState) => state.user.chatRequest);
-
+  console.log('MessageBubble rendered with message:', chatRequest);
   // Animation values for messages
   const opacity = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(20)).current;
@@ -68,12 +68,12 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
           duration: 250,
           useNativeDriver: true,
         }),
-      Animated.timing(translateY, {
-        toValue: 0,
-        duration: 300,
-        easing: Easing.out(Easing.ease),
-        useNativeDriver: true,
-      }),
+        Animated.timing(translateY, {
+          toValue: 0,
+          duration: 300,
+          easing: Easing.out(Easing.ease),
+          useNativeDriver: true,
+        }),
       ]).start();
     }
   }, [opacity, translateY, cardOpacity, cardScale, message.type]);
@@ -82,6 +82,17 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
     const date = new Date(timestamp);
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   }, []);
+
+  const formatDate = (dateOfBirth?: string) => {
+    if (!dateOfBirth) return '-';
+
+    const date = new Date(dateOfBirth);
+
+    return Number.isNaN(date.getTime())
+      ? '-'
+      : date.toLocaleDateString('en-GB');
+  };
+
 
   /* =====================================================
      USER INFO CARD (NO BUBBLE, NO PRESSABLE)
@@ -113,7 +124,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
           </AppText>
 
           <AppText style={styles.userSub}>
-            DOB: {chatRequest?.dateOfBirth || '-'} | 
+            DOB: {formatDate(chatRequest?.dateOfBirth)}
           </AppText>
           <AppText style={styles.userSub}>
             TOB:{' '}
@@ -208,9 +219,9 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
           message.isOwn
             ? [styles.ownBubble, { backgroundColor: theme.colors.primary }]
             : [
-                styles.otherBubble,
-                { backgroundColor: theme.colors.surfaceSecondary },
-              ],
+              styles.otherBubble,
+              { backgroundColor: theme.colors.surfaceSecondary },
+            ],
           {
             opacity,
             transform: [
@@ -283,7 +294,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
           </TouchableOpacity>
         )}
 
-       
+
         {onReplyPress && (
           <TouchableOpacity
             style={[
@@ -318,9 +329,9 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
           </AppText>
           {message.isOwn && renderStatusIcon()}
         </View>
-        </Animated.View>
-      </Pressable>
-    );
+      </Animated.View>
+    </Pressable>
+  );
 };
 
 const styles = StyleSheet.create({
@@ -449,9 +460,9 @@ const styles = StyleSheet.create({
   //   zIndex: 1,
   // },
   replyButton: {
-  position: 'absolute',
-  top: 4,
-  padding: 4,
-  zIndex: 1,
-},
+    position: 'absolute',
+    top: 4,
+    padding: 4,
+    zIndex: 1,
+  },
 });
