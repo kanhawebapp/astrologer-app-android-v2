@@ -34,7 +34,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
 }) => {
   const { theme } = useTheme();
   const chatRequest = useSelector((state: RootState) => state.user.chatRequest);
-  console.log('MessageBubble rendered with message:', chatRequest);
+  // console.log('MessageBubble rendered with message:', chatRequest);
   // Animation values for messages
   const opacity = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(20)).current;

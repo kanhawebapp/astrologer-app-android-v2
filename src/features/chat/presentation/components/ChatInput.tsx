@@ -9,6 +9,7 @@ import {
   Animated,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { useSelector } from 'react-redux';
 import { AppText } from '../../../../components/common/AppText';
 import { useTheme } from '../../../../hooks/useTheme';
 import { socketManager } from '../../../../services/socket/socketManager';
@@ -19,6 +20,12 @@ import { useUploadImage } from '../../../../services/api/upload/upload.hook';
 import type { ChatMessage } from '../../domain/chatTypes';
 import { useToast } from '../../../../hooks/useToast';
 import { uploadApi } from '../../../../services/api/imageMessage/upload.service';
+import { uploadImage } from '../../../../services/api/upload/upload.api';
+import { RootState } from '../../../../store';
+
+const generateId = (): string => {
+  return Date.now().toString(36) + Math.random().toString(36).substr(2);
+};
 
 interface ChatInputProps {
   onSendMessage: (text: string) => Promise<void>;
@@ -39,6 +46,10 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   const [text, setText] = useState('');
   // const [keyboardHeight, setKeyboardHeight] = useState(0);
   const { showError } = useToast();
+  const authUser = useSelector((state: RootState) => state.auth.user);
+  const activeSession = useSelector(
+    (state: RootState) => state.chat.activeSession,
+  );
 
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const inputRef = useRef<TextInput>(null);
@@ -132,60 +143,85 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   //   }
   // }, [roomId, userName, upload]);
 
-  const handlePickImage = async () => {
-    const result =
-      await launchImageLibrary({
-        mediaType: 'photo',
-        quality: 1,
-      });
+ const handlePickImage = async () => {
+  try {
+    const result = await launchImageLibrary({
+      mediaType: 'photo',
+      quality: 1,
+    });
 
-    if (
-      result.didCancel ||
-      !result.assets?.length
-    ) {
+    if (result.didCancel || !result.assets?.length) {
       return;
     }
 
     const image = result.assets[0];
 
-    try {
-      const response =
-        await uploadApi.uploadFile({
-          uri: image.uri!,
-          name:
-            image.fileName || 'image.jpg',
-          type:
-            image.type || 'image/jpeg',
-        });
-
-      console.log(
-        'upload response',
-        response,
-      );
-
-      const uploaded =
-        response.data.uploadFile;
-
-      console.log(
-        'Image URL:',
-        uploaded.url,
-      );
-
-      console.log(
-        'Filename:',
-        uploaded.filename,
-      );
-
-      // socketManager.emit(ChatSocketEvents.SEND_MESSAGE, {
-      //   room_id: roomId,
-      //   message: uploaded.url,
-      //   message_type: 'image',
-      //   user_name: userName,
-      // });
-    } catch (error) {
-      console.log(error);
+    if (!image.uri) {
+      console.log('❌ Image URI is missing');
+      return;
     }
-  };
+
+    const file = {
+      uri: image.uri,
+      name: image.fileName || 'image.jpg',
+      type: image.type || 'image/jpeg',
+    };
+
+    console.log('========== IMAGE SELECTED ==========');
+    console.log('File:', file);
+
+    const response = await uploadImage.uploadFile(file);
+
+    console.log(
+      '========== UPLOAD RESPONSE ==========',
+    );
+    console.log(
+      JSON.stringify(response, null, 2),
+    );
+
+    const uploaded = response?.data?.uploadFile;
+
+    if (!uploaded?.success || !uploaded?.url) {
+      throw new Error('Image upload failed');
+    }
+
+    console.log('Image URL:', uploaded.url);
+    console.log('Filename:', uploaded.filename);
+
+    const messageId = generateId();
+    const indianTime = new Date().toLocaleString('en-IN', {
+      timeZone: 'Asia/Kolkata',
+    });
+    const astrologerId = authUser?.id || activeSession?.astrologerId || '';
+    const userId = activeSession?.userId || '';
+    const replyTo = replyToMessage
+      ? {
+          sender: replyToMessage.isOwn
+            ? 'You'
+            : replyToMessage.senderName || 'User',
+          message: replyToMessage.text,
+          image: replyToMessage.imageUrl || null,
+        }
+      : null;
+
+    const payloadToSend = {
+      room_id: String(roomId),
+      msg_id: messageId,
+      sender_id: astrologerId,
+      received_id: userId || '',
+      sender: 'astrologer',
+      message: '',
+      image: uploaded.url,
+      time: indianTime,
+      replyTo,
+    };
+
+    socketManager.emit(ChatSocketEvents.SEND_MESSAGE, payloadToSend);
+    onCancelReply?.();
+  } catch (error) {
+    console.log('❌ IMAGE PICK/UPLOAD ERROR:', error);
+  }
+};
 
 
 
