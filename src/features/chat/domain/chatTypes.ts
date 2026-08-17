@@ -60,6 +60,12 @@ export interface GetChatHistoryResponse {
 
 export type ChatStatus = 'IDLE' | 'REQUEST' | 'ACTIVE' | 'ENDED';
 
+export interface ReplyToData {
+  sender: string;
+  message: string;
+  image?: string | null;
+}
+
 export interface ChatMessage {
   type: string;
   id: string;
@@ -71,14 +77,8 @@ export interface ChatMessage {
   receiverName: string;
   text: string;
   imageUrl?: string;
-  
-  replyTo?:
-    | {
-        sender: string;
-        message: string;
-        image?: string | null;
-      }
-    | null;
+  image?: string | null;
+  replyTo?: ReplyToData | null;
   timestamp: number;
   status: 'sending' | 'sent' | 'delivered' | 'read' | 'failed';
   isOwn: boolean;

@@ -7,6 +7,7 @@ import {
   Platform,
   PermissionsAndroid,
   Animated,
+  Image,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useSelector } from 'react-redux';
@@ -17,7 +18,7 @@ import { ChatSocketEvents } from '../../../../features/chat/domain/chatEvents';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { useUploadImage } from '../../../../services/api/upload/upload.hook';
 
-import type { ChatMessage } from '../../domain/chatTypes';
+import type { ReplyToData } from '../../domain/chatTypes';
 import { useToast } from '../../../../hooks/useToast';
 import { uploadApi } from '../../../../services/api/imageMessage/upload.service';
 import { uploadImage } from '../../../../services/api/upload/upload.api';
@@ -31,7 +32,7 @@ interface ChatInputProps {
   onSendMessage: (text: string) => Promise<void>;
   roomId: string;
   userName: string;
-  replyToMessage?: ChatMessage | null;
+  replyToMessage?: ReplyToData | null;
   onCancelReply?: () => void;
 }
 
@@ -194,15 +195,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
     });
     const astrologerId = authUser?.id || activeSession?.astrologerId || '';
     const userId = activeSession?.userId || '';
-    const replyTo = replyToMessage
-      ? {
-          sender: replyToMessage.isOwn
-            ? 'You'
-            : replyToMessage.senderName || 'User',
-          message: replyToMessage.text,
-          image: replyToMessage.imageUrl || null,
-        }
-      : null;
+    const replyTo = replyToMessage || null;
 
     const payloadToSend = {
       room_id: String(roomId),
@@ -370,10 +363,16 @@ export const ChatInput: React.FC<ChatInputProps> = ({
             <Icon name="reply" size={14} color={theme.colors.primary} />
             <View style={styles.replyTextContainer}>
               <AppText color={theme.colors.primary}>
-                Reply to {replyToMessage.senderName}
+                Reply to {replyToMessage.sender}
               </AppText>
-              <AppText numberOfLines={1}>{replyToMessage.text}</AppText>
+              <AppText numberOfLines={1}>{replyToMessage.message}</AppText>
             </View>
+            {replyToMessage.image ? (
+              <Image
+                source={{ uri: replyToMessage.image }}
+                style={styles.replyPreviewImage}
+              />
+            ) : null}
           </View>
           <TouchableOpacity onPress={onCancelReply} style={styles.cancelReply}>
             <Icon name="close" size={18} color={theme.colors.textTertiary} />
@@ -447,6 +446,12 @@ const styles = StyleSheet.create({
   },
   replyTextContainer: {
     flex: 1,
+  },
+  replyPreviewImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 6,
+    marginLeft: 8,
   },
   replyLabel: {
     fontWeight: '600',

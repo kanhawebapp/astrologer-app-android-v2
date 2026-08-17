@@ -277,6 +277,13 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
               style={styles.replyMessage}>
               {replyMessage}
             </AppText>
+            {message.replyTo?.image ? (
+              <Image
+                source={{ uri: message.replyTo.image }}
+                style={styles.replyQuoteImage}
+                resizeMode="cover"
+              />
+            ) : null}
           </TouchableOpacity>
         )}
 
@@ -416,6 +423,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
     lineHeight: 16,
     opacity: 0.8,
+  },
+  replyQuoteImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 6,
+    marginTop: 4,
   },
 
   /* IMAGE */

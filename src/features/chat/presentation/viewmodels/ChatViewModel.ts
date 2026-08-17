@@ -6,7 +6,7 @@ import { RootState, AppDispatch } from '../../../../store';
 import { setActiveChat } from '../../../../store/slices/chatSlice';
 import { selectMessagesByRoom } from '../../../../store/selectors/chatSelectors';
 import { useChatSocket, useChatMessages, useChatTimer } from '../hooks';
-import type { ChatMessage } from '../../domain/chatTypes';
+import type { ChatMessage, ReplyToData } from '../../domain/chatTypes';
 import { RootStackParamList } from '../../../../navigation/types';
 import { socketManager } from '../../../../services/socket/socketManager';
 
@@ -32,7 +32,7 @@ export const useChatViewModel = () => {
   const hasJoinedRoomRef = useRef(false);
 
   // Local state
-  const [replyToMessage, setReplyToMessage] = useState<ChatMessage | undefined>(
+  const [replyToMessage, setReplyToMessage] = useState<ReplyToData | undefined>(
     undefined,
   );
   const [isTyping, setIsTyping] = useState(false);
@@ -334,7 +334,15 @@ export const useChatViewModel = () => {
   );
 
   const handleReplyPress = useCallback((message: ChatMessage) => {
-    setReplyToMessage(message);
+    console.log('Reply message:', message);
+    console.log('Reply image:', message.image || message.imageUrl);
+    const replyTo: ReplyToData = {
+      sender: message.isOwn ? 'You' : message.senderName || 'User',
+      message: message.text === '[EMPTY]' ? '' : message.text || '',
+      image: message.image || message.imageUrl || null,
+    };
+    console.log('ReplyTo data:', replyTo);
+    setReplyToMessage(replyTo);
   }, []);
 
   const handleCancelReply = useCallback(() => {

@@ -13,6 +13,7 @@ import {
 import { chatSocketService } from '../../data/chatSocketService';
 import type {
   ChatMessage,
+  ReplyToData,
   TypingInfo,
   ChatRequest,
   ActiveChatSession,
@@ -113,6 +114,7 @@ export const useChatMessages = () => {
       const sender_id = data.sender_id || data.senderId || data.senderID || '';
       const messageText = data.message || data.text || data.messageText || '';
       const imageUrl = data.image || data.imageUrl || null;
+      const image = imageUrl;
       const session_id =
         data.session_id || data.sessionId || data.sessionID || '';
       const msg_id =
@@ -165,6 +167,7 @@ export const useChatMessages = () => {
             '',
 text: messageText,
          imageUrl,
+         image,
            timestamp:
             data.created_at || data.timestamp || data.createdAt || Date.now(),
           status: 'delivered',
@@ -215,6 +218,7 @@ text: messageText,
               '',
 text: messageText,
          imageUrl,
+         image,
              timestamp:
               data.created_at || data.timestamp || data.createdAt || Date.now(),
             status: 'delivered',
@@ -267,6 +271,7 @@ text: messageText,
           '',
 text: messageText,
          imageUrl,
+         image,
          timestamp:
           data.created_at || data.timestamp || data.createdAt || Date.now(),
         status: 'delivered',
@@ -406,7 +411,7 @@ text: messageText,
     async (
       text: string,
       imageUrl?: string,
-      replyTo?: ChatMessage | string,
+      replyTo?: ChatMessage | ReplyToData | string,
     ): Promise<ChatMessage | null> => {
       const timestamp = new Date().toISOString();
 
@@ -477,11 +482,19 @@ text: messageText,
         | { sender: string; message: string; image?: string | null }
         | null;
       if (replyTo && typeof replyTo !== 'string') {
-        replyToData = {
-          sender: replyTo.isOwn ? 'You' : (replyTo.senderName || 'User'),
-          message: replyTo.text,
-          image: replyTo.imageUrl || null,
-        };
+        if ('isOwn' in replyTo) {
+          replyToData = {
+            sender: replyTo.isOwn ? 'You' : (replyTo.senderName || 'User'),
+            message: replyTo.text === '[EMPTY]' ? '' : (replyTo.text || ''),
+            image: replyTo.image || replyTo.imageUrl || null,
+          };
+        } else {
+          replyToData = {
+            sender: replyTo.sender || '',
+            message: replyTo.message || '',
+            image: replyTo.image || null,
+          };
+        }
         console.log("📤 Sending replyTo:", replyToData);
       } else {
         replyToData = null;
@@ -497,6 +510,7 @@ text: messageText,
         receiverName: receiverName,
         text: text.trim(),
         imageUrl,
+        image: imageUrl || null,
         replyTo: replyToData,
         timestamp: Date.now(),
         status: 'sending',
