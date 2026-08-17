@@ -219,22 +219,23 @@ export const useChatViewModel = () => {
       });
       return;
     }
-    socketManager.emit('complted_chat', {
-      room_id,
-      astroId: astroid,
-      user_id,
-    });
 
-    const completeHandler = () => {
-      if (chatStatus === 'REQUEST') {
-        handleEndChat();
-      } else if (chatStatus === 'ACTIVE') {
-        Alert.alert('Cancel Chat?', 'This will terminate the session', [
-          { text: 'Cancel', style: 'cancel' },
-          {
-            text: 'Cancel Chat',
-            style: 'destructive',
-            onPress: async () => {
+    Alert.alert('Cancel Chat?', 'This will terminate the session', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'End Chat',
+        style: 'destructive',
+        onPress: async () => {
+          socketManager.emit('complted_chat', {
+            room_id,
+            astroId: astroid,
+            user_id,
+          });
+
+          setTimeout(async () => {
+            if (chatStatus === 'REQUEST') {
+              handleEndChat();
+            } else if (chatStatus === 'ACTIVE') {
               socketManager.emit('complted_chat', {
                 room_id,
                 astroid,
@@ -242,13 +243,11 @@ export const useChatViewModel = () => {
               });
               await leaveChat('Astrologer cancelled the chat');
               setTimeout(handleEndChat, 300);
-            },
-          },
-        ]);
-      }
-    };
-
-    setTimeout(completeHandler, 300);
+            }
+          }, 300);
+        },
+      },
+    ]);
   }, [
     paramRoomId,
     activeSession,
