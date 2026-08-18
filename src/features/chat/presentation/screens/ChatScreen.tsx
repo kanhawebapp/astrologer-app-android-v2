@@ -8,9 +8,9 @@ import {
   TouchableOpacity,
   Image,
   Platform,
+  KeyboardAvoidingView,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useChatViewModel } from '../viewmodels';
 import {
   ChatHeader,
@@ -52,39 +52,6 @@ export const ChatScreen: React.FC = () => {
 
   const keyExtractor = React.useCallback((item: any) => item.id, []);
 
-  const renderContent = () => {
-    if (vm.chatStatus === 'IDLE' || vm.chatStatus === 'ENDED') {
-      return <EmptyState error={vm.error} chatStatus={vm.chatStatus} />;
-    }
-
-    if (vm.chatStatus === 'ACTIVE' && vm.activeSession) {
-      return (
-        <FlatList
-          ref={vm.flatListRef as any}
-          data={vm.finalMessages}
-          renderItem={renderMessage}
-          keyExtractor={keyExtractor}
-          showsVerticalScrollIndicator={false}
-          inverted
-          keyboardShouldPersistTaps="handled"
-          contentContainerStyle={{
-            paddingTop: 12,
-            paddingBottom: 80 + Math.max(insets.bottom, 10),
-          }}
-          onContentSizeChange={() =>
-            vm.flatListRef.current?.scrollToOffset({
-              offset: 0,
-              animated: false,
-            })
-          }
-          ListHeaderComponent={renderTypingIndicator}
-        />
-      );
-    }
-
-    return null;
-  };
-
   return (
     <View
       style={[
@@ -113,46 +80,48 @@ export const ChatScreen: React.FC = () => {
         isActive={vm.isActive}
       />
 
-      {vm.chatStatus === 'ACTIVE' && vm.activeSession && (
-        <KeyboardAwareScrollView
-          contentContainerStyle={styles.scrollContent}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-          extraHeight={Platform.OS === 'android' ? 100 : 60}
-          enableOnAndroid={true}
-          keyboardOpeningTime={0}
-          viewIsInsideTabBar={true}>
-          <FlatList
-            ref={vm.flatListRef as any}
-            data={vm.finalMessages}
-            renderItem={renderMessage}
-            keyExtractor={keyExtractor}
-            showsVerticalScrollIndicator={false}
-            inverted
-            ListHeaderComponent={renderTypingIndicator}
-          />
-        </KeyboardAwareScrollView>
-      )}
+      {vm.chatStatus === 'ACTIVE' ? (
+        <KeyboardAvoidingView
+          style={styles.keyboardView}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          keyboardVerticalOffset={0}>
+          {vm.activeSession ? (
+            <FlatList
+              ref={vm.flatListRef as any}
+              style={styles.messageList}
+              data={vm.finalMessages}
+              renderItem={renderMessage}
+              keyExtractor={keyExtractor}
+              showsVerticalScrollIndicator={false}
+              inverted
+              keyboardShouldPersistTaps="handled"
+              contentContainerStyle={styles.messageListContent}
+              onContentSizeChange={vm.handleContentSizeChange}
+              ListHeaderComponent={renderTypingIndicator}
+            />
+          ) : (
+            <View style={styles.messageList} />
+          )}
+
+          <View
+            style={[
+              styles.inputWrapper,
+              { backgroundColor: theme.colors.background },
+            ]}>
+            <ChatInput
+              onSendMessage={vm.handleSendMessage}
+              roomId={vm.effectiveRoomId!}
+              userName={vm.activeSession?.userName || 'User'}
+              replyToMessage={vm.replyToMessage}
+              onCancelReply={vm.handleCancelReply}
+            />
+          </View>
+        </KeyboardAvoidingView>
+      ) : null}
 
       {vm.chatStatus === 'IDLE' || vm.chatStatus === 'ENDED' ? (
         <EmptyState error={vm.error} chatStatus={vm.chatStatus} />
       ) : null}
-
-      {vm.chatStatus === 'ACTIVE' && (
-        <View
-          style={[
-            styles.inputWrapper,
-            { backgroundColor: theme.colors.background },
-          ]}>
-          <ChatInput
-            onSendMessage={vm.handleSendMessage}
-            roomId={vm.effectiveRoomId!}
-            userName={vm.activeSession?.userName || 'User'}
-            replyToMessage={vm.replyToMessage}
-            onCancelReply={vm.handleCancelReply}
-          />
-        </View>
-      )}
 
       {selectedImage && (
         <View style={styles.modalContainer}>
@@ -189,9 +158,14 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     opacity: 0.03,
   },
-  scrollContent: {
-    flexGrow: 1,
-    justifyContent: 'flex-end',
+  keyboardView: {
+    flex: 1,
+  },
+  messageList: {
+    flex: 1,
+  },
+  messageListContent: {
+    paddingTop: 12,
     paddingBottom: 10,
   },
   inputWrapper: {

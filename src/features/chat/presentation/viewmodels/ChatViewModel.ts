@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useRef, useState, useEffect } from 'react';
-import { Alert, FlatList } from 'react-native';
+import { Alert, FlatList, Keyboard, Platform } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../../../../store';
@@ -143,13 +143,39 @@ export const useChatViewModel = () => {
     });
   }, [effectiveRoomId]);
 
+  const pendingScrollToLatestRef = useRef(false);
+
+  const scrollToLatest = useCallback((animated = true) => {
+    pendingScrollToLatestRef.current = true;
+    requestAnimationFrame(() => {
+      flatListRef.current?.scrollToOffset({ offset: 0, animated });
+    });
+  }, []);
+
+  const handleContentSizeChange = useCallback(() => {
+    if (!pendingScrollToLatestRef.current) {
+      return;
+    }
+    pendingScrollToLatestRef.current = false;
+    flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
+  }, []);
+
   // Auto-scroll on new messages
   useEffect(() => {
     if (currentMessages.length > prevMessageCountRef.current) {
-      flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
+      scrollToLatest(true);
     }
     prevMessageCountRef.current = currentMessages.length;
-  }, [currentMessages.length]);
+  }, [currentMessages.length, scrollToLatest]);
+
+  // Keep the latest inverted-list items above the keyboard
+  useEffect(() => {
+    const event = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const sub = Keyboard.addListener(event, () => {
+      scrollToLatest(true);
+    });
+    return () => sub.remove();
+  }, [scrollToLatest]);
 
   // Typing listener
   useEffect(() => {
@@ -418,6 +444,7 @@ export const useChatViewModel = () => {
       handleSendMessage,
       handleReplyPress,
       handleCancelReply,
+      handleContentSizeChange,
       flatListRef,
       prevMessageCountRef,
     }),
@@ -450,6 +477,7 @@ export const useChatViewModel = () => {
       handleSendMessage,
       handleReplyPress,
       handleCancelReply,
+      handleContentSizeChange,
       flatListRef,
       prevMessageCountRef,
     ],
