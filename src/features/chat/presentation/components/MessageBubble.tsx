@@ -120,7 +120,10 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
           </AppText>
 
           <AppText style={styles.userSub}>
-            {chatRequest?.gender || '-'} • {chatRequest?.occupation || '-'}
+            GENDER: {chatRequest?.gender || '-'}
+          </AppText>
+          <AppText style={styles.userSub}>
+            OCCUPATION: {chatRequest?.occupation || '-'}
           </AppText>
 
           <AppText style={styles.userSub}>
