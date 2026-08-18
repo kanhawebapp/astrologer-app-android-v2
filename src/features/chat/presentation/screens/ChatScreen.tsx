@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingBottom: 10,
     paddingTop: 8,
-    borderTopWidth: 1,
+    // borderTopWidth: 1,
     // marginTop: 15,
   },
   modalContainer: {

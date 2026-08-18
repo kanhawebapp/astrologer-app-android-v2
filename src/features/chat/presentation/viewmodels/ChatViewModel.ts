@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useRef, useState, useEffect } from 'react';
-import { Alert, FlatList, Keyboard, Platform } from 'react-native';
+import { Alert, BackHandler, FlatList, Keyboard, Platform } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../../../../store';
@@ -222,17 +222,6 @@ export const useChatViewModel = () => {
     completeChat();
   }, [completeChat]);
 
-  const handleBack = useCallback(() => {
-    if (chatStatus === 'ACTIVE') {
-      Alert.alert('Leave Chat', 'Are you sure you want to leave this chat?', [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Leave', style: 'destructive', onPress: handleLeave },
-      ]);
-    } else {
-      navigation.goBack();
-    }
-  }, [chatStatus, navigation, handleLeave]);
-
   const handleCancelChatRequest = useCallback(() => {
     const astroid = authUser?.id;
     const room_id = paramRoomId || activeSession?.roomId;
@@ -283,6 +272,31 @@ export const useChatViewModel = () => {
     leaveChat,
     authUser,
   ]);
+
+  const handleBack = useCallback(() => {
+    if (chatStatus === 'ACTIVE') {
+      handleCancelChatRequest();
+    } else {
+      navigation.goBack();
+    }
+  }, [chatStatus, navigation, handleCancelChatRequest]);
+
+  useEffect(() => {
+    const onHardwareBackPress = () => {
+      if (chatStatus === 'ACTIVE') {
+        handleBack();
+        return true;
+      }
+      return false;
+    };
+
+    const subscription = BackHandler.addEventListener(
+      'hardwareBackPress',
+      onHardwareBackPress,
+    );
+
+    return () => subscription.remove();
+  }, [chatStatus, handleBack]);
 
 
   //   const handleCancelChatRequest = useCallback(() => {
