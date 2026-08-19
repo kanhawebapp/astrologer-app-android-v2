@@ -408,13 +408,11 @@ export const useChatViewModel = () => {
   }, []);
 
   // Time-critical alert (after handlers)
-  useEffect(() => {
-    if (isTimeCritical && remainingTime === 0) {
-      Alert.alert('Time Exhausted', 'Your chat time has ended.', [
-        { text: 'OK', onPress: () => handleEndChat() },
-      ]);
-    }
-  }, [isTimeCritical, remainingTime, handleEndChat]);
+ useEffect(() => {
+  if (isTimeCritical && remainingTime === 0) {
+    completeChat();
+  }
+}, [isTimeCritical, remainingTime, completeChat]);
 
   // Message processing memos
   const reversedMessages = useMemo(
