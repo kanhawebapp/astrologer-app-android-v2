@@ -42,11 +42,10 @@ const formatTime = (isoTime: string): string => {
 const formatDuration = (seconds: number): string => {
   if (seconds === 0) return '--';
   const minutes = Math.floor(seconds / 60);
-  if (minutes === 0) return `${seconds}s`;
-  if (minutes < 60) return `${minutes}m`;
-  const hours = Math.floor(minutes / 60);
-  const mins = minutes % 60;
-  return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
+  const remainingSec = seconds % 60;
+  if (minutes === 0) return `${seconds} sec`;
+  if (remainingSec === 0) return `${minutes} min`;
+  return `${minutes} min ${remainingSec} sec`;
 };
 
 const formatDate = (isoTime: string): string => {
@@ -148,22 +147,18 @@ export const SessionCard: React.FC<SessionCardProps> = React.memo(
           <View style={styles.metaItem}>
             <Icon name="timelapse" size={16} color={theme.colors.textTertiary} />
             <AppText variant="caption" color={theme.colors.textSecondary}>
-              {formatDuration(session.duration)}
+              {formatDuration(session.durationSec)}
             </AppText>
           </View>
           <View style={styles.metaItem}>
-            {session.rating && session.rating > 0 ? (
-              <>
-                <Icon name="star" size={16} color={theme.colors.warning} />
-                <AppText variant="caption" color={theme.colors.textSecondary}>
-                  {session.rating.toFixed(1)}
-                </AppText>
-              </>
-            ) : (
-              <AppText variant="caption" color={theme.colors.textTertiary}>
-                Not rated
-              </AppText>
-            )}
+            {[1, 2, 3, 4, 5].map(i => (
+              <Icon
+                key={i}
+                name={session.rating && i <= session.rating ? 'star' : 'star-outline'}
+                size={16}
+                color={theme.colors.warning}
+              />
+            ))}
           </View>
           <View style={styles.amountContainer}>
             {session.earnings > 0 ? (

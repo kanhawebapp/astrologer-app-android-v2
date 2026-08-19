@@ -42,6 +42,8 @@ const mapSessionToDomain = (apiSession: any): Session => ({
   startTime: apiSession.startedAt || apiSession.createdAt,
   endTime: apiSession.endedAt || undefined,
   duration: apiSession.durationSec || apiSession.durationMinutes || 0,
+  durationMinutes: apiSession.durationMinutes || 0,
+  durationSec: apiSession.durationSec || 0,
   earnings: apiSession.coinsEarned || apiSession.earnings || 0,
   rating: apiSession.rating || undefined,
   isLive: apiSession.status === 'ONGOING',

@@ -33,6 +33,8 @@ export interface Session {
   startTime: string;
   endTime?: string;
   duration: number;
+  durationMinutes?: number;
+  durationSec?: number;
   earnings: number;
   rating?: number;
   orderId?: string;
