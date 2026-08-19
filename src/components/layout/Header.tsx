@@ -2,11 +2,9 @@ import React from 'react';
 import {
   View,
   TouchableOpacity,
-  StatusBar,
   StyleSheet,
-  Platform,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useTheme } from '../../hooks/useTheme';
 import { AppText } from '../common/AppText';
 
@@ -26,24 +24,24 @@ export const Header: React.FC<HeaderProps> = ({
   const { theme } = useTheme();
 
   return (
-    <View
-      style={[
-        styles.container,
-        {
-          // backgroundColor: theme.colors.background,
-          // borderBottomColor: theme.colors.border,
-        },
-      ]}>
+    <View style={styles.container}>
       <View style={styles.left}>
         {showBack && onBackPress && (
-          <TouchableOpacity onPress={onBackPress} style={styles.backButton}>
-            <AppText variant="h5" color={theme.colors.primary}>
-              {'<'}
-            </AppText>
+          <TouchableOpacity
+            onPress={onBackPress}
+            style={styles.backButton}
+            activeOpacity={0.7}>
+            <Icon
+              name="arrow-back"
+              size={24}
+              color={theme.colors.primary}
+            />
           </TouchableOpacity>
         )}
       </View>
+
       <AppText variant="h5">{title}</AppText>
+
       <View style={styles.right}>{rightComponent}</View>
     </View>
   );
@@ -56,7 +54,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    // borderBottomWidth: 1,
   },
   left: {
     minWidth: 40,
