@@ -15,12 +15,11 @@ import InCallManager from 'react-native-incall-manager';
 import { RootState, AppDispatch, store } from '../../../../store';
 import {
   setCallState,
-  incrementCallDuration,
   toggleMute,
   setError,
   resetCall,
   setCallDuration,
-  decrementCallTime,
+  setCallTime,
   toggleSpeaker,
   setSpeakerOn,
 } from '../../../../store/slices/callSlice';
@@ -36,6 +35,11 @@ type CallScreenRouteProp = RouteProp<RootStackParamList, 'CallScreen'>;
 type CallScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'CallScreen'>;
 
 const DEBUG_PREFIX = '[CallScreen]';
+
+// Survives CallScreen remount during the same connected call. Reset only when
+// the call leaves `connected` — never on AppState changes.
+let callScreenStartMs: number | null = null;
+let callScreenInitialRemainingSec: number | null = null;
 
 export const CallScreen: React.FC = () => {
   const navigation = useNavigation<CallScreenNavigationProp>();
@@ -84,51 +88,67 @@ export const CallScreen: React.FC = () => {
     return unsubscribe;
   }, [navigation, callState]);
 
-  const timerIntervalRef = useRef<any | null>(null);
-  const callTimeTimerRef = useRef<any | null>(null);
+  const timerIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const appStateRef = useRef(AppState.currentState);
   const endedRef = useRef(false);
   const astroId = (store.getState().auth.user as any)?.id;
 
-  // Start timer when connected
+  const clearCallTimer = useCallback(() => {
+    if (timerIntervalRef.current) {
+      clearInterval(timerIntervalRef.current);
+      timerIntervalRef.current = null;
+    }
+  }, []);
+
+  const syncCallTimersFromWallClock = useCallback(() => {
+    if (callScreenStartMs == null) {
+      return;
+    }
+    const elapsedSeconds = Math.max(
+      0,
+      Math.floor((Date.now() - callScreenStartMs) / 1000),
+    );
+    dispatch(setCallDuration(elapsedSeconds));
+    if (callScreenInitialRemainingSec != null && callScreenInitialRemainingSec > 0) {
+      dispatch(
+        setCallTime(Math.max(0, callScreenInitialRemainingSec - elapsedSeconds)),
+      );
+    }
+  }, [dispatch]);
+
+  // Authoritative elapsed time = Date.now() - call start. Interval only refreshes UI.
   useEffect(() => {
     if (callState === 'connected') {
-      timerIntervalRef.current = setInterval(() => {
-        dispatch(incrementCallDuration());
-      }, 1000);
-
-      callTimeTimerRef.current = setInterval(() => {
-        dispatch(decrementCallTime());
-      }, 1000);
+      if (callScreenStartMs == null) {
+        callScreenStartMs = Date.now();
+        callScreenInitialRemainingSec = store.getState().call.callTime;
+      }
+      clearCallTimer();
+      syncCallTimersFromWallClock();
+      timerIntervalRef.current = setInterval(syncCallTimersFromWallClock, 1000);
     } else {
-      if (timerIntervalRef.current) {
-        clearInterval(timerIntervalRef.current);
-        timerIntervalRef.current = null;
-      }
-      if (callTimeTimerRef.current) {
-        clearInterval(callTimeTimerRef.current);
-        callTimeTimerRef.current = null;
-      }
+      clearCallTimer();
+      callScreenStartMs = null;
+      callScreenInitialRemainingSec = null;
     }
     return () => {
-      if (timerIntervalRef.current) {
-        clearInterval(timerIntervalRef.current);
-      }
-      if (callTimeTimerRef.current) {
-        clearInterval(callTimeTimerRef.current);
-      }
+      clearCallTimer();
     };
-  }, [callState, dispatch]);
+  }, [callState, clearCallTimer, dispatch, syncCallTimersFromWallClock]);
 
-  // Handle app state changes
+  // Existing AppState listener: catch up the UI when JS timers were frozen.
+  // Does not reset the start timestamp or create a second timer.
   useEffect(() => {
     const handleAppStateChange = (nextAppState: AppStateStatus) => {
       appStateRef.current = nextAppState;
+      if (nextAppState === 'active' && callScreenStartMs != null) {
+        syncCallTimersFromWallClock();
+      }
     };
 
     const subscription = AppState.addEventListener('change', handleAppStateChange);
     return () => subscription.remove();
-  }, []);
+  }, [syncCallTimersFromWallClock]);
 
   // Cleanup on unmount - stop InCallManager
   useEffect(() => {
