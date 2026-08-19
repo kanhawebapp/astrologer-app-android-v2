@@ -205,7 +205,7 @@ export const ZodiacRing: React.FC<ZodiacRingProps> = ({
     const rotateAnim = Animated.loop(
       Animated.timing(rotation, {
         toValue: 1,
-        duration: 30000,
+        duration: 60000,
         easing: Easing.linear,
         useNativeDriver: true,
       }),

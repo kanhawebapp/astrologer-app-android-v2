@@ -2,7 +2,7 @@ import { startIncomingRing, stopIncomingRing } from './call.service';
 
 const DEBUG_PREFIX = '[RingtoneManager]';
 
-const DEFAULT_RING_TIMEOUT_MS = 30000; // 30 seconds
+const DEFAULT_RING_TIMEOUT_MS = 60000; // 30 seconds
 
 class RingtoneManager {
   private isPlaying: boolean = false;

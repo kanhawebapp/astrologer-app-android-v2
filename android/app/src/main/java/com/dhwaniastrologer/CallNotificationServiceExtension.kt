@@ -575,7 +575,7 @@ class CallNotificationServiceExtension : INotificationServiceExtension {
                 .setFullScreenIntent(acceptPendingIntent, true)
                 .setVisibility(Notification.VISIBILITY_PUBLIC)
                 .setStyle(callStyle)
-                .setTimeoutAfter(30000)
+                .setTimeoutAfter(60000)
                 .setColor(ContextCompat.getColor(context, R.color.call_accept_green))
                 .build()
 
@@ -633,7 +633,7 @@ class CallNotificationServiceExtension : INotificationServiceExtension {
             .setVibrate(longArrayOf(0, 1000, 500, 1000))
             .setAutoCancel(false)
             .setOngoing(true)
-            .setTimeoutAfter(30000)
+            .setTimeoutAfter(60000)
             .setFullScreenIntent(acceptPendingIntent, true)
             .addAction(R.drawable.ic_accept_call, acceptLabel, acceptPendingIntent)
             .addAction(R.drawable.ic_reject_call, rejectLabel, rejectPendingIntent)

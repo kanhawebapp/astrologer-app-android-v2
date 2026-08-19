@@ -31,7 +31,7 @@ export type ChatSocketEventName =
 
 export const TIMING_DEBOUNCE_MS = 300;
 export const TYPING_DEBOUNCE_MS = 1000;
-export const AUTO_REJECT_TIME_MS = 30000;
+export const AUTO_REJECT_TIME_MS = 60000;
 export const RECONNECT_DELAY_MS = 2000;
 export const MESSAGE_RETRY_ATTEMPTS = 3;
 export const MESSAGE_RETRY_DELAY_MS = 2000;

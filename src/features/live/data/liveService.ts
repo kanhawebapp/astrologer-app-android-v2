@@ -9,7 +9,7 @@ import {
 
 const defaultConfig: LiveStreamingConfig = {
   maxMessages: 50,
-  messageDisplayDuration: 30000,
+  messageDisplayDuration: 60000,
   likeInterval: 2000,
   giftMinInterval: 15000,
   simulateMode: true,

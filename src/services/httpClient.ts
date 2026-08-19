@@ -13,7 +13,7 @@ class HttpClient {
   constructor() {
     this.instance = axios.create({
       baseURL: Config.API_BASE_URL,
-      timeout: 30000,
+      timeout: 60000,
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
