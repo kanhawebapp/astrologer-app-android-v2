@@ -414,7 +414,10 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           />
         </Animated.View>
 
-        <TouchableOpacity onPress={handleSend} style={styles.sendButton}>
+        <TouchableOpacity
+          onPress={handleSend}
+          style={[styles.sendButton, !text.trim() && { opacity: 0.5 }]}
+          disabled={!text.trim()}>
           <Icon name="send" size={20} color="white" />
         </TouchableOpacity>
       </View>
