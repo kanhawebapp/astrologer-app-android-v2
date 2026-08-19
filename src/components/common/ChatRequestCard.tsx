@@ -560,9 +560,9 @@ export const ChatRequestCard: React.FC<ChatRequestCardProps> = memo(() => {
             <Text style={[styles.metaText, { color: theme.colors.textTertiary }]}>
               ⏱ {latestRequest.maximumTime} min
             </Text>
-            <Text style={[styles.metaText, { color: theme.colors.textTertiary }]}>
+            {/* <Text style={[styles.metaText, { color: theme.colors.textTertiary }]}>
               💰 ₹{latestRequest.pricePerMinute}/min
-            </Text>
+            </Text> */}
           </View>
         </View>
       </View>
