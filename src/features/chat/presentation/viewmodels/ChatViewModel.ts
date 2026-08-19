@@ -241,14 +241,30 @@ export const useChatViewModel = () => {
         text: 'End Chat',
         style: 'destructive',
         onPress: async () => {
+          console.log('[END_CHAT_DEBUG] button pressed', {
+            roomId: room_id,
+            activeChat: !!activeSession,
+            chatStatus,
+            sessionId: activeSession?.sessionId,
+          });
           socketManager.emit('complted_chat', {
             room_id,
             astroId: astroid,
             user_id,
           });
+          console.log('[END_CHAT_DEBUG] socket event emitted', {
+            event: 'complted_chat',
+            room_id,
+          });
 
           setTimeout(async () => {
+            console.log('[END_CHAT_DEBUG] delayed branch', {
+              chatStatusNow: chatStatus,
+              willCallHandleEndChat:
+                chatStatus === 'REQUEST' || chatStatus === 'ACTIVE',
+            });
             if (chatStatus === 'REQUEST') {
+              console.log('[END_CHAT_DEBUG] endChat called via handleEndChat (REQUEST)');
               handleEndChat();
             } else if (chatStatus === 'ACTIVE') {
               socketManager.emit('complted_chat', {
@@ -256,8 +272,11 @@ export const useChatViewModel = () => {
                 astroid,
                 user_id,
               });
+              console.log('[END_CHAT_DEBUG] leaveChat called');
               await leaveChat('Astrologer cancelled the chat');
               setTimeout(handleEndChat, 300);
+            } else {
+              console.log('[END_CHAT_DEBUG] skipped handleEndChat because chatStatus is', chatStatus);
             }
           }, 300);
         },

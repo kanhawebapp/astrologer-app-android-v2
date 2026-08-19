@@ -280,6 +280,9 @@ export const useGlobalChatSocket = () => {
       // console.log(`   User: ${data.userName}`);
 
       if (isMounted.current) {
+        console.log('[CHAT_DEBUG] setActiveSession from global handleChatStarted', {
+          data,
+        });
         dispatch(setActiveSession(data));
         // console.log(`${DEBUG_PREFIX} Active session set in Redux`);
       }
@@ -307,7 +310,14 @@ export const useGlobalChatSocket = () => {
 
 const handleCompletedChat = useCallback(
   (data: { sessionId: string; roomId: string }) => {
-    // console.log(`${DEBUG_PREFIX} completed_chat`, data);
+    const stateBefore = store.getState().chat;
+    console.log('[CHAT_DEBUG] socket=completed_chat handleCompletedChat', {
+      data,
+      isMounted: isMounted.current,
+      chatStatusBefore: stateBefore.chatStatus,
+      roomIdBefore: stateBefore.activeSession?.roomId,
+      remainingTimeBefore: stateBefore.activeSession?.remainingTime,
+    });
 
     if (!isMounted.current) {
       return;
@@ -324,6 +334,13 @@ const handleCompletedChat = useCallback(
     dispatch(setChatStatus('IDLE'));
 
     dispatch(setError(null));
+    const stateAfter = store.getState().chat;
+    console.log('[CHAT_DEBUG] socket=completed_chat AFTER store updates', {
+      chatStatusAfter: stateAfter.chatStatus,
+      activeSessionAfter: !!stateAfter.activeSession,
+      roomIdAfter: stateAfter.activeSession?.roomId,
+      remainingTimeAfter: stateAfter.activeSession?.remainingTime,
+    });
   },
   [dispatch],
 );
@@ -402,6 +419,11 @@ const handleCompletedChat = useCallback(
   }) => {
     // console.log(`${DEBUG_PREFIX} chat_cancel_by_user`, data);
 
+    console.log('[CHAT_DEBUG] socket=chat_cancel_by_user', {
+      data,
+      isMounted: isMounted.current,
+    });
+
     if (!isMounted.current) {
       return;
     }
@@ -419,6 +441,11 @@ const handleCompletedChat = useCallback(
     dispatch(setChatStatus('IDLE'));
 
     dispatch(setError(null));
+    const stateAfter = store.getState().chat;
+    console.log('[CHAT_DEBUG] socket=chat_cancel_by_user AFTER store updates', {
+      chatStatusAfter: stateAfter.chatStatus,
+      activeSessionAfter: !!stateAfter.activeSession,
+    });
   },
   [dispatch],
 );

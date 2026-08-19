@@ -132,6 +132,11 @@ export const useChatSocket = () => {
   }, []);
 
   const completeChat = useCallback(async () => {
+    console.log('[END_CHAT_DEBUG] completeChat() triggered', {
+      activeSession: !!activeSession,
+      roomId: activeSession?.roomId,
+      sessionId: activeSession?.sessionId,
+    });
     console.log('🔴 [useChatSocket] completeChat() triggered');
     if (activeSession) {
       try {

@@ -23,6 +23,11 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   };
 
   const displayMessage = message || getDefaultMessage();
+  console.log('[CHAT_DEBUG] EmptyState render', {
+    chatStatus,
+    error,
+    displayMessage,
+  });
 
   return (
     <View style={styles.container}>

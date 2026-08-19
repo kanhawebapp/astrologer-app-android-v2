@@ -124,6 +124,13 @@ const chatSlice = createSlice({
       state.connecting = action.payload;
     },
     setChatStatus: (state, action: PayloadAction<ChatStatus>) => {
+      console.log('[CHAT_DEBUG] redux setChatStatus', {
+        from: state.chatStatus,
+        to: action.payload,
+        activeSession: !!state.activeSession,
+        roomId: state.activeSession?.roomId,
+        remainingTime: state.activeSession?.remainingTime,
+      });
       state.chatStatus = action.payload;
     },
     setLatestRequest: (state, action: PayloadAction<ChatRequest | null>) => {

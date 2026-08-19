@@ -381,6 +381,12 @@ text: messageText,
         roomId: session.roomId,
         userName: session.userName,
       });
+      console.log('[CHAT_DEBUG] setActiveSession from handleChatStarted', {
+        remainingTime: session.remainingTime,
+        maximumTime: session.maximumTime,
+        startedAt: session.startedAt,
+        roomId: session.roomId,
+      });
 
       dispatch(setActiveSession(session));
     },
