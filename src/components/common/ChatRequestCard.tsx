@@ -23,6 +23,7 @@ import {
   setAcceptChatTrigger,
   setRejectChatTrigger,
 } from './chatRequestCardTriggers';
+import { ringtoneManager } from '../../services/call/ringtoneManager';
 
 interface ChatRequestCardProps {
   onChatStarted?: (data: {
@@ -48,6 +49,7 @@ export const ChatRequestCard: React.FC<ChatRequestCardProps> = memo(() => {
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const isAnimatingRef = useRef(false);
+  const ringingSessionIdRef = useRef<string | null>(null);
 
   const { chatStatus, connecting, latestRequest } = useSelector(
     (state: RootState) => state.chat,
@@ -60,10 +62,41 @@ export const ChatRequestCard: React.FC<ChatRequestCardProps> = memo(() => {
   const popupShouldShow =
     chatStatus === 'REQUEST' && latestRequest != null;
 
+  const latestRequestSessionId = latestRequest?.sessionId;
+
+  // Reuse the exact same incoming-call ringtone behavior.
+  // This ensures the "chat request" foreground popup rings and then stops
+  // based on the same start/stop utility.
+  useEffect(() => {
+    if (!popupShouldShow || !latestRequestSessionId) {
+      ringingSessionIdRef.current = null;
+      ringtoneManager.stopRingtone();
+      return;
+    }
+
+    if (ringingSessionIdRef.current !== latestRequestSessionId) {
+      // Stop first to reset the internal ringtone timeout when requests
+      // replace each other.
+      ringtoneManager.stopRingtone();
+      ringtoneManager.startRingtone(AUTO_REJECT_TIME_MS);
+      ringingSessionIdRef.current = latestRequestSessionId;
+    }
+  }, [popupShouldShow, latestRequestSessionId]);
+
+  // Ensure we never leave a ringtone running if this component unmounts.
+  useEffect(() => {
+    return () => {
+      ringtoneManager.stopRingtone();
+    };
+  }, []);
+
 
   const closeCard = useCallback(() => {
     if (isAnimatingRef.current) return;
     isAnimatingRef.current = true;
+
+    // Stop ringing immediately when the card is dismissed/hidden.
+    ringtoneManager.stopRingtone();
 
     Animated.parallel([
       Animated.timing(slideAnim, {
