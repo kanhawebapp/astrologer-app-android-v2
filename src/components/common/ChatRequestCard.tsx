@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useEffect, useRef, memo } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, Animated } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, Animated, AppState } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 import { RootState, AppDispatch } from '../../store';
@@ -172,9 +172,49 @@ export const ChatRequestCard: React.FC<ChatRequestCardProps> = memo(() => {
       // Fixed 30-second auto-dismiss window, aligned with the backend
       // AUTO_REJECT_TIME_MS. Previously the countdown was maximumTime * 60.
       const timerSeconds = AUTO_REJECT_TIME_MS / 1000;
-      setCountdown(timerSeconds);
+      const endTime = Date.now() + AUTO_REJECT_TIME_MS;
+      let expired = false;
       const sessionId = latestRequest.sessionId;
       const roomId = latestRequest.roomId;
+
+      const applyRemaining = () => {
+        const remaining = Math.max(0, Math.ceil((endTime - Date.now()) / 1000));
+        if (remaining > 0) {
+          setCountdown(remaining);
+          return;
+        }
+
+        if (expired) {
+          return;
+        }
+        expired = true;
+
+        if (timerRef.current) {
+          clearInterval(timerRef.current);
+          timerRef.current = null;
+        }
+
+        console.log(
+          `[ChatRequestCard] timer expired (${timerSeconds}s) session=${sessionId}`,
+        );
+
+        closeCard();
+
+        console.log(
+          `[ChatRequestCard] ChatRequestCard auto-dismissed session=${sessionId}`,
+        );
+
+        setTimeout(async () => {
+          try {
+            await chatSocketService.rejectChat(sessionId, roomId);
+          } catch (error) {
+            // Silent fail
+          }
+          dispatch(removeChatRequest(sessionId));
+        }, 250);
+
+        setCountdown(0);
+      };
 
       console.log(
         `[ChatRequestCard] ChatRequestCard shown session=${sessionId} roomId=${roomId}`,
@@ -183,38 +223,32 @@ export const ChatRequestCard: React.FC<ChatRequestCardProps> = memo(() => {
         `[ChatRequestCard] timer started (${timerSeconds}s) session=${sessionId}`,
       );
 
-      timerRef.current = setInterval(() => {
-        setCountdown(prev => {
-          if (prev <= 1) {
-            if (timerRef.current) {
-              clearInterval(timerRef.current);
-              timerRef.current = null;
-            }
+      applyRemaining();
+      if (!expired) {
+        timerRef.current = setInterval(applyRemaining, 1000);
+      }
 
-            console.log(
-              `[ChatRequestCard] timer expired (${timerSeconds}s) session=${sessionId}`,
-            );
-
-            closeCard();
-
-            console.log(
-              `[ChatRequestCard] ChatRequestCard auto-dismissed session=${sessionId}`,
-            );
-
-            setTimeout(async () => {
-              try {
-                await chatSocketService.rejectChat(sessionId, roomId);
-              } catch (error) {
-                // Silent fail
-              }
-              dispatch(removeChatRequest(sessionId));
-            }, 250);
-
-            return 0;
+      const appStateSubscription = AppState.addEventListener(
+        'change',
+        nextState => {
+          if (nextState !== 'active' || !timerRef.current) {
+            return;
           }
-          return prev - 1;
-        });
-      }, 1000);
+          applyRemaining();
+          if (timerRef.current) {
+            clearInterval(timerRef.current);
+            timerRef.current = setInterval(applyRemaining, 1000);
+          }
+        },
+      );
+
+      return () => {
+        appStateSubscription.remove();
+        if (timerRef.current) {
+          clearInterval(timerRef.current);
+          timerRef.current = null;
+        }
+      };
     }
 
     return () => {
