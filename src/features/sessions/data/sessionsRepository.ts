@@ -8,8 +8,9 @@ const mapSessionStatus = (status: string): SessionStatus => {
       return SessionStatus.ACTIVE;
     case 'COMPLETED':
       return SessionStatus.COMPLETED;
+    case 'CANCELLED':
     case 'MISSED':
-      return SessionStatus.MISSED;
+      return SessionStatus.CANCELLED;
     case 'PENDING':
       return SessionStatus.PENDING;
     default:
@@ -45,6 +46,8 @@ const mapSessionToDomain = (apiSession: any): Session => ({
   durationMinutes: apiSession.durationMinutes || 0,
   durationSec: apiSession.durationSec || 0,
   earnings: apiSession.coinsEarned || apiSession.earnings || 0,
+  commission:
+    apiSession.commission != null ? apiSession.commission : null,
   rating: apiSession.rating || undefined,
   isLive: apiSession.status === 'ONGOING',
 });
@@ -92,7 +95,7 @@ export const sessionsRepository = {
         activeSessions: sessions.filter(s => s.status === SessionStatus.ACTIVE).length,
         pendingSessions: sessions.filter(s => s.status === SessionStatus.PENDING).length,
         completedSessions: sessions.filter(s => s.status === SessionStatus.COMPLETED).length,
-        missedSessions: sessions.filter(s => s.status === SessionStatus.MISSED).length,
+        cancelledSessions: sessions.filter(s => s.status === SessionStatus.CANCELLED).length,
       };
 
       return {

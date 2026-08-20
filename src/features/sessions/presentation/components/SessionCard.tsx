@@ -21,7 +21,7 @@ const STATUS_CONFIG: Record<
   },
   pending: { label: 'Pending', iconName: 'schedule', color: '#F59E0B' },
   completed: { label: 'Completed', iconName: 'check-circle', color: '#6B7280' },
-  missed: { label: 'Missed', iconName: 'cancel', color: '#EF4444' },
+  cancelled: { label: 'Cancelled', iconName: 'block', color: '#EF4444' },
 };
 
 const TYPE_CONFIG: Record<SessionType, { label: string; iconName: string }> = {
@@ -68,6 +68,10 @@ export const SessionCard: React.FC<SessionCardProps> = React.memo(
       session.type === SessionType.CHAT
         ? theme.colors.info
         : theme.colors.accentPurple;
+
+    const earnedAmount =
+      session.commission != null ? session.commission : session.earnings;
+    const truncatedSessionId = session.id?.slice(0, 8) ?? '';
 
     return (
       <TouchableOpacity
@@ -122,6 +126,14 @@ export const SessionCard: React.FC<SessionCardProps> = React.memo(
                   {formatDate(session.startTime)} • {formatTime(session.startTime)}
                 </AppText>
               </View>
+              {!!truncatedSessionId && (
+                <AppText
+                  variant="caption"
+                  color={theme.colors.textTertiary}
+                  style={styles.sessionId}>
+                 Session ID: {truncatedSessionId}
+                </AppText>
+              )}
             </View>
           </View>
           <View
@@ -161,10 +173,10 @@ export const SessionCard: React.FC<SessionCardProps> = React.memo(
             ))}
           </View>
           <View style={styles.amountContainer}>
-            {session.earnings > 0 ? (
+            {earnedAmount > 0 ? (
               <>
                 <AppText variant="label" color={theme.colors.success}>
-                  ₹{session.earnings}
+                  ₹{earnedAmount}
                 </AppText>
                 <AppText variant="caption" color={theme.colors.textTertiary} style={styles.earningsLabel}>
                   Earned
@@ -246,6 +258,10 @@ const styles = StyleSheet.create({
   userName: {
     fontWeight: '600',
     flex: 1,
+  },
+  sessionId: {
+    marginTop: 2,
+    fontSize: 10,
   },
   liveIndicator: {
     flexDirection: 'row',

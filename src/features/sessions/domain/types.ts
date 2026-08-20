@@ -36,6 +36,7 @@ export interface Session {
   durationMinutes?: number;
   durationSec?: number;
   earnings: number;
+  commission?: number | null;
   rating?: number;
   orderId?: string;
   isLive: boolean;
@@ -55,7 +56,7 @@ export interface SessionsStats {
   activeSessions: number;
   pendingSessions: number;
   completedSessions: number;
-  missedSessions: number;
+  cancelledSessions: number;
 }
 
 export interface SessionsDashboard {

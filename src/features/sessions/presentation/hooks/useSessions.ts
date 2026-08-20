@@ -41,7 +41,7 @@ interface UseSessionsReturn {
     activeSessions: number;
     pendingSessions: number;
     completedSessions: number;
-    missedSessions: number;
+    cancelledSessions: number;
   };
 }
 
@@ -60,7 +60,7 @@ export const useSessions = (): UseSessionsReturn => {
     activeSessions: 0,
     pendingSessions: 0,
     completedSessions: 0,
-    missedSessions: 0,
+    cancelledSessions: 0,
   });
 
   const [activeFilter, setActiveFilter] = useState<FilterType>(FilterType.ALL);
@@ -95,26 +95,36 @@ export const useSessions = (): UseSessionsReturn => {
 
       if (sessionsData?.success) {
         // Transform API response to match our expected format
+        const mapApiStatus = (status: string): SessionStatus => {
+          switch (status?.toUpperCase()) {
+            case 'ONGOING':
+              return SessionStatus.ACTIVE;
+            case 'COMPLETED':
+              return SessionStatus.COMPLETED;
+            case 'CANCELLED':
+            case 'MISSED':
+              return SessionStatus.CANCELLED;
+            case 'PENDING':
+              return SessionStatus.PENDING;
+            default:
+              return SessionStatus.PENDING;
+          }
+        };
+
         const transformedSessions: Session[] = (sessionsData.data || []).map((item: AstrologerSession) => ({
           id: item.sessionId,
           userId: item.userId,
           userName: item.userName.trim(),
           userPhone: `${item.userCountryCode} ${item.userMobile}`,
           type: item.sessionType === 'CALL' ? SessionType.CALL : SessionType.CHAT,
-          status:
-            item.status === 'ONGOING'
-              ? SessionStatus.ACTIVE
-              : item.status === 'COMPLETED'
-                ? SessionStatus.COMPLETED
-                : item.status === 'MISSED'
-                  ? SessionStatus.MISSED
-                  : SessionStatus.ACTIVE,
+          status: mapApiStatus(item.status),
           startTime: item.startedAt,
           endTime: item.endedAt || undefined,
           duration: item.durationSec,
           durationMinutes: item.durationMinutes,
           durationSec: item.durationSec,
           earnings: item.coinsEarned,
+          commission: item.commission != null ? item.commission : null,
           rating: item.rating ?? undefined,
           isLive: item.status === 'ONGOING',
           orderId: undefined,
@@ -166,7 +176,7 @@ export const useSessions = (): UseSessionsReturn => {
           activeSessions: transformedSessions.filter(s => s.status === SessionStatus.ACTIVE).length,
           pendingSessions: transformedSessions.filter(s => s.status === SessionStatus.PENDING).length,
           completedSessions: transformedSessions.filter(s => s.status === SessionStatus.COMPLETED).length,
-          missedSessions: transformedSessions.filter(s => s.status === SessionStatus.MISSED).length,
+          cancelledSessions: transformedSessions.filter(s => s.status === SessionStatus.CANCELLED).length,
         };
 
         setSessions(transformedSessions);

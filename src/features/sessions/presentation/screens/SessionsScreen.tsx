@@ -94,7 +94,7 @@ export const SessionsScreen: React.FC = () => {
     stats,
     filteredSessions,
   } = useSessions();
-
+console.log("filteredSessionsfilteredSessionsv",filteredSessions)
   const navigation = useNavigation<any>();
 
   const handleSessionPress = useCallback(

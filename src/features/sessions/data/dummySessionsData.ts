@@ -95,7 +95,7 @@ export const dummySessions: Session[] = [
   //   userAvatar: 'https://randomuser.me/api/portraits/men/55.jpg',
   //   userPhone: '+91 9876543214',
   //   type: SessionType.CALL,
-  //   status: SessionStatus.MISSED,
+  //   status: SessionStatus.CANCELLED,
   //   startTime: formatISOTime(new Date(now.getTime() - 180 * 60000)),
   //   duration: 0,
   //   earnings: 0,
@@ -194,7 +194,7 @@ export const dummyStats: SessionsStats = {
   activeSessions: 2,
   pendingSessions: 2,
   completedSessions: 5,
-  missedSessions: 1,
+  cancelledSessions: 1,
 };
 
 export const getActiveSession = (): Session | null => {

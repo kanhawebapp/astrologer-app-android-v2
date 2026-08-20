@@ -22,7 +22,7 @@ const STATUS_FILTERS: { key: FilterType; label: string; iconName?: string }[] =
     },
     // { key: FilterType.PENDING, label: 'Pending', iconName: 'schedule' },
     { key: FilterType.COMPLETED, label: 'Completed', iconName: 'check-circle' },
-    { key: FilterType.MISSED, label: 'Missed', iconName: 'cancel' },
+    { key: FilterType.CANCELLED, label: 'Cancelled', iconName: 'block' },
   ];
 
 const SESSION_TYPES: {

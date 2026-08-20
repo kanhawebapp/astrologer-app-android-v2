@@ -80,7 +80,7 @@ const SessionDetailScreen: React.FC = () => {
             case 'ongoing':
                 return '#3B82F6';
 
-            case 'missed':
+            case 'cancelled':
                 return '#EF4444';
 
             default:
@@ -258,7 +258,7 @@ const SessionDetailScreen: React.FC = () => {
                     <StatCard
                         icon="account-balance-wallet"
                         title="Earnings"
-                        value={`₹${session.earnings}`}
+                        value={`₹${session.commission ?? 0}`}
                         theme={theme}
                     />
                 </View>

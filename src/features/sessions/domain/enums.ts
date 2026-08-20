@@ -8,7 +8,7 @@ export enum SessionStatus {
   ACTIVE = 'active',
   PENDING = 'pending',
   COMPLETED = 'completed',
-  MISSED = 'missed',
+  CANCELLED = 'cancelled',
 }
 
 export enum FilterType {
@@ -16,7 +16,7 @@ export enum FilterType {
   ACTIVE = 'active',
   PENDING = 'pending',
   COMPLETED = 'completed',
-  MISSED = 'missed',
+  CANCELLED = 'cancelled',
 }
 
 export enum SessionTypeFilter {

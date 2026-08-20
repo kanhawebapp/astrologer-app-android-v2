@@ -26,7 +26,7 @@ export interface AstrologerSession {
   durationMinutes: number;
   ratePerMin: number;
   coinsEarned: number;
-  commission: number;
+  commission: number | null;
 }
 
 export interface GetAstrologerSessionsResponse {

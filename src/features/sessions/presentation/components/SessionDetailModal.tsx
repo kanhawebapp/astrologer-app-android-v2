@@ -40,7 +40,7 @@ const STATUS_CONFIG: Record<SessionStatus, { label: string; color: string }> = {
   active: { label: 'Active', color: '#22C55E' },
   pending: { label: 'Pending', color: '#F59E0B' },
   completed: { label: 'Completed', color: '#6B7280' },
-  missed: { label: 'Missed', color: '#EF4444' },
+  cancelled: { label: 'Cancelled', color: '#EF4444' },
 };
 
 const TYPE_CONFIG: Record<SessionType, { label: string; iconName: string }> = {
@@ -385,7 +385,7 @@ export const SessionDetailModal: React.FC<SessionDetailModalProps> = ({
                       Session ID
                     </AppText>
                     <AppText variant="body1" color={theme.colors.text}>
-                      {session.id}
+                      {session.id?.slice(0, 8)}
                     </AppText>
                   </View>
                 </View>
