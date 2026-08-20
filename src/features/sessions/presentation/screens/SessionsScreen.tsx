@@ -30,7 +30,7 @@ const ListHeader: React.FC<{
   earningsToday: number;
   earningsWeekly: number;
   earningsMonthly: number;
-  earningsPending: number;
+  cancelledSessions: number;
   stats: any;
   theme: any
 }> = ({
@@ -41,7 +41,7 @@ const ListHeader: React.FC<{
   earningsToday,
   earningsWeekly,
   earningsMonthly,
-  earningsPending,
+  cancelledSessions,
   stats,
   theme
 }) =>
@@ -62,7 +62,7 @@ const ListHeader: React.FC<{
         today={earningsToday}
         weekly={earningsWeekly}
         monthly={earningsMonthly}
-        pending={earningsPending}
+        cancelled={cancelledSessions}
       />
       <SessionFilterTabs
         activeFilter={activeFilter as any}
@@ -90,7 +90,6 @@ export const SessionsScreen: React.FC = () => {
     earningsToday,
     earningsWeekly,
     earningsMonthly,
-    earningsPendingPayout,
     stats,
     filteredSessions,
   } = useSessions();
@@ -147,7 +146,7 @@ console.log("filteredSessionsfilteredSessionsv",filteredSessions)
         earningsToday={earningsToday}
         earningsWeekly={earningsWeekly}
         earningsMonthly={earningsMonthly}
-        earningsPending={earningsPendingPayout}
+        cancelledSessions={stats.cancelledSessions}
         stats={stats}
         theme={theme}
       />
@@ -160,8 +159,8 @@ console.log("filteredSessionsfilteredSessionsv",filteredSessions)
       earningsToday,
       earningsWeekly,
       earningsMonthly,
-      earningsPendingPayout,
       stats,
+      theme,
     ],
   );
 

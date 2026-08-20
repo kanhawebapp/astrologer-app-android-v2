@@ -8,7 +8,7 @@ interface EarningsSummaryCardProps {
   today: number;
   weekly: number;
   monthly: number;
-  pending: number;
+  cancelled: number;
 }
 
 interface EarningsItemProps {
@@ -17,6 +17,8 @@ interface EarningsItemProps {
   iconName: string;
   color: string;
   isHighlighted?: boolean;
+  /** When true, show raw count instead of currency formatting */
+  isCount?: boolean;
 }
 
 const formatCurrency = (amount: number): string => {
@@ -32,6 +34,7 @@ const EarningsItem: React.FC<EarningsItemProps> = ({
   iconName,
   color,
   isHighlighted,
+  isCount,
 }) => {
   const { theme } = useTheme();
 
@@ -66,7 +69,7 @@ const EarningsItem: React.FC<EarningsItemProps> = ({
         variant={isHighlighted ? 'h5' : 'body1'}
         color={isHighlighted ? color : theme.colors.text}
         style={styles.itemAmount}>
-        {formatCurrency(amount)}
+        {isCount ? String(amount) : formatCurrency(amount)}
       </AppText>
     </View>
   );
@@ -76,7 +79,7 @@ export const EarningsSummaryCard: React.FC<EarningsSummaryCardProps> = ({
   today,
   weekly,
   monthly,
-  pending,
+  cancelled,
 }) => {
   const { theme } = useTheme();
 
@@ -122,10 +125,11 @@ export const EarningsSummaryCard: React.FC<EarningsSummaryCardProps> = ({
           color={theme.colors.accentPurple}
         />
         <EarningsItem
-          title="Pending"
-          amount={pending}
-          iconName="schedule"
-          color={theme.colors.warning}
+          title="Cancelled"
+          amount={cancelled}
+          iconName="block"
+          color={theme.colors.error}
+          isCount
         />
       </View>
     </View>
