@@ -15,11 +15,11 @@ interface SessionFilterTabsProps {
 const STATUS_FILTERS: { key: FilterType; label: string; iconName?: string }[] =
   [
     { key: FilterType.ALL, label: 'All' },
-    {
-      key: FilterType.ACTIVE,
-      label: 'Active',
-      iconName: 'radio-button-checked',
-    },
+    // {
+    //   key: FilterType.ACTIVE,
+    //   label: 'Active',
+    //   iconName: 'radio-button-checked',
+    // },
     // { key: FilterType.PENDING, label: 'Pending', iconName: 'schedule' },
     { key: FilterType.COMPLETED, label: 'Completed', iconName: 'check-circle' },
     { key: FilterType.CANCELLED, label: 'Cancelled', iconName: 'block' },

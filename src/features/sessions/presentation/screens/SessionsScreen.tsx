@@ -58,12 +58,12 @@ const ListHeader: React.FC<{
           </AppText>
         </View>
       </View>
-      <EarningsSummaryCard
+      {/* <EarningsSummaryCard
         today={earningsToday}
         weekly={earningsWeekly}
         monthly={earningsMonthly}
         cancelled={cancelledSessions}
-      />
+      /> */}
       <SessionFilterTabs
         activeFilter={activeFilter as any}
         onFilterChange={onFilterChange}
