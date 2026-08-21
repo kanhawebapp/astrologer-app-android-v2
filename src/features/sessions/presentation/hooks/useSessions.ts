@@ -135,6 +135,8 @@ export const useSessions = (): UseSessionsReturn => {
   const isMockDataRef = useRef(false);
   // Ignore stale initial-fetch responses so they cannot wipe paginated state
   const fetchGenerationRef = useRef(0);
+  // Mount effect must start page=1 only once
+  const hasInitialFetchRef = useRef(false);
 
   const updatePaginationFromResponse = (
     currentPage: unknown,
@@ -166,6 +168,15 @@ export const useSessions = (): UseSessionsReturn => {
   };
 
   const fetchSessions = useCallback(async (showRefreshing = false) => {
+    // Block late/duplicate initial page=1 BEFORE the network call once
+    // the user has already paginated past page 1.
+    if (
+      !showRefreshing &&
+      (currentPageRef.current > 1 || isLoadingMoreRef.current)
+    ) {
+      return;
+    }
+
     const fetchGeneration = ++fetchGenerationRef.current;
 
     try {
@@ -193,7 +204,7 @@ export const useSessions = (): UseSessionsReturn => {
         return;
       }
 
-      // Do not wipe accumulated pages if a non-refresh initial fetch finishes late
+      // Safety: do not wipe accumulated pages if pagination advanced during await
       if (!showRefreshing && currentPageRef.current > 1) {
         console.log('⚠️ Ignoring fetchSessions overwrite — pagination already active', {
           currentPage: currentPageRef.current,
@@ -403,10 +414,13 @@ export const useSessions = (): UseSessionsReturn => {
       );
 
       if (sessionsData.totalCount != null) {
-        setStats(prev => ({
-          ...prev,
-          totalSessions: sessionsData.totalCount,
-        }));
+        // Keep same stats reference when totalCount is unchanged so
+        // SessionsScreen ListHeaderComponent does not remount mid-scroll.
+        setStats(prev =>
+          prev.totalSessions === sessionsData.totalCount
+            ? prev
+            : { ...prev, totalSessions: sessionsData.totalCount },
+        );
       }
     } catch (err) {
       console.log('❌ Load more sessions error:', {
@@ -433,6 +447,10 @@ export const useSessions = (): UseSessionsReturn => {
   }, []);
 
   useEffect(() => {
+    if (hasInitialFetchRef.current) {
+      return;
+    }
+    hasInitialFetchRef.current = true;
     fetchSessions();
   }, [fetchSessions]);
 

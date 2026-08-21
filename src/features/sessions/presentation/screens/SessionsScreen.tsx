@@ -8,6 +8,8 @@ import {
   RefreshControl,
   NativeSyntheticEvent,
   NativeScrollEvent,
+  StatusBar,
+  Platform,
 } from 'react-native';
 import { ScreenContainer } from '../../../../components/layout/ScreenContainer';
 import { AppText } from '../../../../components/common/AppText';
@@ -20,7 +22,7 @@ import {
   EarningsSummaryCard,
   EmptyState,
 } from '../components';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 
 const ItemSeparator = () => <View style={styles.separator} />;
 
@@ -37,7 +39,7 @@ const ListHeader: React.FC<{
   earningsMonthly: number;
   cancelledSessions: number;
   stats: any;
-  theme: any
+  theme: any;
 }> = ({
   activeFilter,
   onFilterChange,
@@ -48,39 +50,40 @@ const ListHeader: React.FC<{
   earningsMonthly,
   cancelledSessions,
   stats,
-  theme
-}) =>
-
-  (
-    <View>
-      <View style={styles.headerTitle}>
-        <AppText variant="h4" style={styles.title}>
-          Sessions
+  theme,
+}) => (
+  <View>
+    <View style={styles.headerTitle}>
+      <AppText variant="h4" style={styles.title}>
+        Sessions
+      </AppText>
+      <View
+        style={[
+          styles.statsContainer,
+          { backgroundColor: theme.colors.primary + 20 },
+        ]}>
+        <AppText variant="caption" style={styles.statsText}>
+          {stats.totalSessions} sessions
         </AppText>
-        <View style={[styles.statsContainer, { backgroundColor: theme.colors.primary + 20 }]}>
-          <AppText variant="caption" style={styles.statsText}>
-            {stats.totalSessions} sessions
-          </AppText>
-        </View>
       </View>
-      {/* <EarningsSummaryCard
+    </View>
+    {/* <EarningsSummaryCard
         today={earningsToday}
         weekly={earningsWeekly}
         monthly={earningsMonthly}
         cancelled={cancelledSessions}
       /> */}
-      <SessionFilterTabs
-        activeFilter={activeFilter as any}
-        onFilterChange={onFilterChange}
-        activeSessionType={activeSessionType as any}
-        onSessionTypeChange={onSessionTypeChange}
-      />
-    </View>
-
-  );
+    <SessionFilterTabs
+      activeFilter={activeFilter as any}
+      onFilterChange={onFilterChange}
+      activeSessionType={activeSessionType as any}
+      onSessionTypeChange={onSessionTypeChange}
+    />
+  </View>
+);
 
 export const SessionsScreen: React.FC = () => {
-  const { theme } = useTheme();
+  const { theme, mode } = useTheme();
   const {
     activeFilter,
     setActiveFilter,
@@ -105,6 +108,20 @@ export const SessionsScreen: React.FC = () => {
   // Ignore FlatList's spurious initial onEndReached until the user scrolls
   const userHasScrolledRef = useRef(false);
 
+  // Home leaves StatusBar translucent; reset on focus so first-open layout
+  // settles before FlatList mounts with data.
+  useFocusEffect(
+    useCallback(() => {
+      StatusBar.setBarStyle(
+        mode === 'dark' ? 'light-content' : 'dark-content',
+      );
+      if (Platform.OS === 'android') {
+        StatusBar.setTranslucent(false);
+        StatusBar.setBackgroundColor(theme.colors.background);
+      }
+    }, [mode, theme.colors.background]),
+  );
+
   const handleSessionPress = useCallback(
     async (session: Session) => {
       setSelectedSession(session);
@@ -117,25 +134,17 @@ export const SessionsScreen: React.FC = () => {
 
   const renderItem: ListRenderItem<Session> = useCallback(
     ({ item, index }) => {
-      console.log('🎨 RENDER ITEM', {
-        index,
-        id: item.id,
-      });
+      // console.log('🎨 RENDER ITEM', {
+      //   index,
+      //   id: item.id,
+      // });
 
-      return (
-        <SessionCard
-          session={item}
-          onPress={handleSessionPress}
-        />
-      );
+      return <SessionCard session={item} onPress={handleSessionPress} />;
     },
     [handleSessionPress],
   );
 
-  const keyExtractor = useCallback(
-    (item: Session) => item.id,
-    [],
-  );
+  const keyExtractor = useCallback((item: Session) => item.id, []);
 
   const onRefresh = useCallback(async () => {
     userHasScrolledRef.current = false;
@@ -162,7 +171,7 @@ export const SessionsScreen: React.FC = () => {
       const { contentOffset, contentSize, layoutMeasurement } =
         event.nativeEvent;
 
-      // console.log('📜 FLATLIST SCROLL', {
+      // console.log('📜 SESSION SCROLL', {
       //   offsetY: contentOffset.y,
       //   contentHeight: contentSize.height,
       //   viewportHeight: layoutMeasurement.height,
@@ -198,7 +207,8 @@ export const SessionsScreen: React.FC = () => {
     );
   }, [isLoadingMore, theme.colors.primary]);
 
-  // Element (not function-as-component) so header always reflects latest props
+  // Depend on primitive stats fields only. `setStats` on every loadMore creates
+  // a new object; remounting ListHeaderComponent breaks first-open virtualization.
   const listHeader = useMemo(
     () => (
       <ListHeader
@@ -222,47 +232,64 @@ export const SessionsScreen: React.FC = () => {
       earningsToday,
       earningsWeekly,
       earningsMonthly,
-      stats,
+      stats.totalSessions,
+      stats.cancelledSessions,
       theme,
     ],
   );
 
-  console.log('📱 FLATLIST DATA', {
+  console.log('📦 SESSION DATA', {
     length: filteredSessions.length,
+    isLoading,
   });
+
+  // First-open bug: FlatList was mounting empty (flexGrow content) while the
+  // tab/StatusBar layout was still settling, then never virtualizing past 0–9
+  // until a full remount. Mount FlatList only after the first page is ready.
+  const isInitialLoading = isLoading && filteredSessions.length === 0;
 
   return (
     <ScreenContainer scrollable={false} withPadding={false}>
-      <FlatList
-        style={styles.list}
-        data={filteredSessions}
-        renderItem={renderItem}
-        keyExtractor={keyExtractor}
-        ListHeaderComponent={listHeader}
-        ListFooterComponent={renderFooter}
-        contentContainerStyle={
-          filteredSessions.length === 0 ? styles.emptyContent : styles.listContent
-        }
-        showsVerticalScrollIndicator={false}
-        ItemSeparatorComponent={ItemSeparator}
-        onScrollBeginDrag={handleScrollBeginDrag}
-        onScroll={handleScroll}
-        scrollEventThrottle={16}
-        onEndReached={handleEndReached}
-        onEndReachedThreshold={0.5}
-        initialNumToRender={10}
-        maxToRenderPerBatch={10}
-        windowSize={21}
-        removeClippedSubviews={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            colors={[theme.colors.primary]}
-            tintColor={theme.colors.primary}
-          />
-        }
-      />
+      {isInitialLoading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={theme.colors.primary} />
+        </View>
+      ) : (
+        <FlatList
+          style={styles.list}
+          data={filteredSessions}
+          renderItem={renderItem}
+          keyExtractor={keyExtractor}
+          ListHeaderComponent={listHeader}
+          ListFooterComponent={renderFooter}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+          ItemSeparatorComponent={ItemSeparator}
+          onScrollBeginDrag={handleScrollBeginDrag}
+          onScroll={handleScroll}
+          scrollEventThrottle={16}
+          onEndReached={handleEndReached}
+          onEndReachedThreshold={0.5}
+          initialNumToRender={10}
+          maxToRenderPerBatch={10}
+          windowSize={21}
+          removeClippedSubviews={false}
+          onLayout={event => {
+            // console.log('📐 FLATLIST ONLAYOUT', {
+            //   width: event.nativeEvent.layout.width,
+            //   height: event.nativeEvent.layout.height,
+            // });
+          }}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={[theme.colors.primary]}
+              tintColor={theme.colors.primary}
+            />
+          }
+        />
+      )}
     </ScreenContainer>
   );
 };
@@ -274,9 +301,6 @@ const styles = StyleSheet.create({
   listContent: {
     paddingBottom: 16,
   },
-  emptyContent: {
-    flexGrow: 1,
-  },
   separator: {
     height: 8,
   },
@@ -284,7 +308,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingTop: 100,
   },
   errorContainer: {
     flex: 1,
@@ -309,7 +332,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   statsContainer: {
-    // backgroundColor: 'rgba(108, 99, 255, 0.1)',
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 12,
