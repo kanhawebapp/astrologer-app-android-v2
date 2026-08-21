@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo, useRef } from 'react';
 import {
   FlatList,
   StyleSheet,
@@ -6,6 +6,8 @@ import {
   View,
   ActivityIndicator,
   RefreshControl,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
 } from 'react-native';
 import { ScreenContainer } from '../../../../components/layout/ScreenContainer';
 import { AppText } from '../../../../components/common/AppText';
@@ -21,6 +23,9 @@ import {
 import { useNavigation } from '@react-navigation/native';
 
 const ItemSeparator = () => <View style={styles.separator} />;
+
+/** Distance from bottom (px) at which the next page should load. */
+const NEAR_BOTTOM_OFFSET = 200;
 
 const ListHeader: React.FC<{
   activeFilter: string;
@@ -83,8 +88,10 @@ export const SessionsScreen: React.FC = () => {
     setActiveSessionType,
     refreshing,
     isLoading,
+    isLoadingMore,
     error,
     refresh,
+    loadMore,
     selectedSession,
     setSelectedSession,
     earningsToday,
@@ -93,8 +100,10 @@ export const SessionsScreen: React.FC = () => {
     stats,
     filteredSessions,
   } = useSessions();
-console.log("filteredSessionsfilteredSessionsv",filteredSessions)
   const navigation = useNavigation<any>();
+
+  // Ignore FlatList's spurious initial onEndReached until the user scrolls
+  const userHasScrolledRef = useRef(false);
 
   const handleSessionPress = useCallback(
     async (session: Session) => {
@@ -107,12 +116,19 @@ console.log("filteredSessionsfilteredSessionsv",filteredSessions)
   );
 
   const renderItem: ListRenderItem<Session> = useCallback(
-    ({ item }) => (
-      <SessionCard
-        session={item}
-        onPress={handleSessionPress}
-      />
-    ),
+    ({ item, index }) => {
+      console.log('🎨 RENDER ITEM', {
+        index,
+        id: item.id,
+      });
+
+      return (
+        <SessionCard
+          session={item}
+          onPress={handleSessionPress}
+        />
+      );
+    },
     [handleSessionPress],
   );
 
@@ -122,21 +138,68 @@ console.log("filteredSessionsfilteredSessionsv",filteredSessions)
   );
 
   const onRefresh = useCallback(async () => {
+    userHasScrolledRef.current = false;
     await refresh();
   }, [refresh]);
 
-  const renderFooter = useCallback(() => {
-    if (isLoading) {
-      return (
-        <View style={styles.footer}>
-          <ActivityIndicator size="small" color={theme.colors.primary} />
-        </View>
-      );
+  const handleEndReached = useCallback(() => {
+    if (!userHasScrolledRef.current) {
+      return;
     }
-    return null;
-  }, [isLoading, theme.colors.primary]);
+    if (isLoading || isLoadingMore || filteredSessions.length === 0) {
+      return;
+    }
+    loadMore();
+  }, [isLoading, isLoadingMore, filteredSessions.length, loadMore]);
 
-  const listHeader = useCallback(
+  const handleScrollBeginDrag = useCallback(() => {
+    userHasScrolledRef.current = true;
+  }, []);
+
+  // Backup when FlatList skips later onEndReached after the empty-list fire
+  const handleScroll = useCallback(
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const { contentOffset, contentSize, layoutMeasurement } =
+        event.nativeEvent;
+
+      // console.log('📜 FLATLIST SCROLL', {
+      //   offsetY: contentOffset.y,
+      //   contentHeight: contentSize.height,
+      //   viewportHeight: layoutMeasurement.height,
+      // });
+
+      if (!userHasScrolledRef.current) {
+        return;
+      }
+      if (isLoading || isLoadingMore || filteredSessions.length === 0) {
+        return;
+      }
+
+      const distanceFromEnd =
+        contentSize.height - (layoutMeasurement.height + contentOffset.y);
+
+      if (distanceFromEnd > NEAR_BOTTOM_OFFSET) {
+        return;
+      }
+
+      loadMore();
+    },
+    [loadMore, isLoading, isLoadingMore, filteredSessions.length],
+  );
+
+  const renderFooter = useCallback(() => {
+    if (!isLoadingMore) {
+      return null;
+    }
+    return (
+      <View style={styles.footer}>
+        <ActivityIndicator size="small" color={theme.colors.primary} />
+      </View>
+    );
+  }, [isLoadingMore, theme.colors.primary]);
+
+  // Element (not function-as-component) so header always reflects latest props
+  const listHeader = useMemo(
     () => (
       <ListHeader
         activeFilter={activeFilter}
@@ -164,43 +227,33 @@ console.log("filteredSessionsfilteredSessionsv",filteredSessions)
     ],
   );
 
-  const renderEmpty = useCallback(() => {
-    if (isLoading) {
-      return (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={theme.colors.primary} />
-        </View>
-      );
-    }
-    if (error) {
-      return (
-        <View style={styles.errorContainer}>
-          <AppText variant="body1" color={theme.colors.error}>
-            {error}
-          </AppText>
-        </View>
-      );
-    }
-    return <EmptyState />;
-  }, [isLoading, error, theme.colors]);
-
-  // console.log("filteredSessionsfilteredSessionsv",filteredSessions)
+  console.log('📱 FLATLIST DATA', {
+    length: filteredSessions.length,
+  });
 
   return (
     <ScreenContainer scrollable={false} withPadding={false}>
       <FlatList
+        style={styles.list}
         data={filteredSessions}
         renderItem={renderItem}
         keyExtractor={keyExtractor}
         ListHeaderComponent={listHeader}
-        // ListEmptyComponent={renderEmpty}
         ListFooterComponent={renderFooter}
         contentContainerStyle={
           filteredSessions.length === 0 ? styles.emptyContent : styles.listContent
         }
         showsVerticalScrollIndicator={false}
         ItemSeparatorComponent={ItemSeparator}
+        onScrollBeginDrag={handleScrollBeginDrag}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
+        onEndReached={handleEndReached}
         onEndReachedThreshold={0.5}
+        initialNumToRender={10}
+        maxToRenderPerBatch={10}
+        windowSize={21}
+        removeClippedSubviews={false}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -215,6 +268,9 @@ console.log("filteredSessionsfilteredSessionsv",filteredSessions)
 };
 
 const styles = StyleSheet.create({
+  list: {
+    flex: 1,
+  },
   listContent: {
     paddingBottom: 16,
   },

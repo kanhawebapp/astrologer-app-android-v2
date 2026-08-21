@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   Session,
   SessionsDashboard,
@@ -8,12 +8,60 @@ import {
   SessionStatus,
   SessionType,
   SessionsStats,
-  Earnings,
 } from '../../domain/types';
 import { sessionsRepository } from '../../data/sessionsRepository';
 import { getFilteredSessions } from '../../data/dummySessionsData';
 import { sessionsApi } from '../../../../services/api/sessionHistory/sessions.service';
-import { GetAstrologerSessionsResponse, AstrologerSession } from '../../../../services/api/sessionHistory/sessions.types';
+import { AstrologerSession } from '../../../../services/api/sessionHistory/sessions.types';
+
+const PAGE_LIMIT = 10;
+
+const mapApiStatus = (status: string): SessionStatus => {
+  switch (status?.toUpperCase()) {
+    case 'ONGOING':
+      return SessionStatus.ACTIVE;
+    case 'COMPLETED':
+      return SessionStatus.COMPLETED;
+    case 'CANCELLED':
+    case 'MISSED':
+      return SessionStatus.CANCELLED;
+    case 'PENDING':
+      return SessionStatus.PENDING;
+    default:
+      return SessionStatus.PENDING;
+  }
+};
+
+const transformApiSessions = (data: AstrologerSession[]): Session[] =>
+  (data || []).map((item: AstrologerSession, index: number) => {
+    // Prefer sessionId; fall back so FlatList keys / dedupe never collapse on undefined
+    const rawId = item.sessionId ?? (item as any).id ?? item.chatId;
+    const id =
+      rawId != null && String(rawId).length > 0
+        ? String(rawId)
+        : `session-${item.userId ?? 'u'}-${item.startedAt ?? index}-${index}`;
+
+    return {
+      id,
+      userId: item.userId,
+      userName: (item.userName || '').trim(),
+      userPhone: `${item.userCountryCode} ${item.userMobile}`,
+      type: item.sessionType === 'CALL' ? SessionType.CALL : SessionType.CHAT,
+      status: mapApiStatus(item.status),
+      startTime: item.startedAt,
+      endTime: item.endedAt || undefined,
+      duration: item.durationSec,
+      durationMinutes: item.durationMinutes,
+      durationSec: item.durationSec,
+      earnings: item.coinsEarned,
+      commission: item.commission != null ? item.commission : null,
+      rating: item.rating ?? undefined,
+      isLive: item.status === 'ONGOING',
+      orderId: undefined,
+      notes: undefined,
+      chatId: item.chatId,
+    };
+  });
 
 interface UseSessionsReturn {
   sessions: Session[];
@@ -24,10 +72,12 @@ interface UseSessionsReturn {
   activeSessionType: SessionTypeFilter;
   setActiveSessionType: (type: SessionTypeFilter) => void;
   isLoading: boolean;
+  isLoadingMore: boolean;
   isMockData: boolean;
   refreshing: boolean;
   error: string | null;
   refresh: () => Promise<void>;
+  loadMore: () => void;
   handleSessionPress: (session: Session) => void;
   selectedSession: Session | null;
   setSelectedSession: (session: Session | null) => void;
@@ -71,15 +121,59 @@ export const useSessions = (): UseSessionsReturn => {
   const [selectedSession, setSelectedSession] = useState<Session | null>(null);
 
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [isMockData, setIsMockData] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const currentPageRef = useRef(1);
+  const totalPagesRef = useRef(1);
+  const totalCountRef = useRef(0);
+  const isLoadingMoreRef = useRef(false);
+  const isLoadingRef = useRef(true);
+  const refreshingRef = useRef(false);
+  const isMockDataRef = useRef(false);
+  // Ignore stale initial-fetch responses so they cannot wipe paginated state
+  const fetchGenerationRef = useRef(0);
+
+  const updatePaginationFromResponse = (
+    currentPage: unknown,
+    totalPages: unknown,
+    totalCount: unknown,
+    fallbackPage?: number,
+  ) => {
+    const page = Number(currentPage);
+    const pages = Number(totalPages);
+    const count = Number(totalCount);
+
+    currentPageRef.current =
+      Number.isFinite(page) && page > 0
+        ? page
+        : fallbackPage ?? currentPageRef.current;
+
+    if (Number.isFinite(count) && count >= 0) {
+      totalCountRef.current = count;
+    }
+
+    if (Number.isFinite(pages) && pages > 0) {
+      totalPagesRef.current = pages;
+    } else if (totalCountRef.current > 0) {
+      totalPagesRef.current = Math.max(
+        1,
+        Math.ceil(totalCountRef.current / PAGE_LIMIT),
+      );
+    }
+  };
+
   const fetchSessions = useCallback(async (showRefreshing = false) => {
+    const fetchGeneration = ++fetchGenerationRef.current;
+
     try {
       if (showRefreshing) {
+        refreshingRef.current = true;
         setRefreshing(true);
       } else {
+        isLoadingRef.current = true;
         setIsLoading(true);
       }
       setError(null);
@@ -87,50 +181,31 @@ export const useSessions = (): UseSessionsReturn => {
       // Try to get data from API first
       const apiResponse = await sessionsApi.getAstrologerSessions({
         page: 1,
-        limit: 10,
+        limit: PAGE_LIMIT,
       });
+
+      // Stale response — a newer fetch/refresh already started
+      if (fetchGeneration !== fetchGenerationRef.current) {
+        console.log('⚠️ Ignoring stale fetchSessions response', {
+          fetchGeneration,
+          current: fetchGenerationRef.current,
+        });
+        return;
+      }
+
+      // Do not wipe accumulated pages if a non-refresh initial fetch finishes late
+      if (!showRefreshing && currentPageRef.current > 1) {
+        console.log('⚠️ Ignoring fetchSessions overwrite — pagination already active', {
+          currentPage: currentPageRef.current,
+        });
+        return;
+      }
 
       const sessionsData = apiResponse.getAstrologerSessions;
       // console.log("checking session data", sessionsData)
 
       if (sessionsData?.success) {
-        // Transform API response to match our expected format
-        const mapApiStatus = (status: string): SessionStatus => {
-          switch (status?.toUpperCase()) {
-            case 'ONGOING':
-              return SessionStatus.ACTIVE;
-            case 'COMPLETED':
-              return SessionStatus.COMPLETED;
-            case 'CANCELLED':
-            case 'MISSED':
-              return SessionStatus.CANCELLED;
-            case 'PENDING':
-              return SessionStatus.PENDING;
-            default:
-              return SessionStatus.PENDING;
-          }
-        };
-
-        const transformedSessions: Session[] = (sessionsData.data || []).map((item: AstrologerSession) => ({
-          id: item.sessionId,
-          userId: item.userId,
-          userName: item.userName.trim(),
-          userPhone: `${item.userCountryCode} ${item.userMobile}`,
-          type: item.sessionType === 'CALL' ? SessionType.CALL : SessionType.CHAT,
-          status: mapApiStatus(item.status),
-          startTime: item.startedAt,
-          endTime: item.endedAt || undefined,
-          duration: item.durationSec,
-          durationMinutes: item.durationMinutes,
-          durationSec: item.durationSec,
-          earnings: item.coinsEarned,
-          commission: item.commission != null ? item.commission : null,
-          rating: item.rating ?? undefined,
-          isLive: item.status === 'ONGOING',
-          orderId: undefined,
-          notes: undefined,
-          chatId: item.chatId
-        }));
+        const transformedSessions = transformApiSessions(sessionsData.data);
 
         // Calculate earnings from sessions
         const calculateEarningsFromSessions = (sessions: Session[], filter: 'today' | 'weekly' | 'monthly' | 'total'): number => {
@@ -172,12 +247,19 @@ export const useSessions = (): UseSessionsReturn => {
 
         // Calculate stats
         const stats: SessionsStats = {
-          totalSessions: transformedSessions.length,
+          totalSessions: sessionsData.totalCount ?? transformedSessions.length,
           activeSessions: transformedSessions.filter(s => s.status === SessionStatus.ACTIVE).length,
           pendingSessions: transformedSessions.filter(s => s.status === SessionStatus.PENDING).length,
           completedSessions: transformedSessions.filter(s => s.status === SessionStatus.COMPLETED).length,
           cancelledSessions: transformedSessions.filter(s => s.status === SessionStatus.CANCELLED).length,
         };
+
+        updatePaginationFromResponse(
+          sessionsData.currentPage,
+          sessionsData.totalPages,
+          sessionsData.totalCount,
+          1,
+        );
 
         setSessions(transformedSessions);
         setActiveSession(activeSession);
@@ -190,16 +272,25 @@ export const useSessions = (): UseSessionsReturn => {
         });
         setStats(stats);
         setIsMockData(false);
+        isMockDataRef.current = false;
       } else {
         // Fallback to repository (which will use mock data)
         const response: SessionApiResponse<SessionsDashboard> =
           await sessionsRepository.getSessions();
 
+        if (fetchGeneration !== fetchGenerationRef.current) {
+          return;
+        }
+
+        currentPageRef.current = 1;
+        totalPagesRef.current = 1;
+        totalCountRef.current = response.data.sessions.length;
         setSessions(response.data.sessions);
         setActiveSession(response.data.activeSession);
         setEarnings(response.data.earnings);
         setStats(response.data.stats);
         setIsMockData(response.isMockData);
+        isMockDataRef.current = response.isMockData;
       }
     } catch (err) {
       setError('Failed to load sessions');
@@ -210,21 +301,126 @@ export const useSessions = (): UseSessionsReturn => {
         const response: SessionApiResponse<SessionsDashboard> =
           await sessionsRepository.getSessions();
 
+        if (fetchGeneration !== fetchGenerationRef.current) {
+          return;
+        }
+
+        currentPageRef.current = 1;
+        totalPagesRef.current = 1;
+        totalCountRef.current = response.data.sessions.length;
         setSessions(response.data.sessions);
         setActiveSession(response.data.activeSession);
         setEarnings(response.data.earnings);
         setStats(response.data.stats);
         setIsMockData(response.isMockData);
+        isMockDataRef.current = response.isMockData;
       } catch (fallbackErr) {
         console.log('Fallback also failed:', fallbackErr);
       }
     } finally {
-      setIsLoading(false);
-      setRefreshing(false);
+      if (fetchGeneration === fetchGenerationRef.current) {
+        isLoadingRef.current = false;
+        refreshingRef.current = false;
+        setIsLoading(false);
+        setRefreshing(false);
+      }
+    }
+  }, []);
+
+  const loadMore = useCallback(async () => {
+    // Synchronous lock — must run before any await
+    if (isLoadingMoreRef.current) {
+      console.log('⛔ LOAD MORE BLOCKED: request already running');
+      return;
+    }
+
+    if (isLoadingRef.current) {
+      console.log('⛔ LOAD MORE BLOCKED: initial loading');
+      return;
+    }
+
+    if (refreshingRef.current) {
+      console.log('⛔ LOAD MORE BLOCKED: refreshing');
+      return;
+    }
+
+    if (isMockDataRef.current) {
+      console.log('⛔ LOAD MORE BLOCKED: mock data');
+      return;
+    }
+
+    const currentPage = Number(currentPageRef.current) || 1;
+    const totalPages = Number(totalPagesRef.current) || 1;
+
+    if (currentPage >= totalPages) {
+      console.log('⛔ LOAD MORE BLOCKED: no more pages', {
+        currentPage,
+        totalPages,
+      });
+      return;
+    }
+
+    // Lock BEFORE the API request so concurrent scroll events cannot race in
+    isLoadingMoreRef.current = true;
+    setIsLoadingMore(true);
+
+    const nextPage = currentPage + 1;
+    console.log('🚀 PAGINATION', {
+      currentPage,
+      nextPage,
+      totalPages,
+      isLoadingMore: true,
+    });
+
+    try {
+      const apiResponse = await sessionsApi.getAstrologerSessions({
+        page: nextPage,
+        limit: PAGE_LIMIT,
+      });
+
+      const sessionsData = apiResponse.getAstrologerSessions;
+
+      if (!sessionsData?.success) {
+        console.log('❌ Page request failed:', nextPage);
+        return;
+      }
+
+      const newSessions = transformApiSessions(sessionsData.data || []);
+
+      setSessions(prev => {
+        const existingIds = new Set(prev.map(session => session.id));
+        const uniqueNewSessions = newSessions.filter(
+          session => !existingIds.has(session.id),
+        );
+        return [...prev, ...uniqueNewSessions];
+      });
+
+      updatePaginationFromResponse(
+        nextPage,
+        sessionsData.totalPages,
+        sessionsData.totalCount,
+        nextPage,
+      );
+
+      if (sessionsData.totalCount != null) {
+        setStats(prev => ({
+          ...prev,
+          totalSessions: sessionsData.totalCount,
+        }));
+      }
+    } catch (err) {
+      console.log('❌ Load more sessions error:', {
+        page: nextPage,
+        error: err,
+      });
+    } finally {
+      isLoadingMoreRef.current = false;
+      setIsLoadingMore(false);
     }
   }, []);
 
   const refresh = useCallback(async () => {
+    currentPageRef.current = 1;
     await fetchSessions(true);
   }, [fetchSessions]);
 
@@ -240,16 +436,6 @@ export const useSessions = (): UseSessionsReturn => {
     fetchSessions();
   }, [fetchSessions]);
 
-  // useEffect(() => {
-  //   const intervalId = setInterval(() => {
-  //     if (!isLoading) {
-  //       fetchSessions(true);
-  //     }
-  //   }, 30000);
-
-  //   return () => clearInterval(intervalId);
-  // }, [fetchSessions, isLoading]);
-
   return {
     sessions,
     filteredSessions,
@@ -259,10 +445,12 @@ export const useSessions = (): UseSessionsReturn => {
     activeSessionType,
     setActiveSessionType,
     isLoading,
+    isLoadingMore,
     isMockData,
     refreshing,
     error,
     refresh,
+    loadMore,
     handleSessionPress,
     selectedSession,
     setSelectedSession,
