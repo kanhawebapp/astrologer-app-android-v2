@@ -313,10 +313,7 @@ const handleCompletedChat = useCallback(
     const stateBefore = store.getState().chat;
     console.log('[CHAT_DEBUG] socket=completed_chat handleCompletedChat', {
       data,
-      isMounted: isMounted.current,
-      chatStatusBefore: stateBefore.chatStatus,
-      roomIdBefore: stateBefore.activeSession?.roomId,
-      remainingTimeBefore: stateBefore.activeSession?.remainingTime,
+      
     });
 
     if (!isMounted.current) {
@@ -331,9 +328,9 @@ const handleCompletedChat = useCallback(
 
     dispatch(hardResetChatFlow());
 
-    dispatch(setChatStatus('IDLE'));
+    // dispatch(setChatStatus('IDLE'));
 
-    dispatch(setError(null));
+    // dispatch(setError(null));
     const stateAfter = store.getState().chat;
     console.log('[CHAT_DEBUG] socket=completed_chat AFTER store updates', {
       chatStatusAfter: stateAfter.chatStatus,

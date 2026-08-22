@@ -13,7 +13,7 @@ export const ChatSocketEvents = {
   GET_TYPING_STATUS: 'typing',
   TYPING_STOP: 'typing',
   // COMPLETED_CHAT: 'cancel_chat_request',
-  COMPLETED_CHAT: 'completed_chat',
+  COMPLETED_CHAT: 'complted_chat',
   LEAVE_CHAT: 'leave_chat',
   USER_DISCONNECTED: 'user_disconnected',
   CHAT_REJECT_AUTO: 'chat_reject_auto',

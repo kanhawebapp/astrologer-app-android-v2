@@ -76,7 +76,7 @@ async acceptChatAstrologer(
       sessionId,
       roomId,
     });
-    console.log('✅ [EMITTER] completeChat() emit finished');
+    // console.log('✅ [EMITTER] completeChat() emit finished');
   }
 
   async leaveChat(
