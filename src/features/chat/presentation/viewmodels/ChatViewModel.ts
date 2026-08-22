@@ -35,7 +35,8 @@ export const useChatViewModel = () => {
   const [replyToMessage, setReplyToMessage] = useState<ReplyToData | undefined>(
     undefined,
   );
-  const [isTyping, setIsTyping] = useState(false);
+const [isTyping, setIsTyping] = useState(false);
+const [typingUserName, setTypingUserName] = useState('');
 
   // Route params
   const routeParams = route.params || {};
@@ -178,23 +179,28 @@ export const useChatViewModel = () => {
   }, [scrollToLatest]);
 
   // Typing listener
-  useEffect(() => {
-    const handleTyping = (data: any) => {
-      if (!data) return;
-      const incomingRoomId = data.room_id || data.roomId || data.roomid;
-      if (incomingRoomId !== effectiveRoomId) return;
-      const typingStatus = data.typing ?? false;
-      if (data?.user_name !== 'Astrologer') {
-        setIsTyping(typingStatus);
-      }
-    };
-    socketManager.off('typing', handleTyping);
-    socketManager.on('typing', handleTyping);
-    return () => {
-      socketManager.off('typing', handleTyping);
-    };
-  }, [effectiveRoomId]);
+ useEffect(() => {
+  const handleTyping = (data: any) => {
+    if (!data) return;
+console.log("data>>>>",data)
+    const incomingRoomId = data.room_id || data.roomId || data.roomid;
+    if (incomingRoomId !== effectiveRoomId) return;
 
+    const typingStatus = data.typing ?? false;
+
+    // Astro ka khud ka typing ignore
+    if (data?.user_name === 'Astrologer') return;
+
+    setIsTyping(typingStatus);
+    setTypingUserName(data.user_name || "");
+  };
+
+  socketManager.on('typing', handleTyping);
+
+  return () => {
+    socketManager.off('typing', handleTyping);
+  };
+}, [effectiveRoomId]);
   // Navigate back when chat ends
   useEffect(() => {
     if (chatStatus === 'ENDED') {
@@ -458,6 +464,7 @@ export const useChatViewModel = () => {
       finalMessages,
       isUserTyping: isUserTypingIndicator,
       isTyping,
+      typingUserName,
       replyToMessage,
       authUser,
       paramRoomId,
@@ -491,6 +498,7 @@ export const useChatViewModel = () => {
       finalMessages,
       isUserTypingIndicator,
       isTyping,
+      typingUserName,
       replyToMessage,
       authUser,
       paramRoomId,

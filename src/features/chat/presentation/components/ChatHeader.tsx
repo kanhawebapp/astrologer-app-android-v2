@@ -254,7 +254,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
     return formattedTime;
   }, [formattedTime]);
 
-  console.log("displayTime>>",displayTime)
+  // console.log("displayTime>>",displayTime)
 
   return (
     <View

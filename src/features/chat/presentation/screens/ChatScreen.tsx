@@ -43,12 +43,12 @@ export const ChatScreen: React.FC = () => {
     ),
     [vm.handleReplyPress],
   );
-  const renderTypingIndicator = React.useCallback(() => {
-    if (vm.isUserTyping && vm.activeSession) {
-      return <TypingIndicator userName={vm.activeSession.userName} />;
-    }
-    return null;
-  }, [vm.isUserTyping, vm.activeSession]);
+ const renderTypingIndicator = React.useCallback(() => {
+  if (vm.isTyping && vm.activeSession) {
+    return <TypingIndicator userName={vm.typingUserName} />;
+  }
+  return null;
+}, [vm.isTyping, vm.typingUserName, vm.activeSession]);
 
   const keyExtractor = React.useCallback((item: any) => item.id, []);
 
@@ -111,7 +111,7 @@ export const ChatScreen: React.FC = () => {
             <ChatInput
               onSendMessage={vm.handleSendMessage}
               roomId={vm.effectiveRoomId!}
-              userName={vm.activeSession?.userName || 'User'}
+              userName="Astrologer"
               replyToMessage={vm.replyToMessage}
               onCancelReply={vm.handleCancelReply}
             />

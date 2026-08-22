@@ -24,20 +24,20 @@ export const useChatTimer = () => {
 
   // Keep remainingTimeRef in sync on every render.
   remainingTimeRef.current = activeSession?.remainingTime ?? 0;
-  console.log('[CHAT_DEBUG] hook=useChatTimer render', {
-    appState: AppState.currentState,
-    roomId: activeSession?.roomId,
-    activeChat: !!activeSession,
-    chatStatus,
-    displayTime: activeSession?.remainingTime,
-    startTime: activeSession?.startedAt,
-    endTime: activeSession?.startedAt
-      ? activeSession.startedAt + (activeSession.remainingTime ?? 0) * 1000
-      : null,
-    remainingTime: activeSession?.remainingTime,
-    timerId: intervalRef.current,
-    intervalRunning: !!intervalRef.current,
-  });
+  // console.log('[CHAT_DEBUG] hook=useChatTimer render', {
+  //   appState: AppState.currentState,
+  //   roomId: activeSession?.roomId,
+  //   activeChat: !!activeSession,
+  //   chatStatus,
+  //   displayTime: activeSession?.remainingTime,
+  //   startTime: activeSession?.startedAt,
+  //   endTime: activeSession?.startedAt
+  //     ? activeSession.startedAt + (activeSession.remainingTime ?? 0) * 1000
+  //     : null,
+  //   remainingTime: activeSession?.remainingTime,
+  //   timerId: intervalRef.current,
+  //   intervalRunning: !!intervalRef.current,
+  // });
 
   const startTimer = useCallback(() => {
     if (intervalRef.current) {
