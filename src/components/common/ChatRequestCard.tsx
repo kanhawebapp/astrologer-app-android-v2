@@ -200,9 +200,9 @@ export const ChatRequestCard: React.FC<ChatRequestCardProps> = memo(() => {
 
         closeCard();
 
-        console.log(
-          `[ChatRequestCard] ChatRequestCard auto-dismissed session=${sessionId}`,
-        );
+        // console.log(
+        //   `[ChatRequestCard] ChatRequestCard auto-dismissed session=${sessionId}`,
+        // );
 
         setTimeout(async () => {
           try {
@@ -216,12 +216,12 @@ export const ChatRequestCard: React.FC<ChatRequestCardProps> = memo(() => {
         setCountdown(0);
       };
 
-      console.log(
-        `[ChatRequestCard] ChatRequestCard shown session=${sessionId} roomId=${roomId}`,
-      );
-      console.log(
-        `[ChatRequestCard] timer started (${timerSeconds}s) session=${sessionId}`,
-      );
+      // console.log(
+      //   `[ChatRequestCard] ChatRequestCard shown session=${sessionId} roomId=${roomId}`,
+      // );
+      // console.log(
+      //   `[ChatRequestCard] timer started (${timerSeconds}s) session=${sessionId}`,
+      // );
 
       applyRemaining();
       if (!expired) {
@@ -346,32 +346,32 @@ export const ChatRequestCard: React.FC<ChatRequestCardProps> = memo(() => {
         const reduxAfterActiveSession = (
           require('../../store').store as any
         ).getState?.();
-        logTrace({
-          traceId,
-          timestamp: new Date().toISOString(),
-          phase: 'after dispatch(setActiveSession)',
-          functionEntered: 'ChatRequestCard.handleAccept() [setActiveSession]',
-          payload: sessionData,
-          reduxStateBefore: reduxBeforeActiveSession,
-          reduxStateAfter: reduxAfterActiveSession,
-        });
+        // logTrace({
+        //   traceId,
+        //   timestamp: new Date().toISOString(),
+        //   phase: 'after dispatch(setActiveSession)',
+        //   functionEntered: 'ChatRequestCard.handleAccept() [setActiveSession]',
+        //   payload: sessionData,
+        //   reduxStateBefore: reduxBeforeActiveSession,
+        //   reduxStateAfter: reduxAfterActiveSession,
+        // });
 
-        logTrace({
-          traceId,
-          timestamp: new Date().toISOString(),
-          phase: 'before navigation.navigate',
-          functionEntered: 'ChatRequestCard.handleAccept() [navigation]',
-          payload: {
-            name: 'ChatScreen',
-            params: {
-              roomId: latestRequest.roomId,
-              userId: latestRequest.userId,
-              userName: latestRequest.userName,
-              maximumTime: latestRequest.maximumTime,
-            },
-          },
-          reduxStateAfter: reduxAfterActiveSession,
-        });
+        // logTrace({
+        //   traceId,
+        //   timestamp: new Date().toISOString(),
+        //   phase: 'before navigation.navigate',
+        //   functionEntered: 'ChatRequestCard.handleAccept() [navigation]',
+        //   payload: {
+        //     name: 'ChatScreen',
+        //     params: {
+        //       roomId: latestRequest.roomId,
+        //       userId: latestRequest.userId,
+        //       userName: latestRequest.userName,
+        //       maximumTime: latestRequest.maximumTime,
+        //     },
+        //   },
+        //   reduxStateAfter: reduxAfterActiveSession,
+        // });
 
         // console.log('[ChatRequestCard] BEFORE navigation.navigate("ChatScreen")');
         navigation.navigate('ChatScreen', {
@@ -382,34 +382,34 @@ export const ChatRequestCard: React.FC<ChatRequestCardProps> = memo(() => {
         });
         // console.log('[ChatRequestCard] AFTER navigation.navigate("ChatScreen")');
 
-        logTrace({
-          traceId,
-          timestamp: new Date().toISOString(),
-          phase: 'after navigation.navigate',
-          functionEntered: 'ChatRequestCard.handleAccept() [navigation]',
-          payload: {
-            name: 'ChatScreen',
-            params: {
-              roomId: latestRequest.roomId,
-              userId: latestRequest.userId,
-              userName: latestRequest.userName,
-              maximumTime: latestRequest.maximumTime,
-            },
-          },
-          reduxStateAfter: (require('../../store').store as any).getState?.(),
-        });
+        // logTrace({
+        //   traceId,
+        //   timestamp: new Date().toISOString(),
+        //   phase: 'after navigation.navigate',
+        //   functionEntered: 'ChatRequestCard.handleAccept() [navigation]',
+        //   payload: {
+        //     name: 'ChatScreen',
+        //     params: {
+        //       roomId: latestRequest.roomId,
+        //       userId: latestRequest.userId,
+        //       userName: latestRequest.userName,
+        //       maximumTime: latestRequest.maximumTime,
+        //     },
+        //   },
+        //   reduxStateAfter: (require('../../store').store as any).getState?.(),
+        // });
 
-        logTrace({
-          traceId,
-          timestamp: new Date().toISOString(),
-          phase: 'before acceptChatAstrologer',
-          functionEntered:
-            'ChatRequestCard.handleAccept() [acceptChatAstrologer]',
-          payload: {
-            sessionId: latestRequest.sessionId,
-            roomId: latestRequest.roomId,
-          },
-        });
+        // logTrace({
+        //   traceId,
+        //   timestamp: new Date().toISOString(),
+        //   phase: 'before acceptChatAstrologer',
+        //   functionEntered:
+        //     'ChatRequestCard.handleAccept() [acceptChatAstrologer]',
+        //   payload: {
+        //     sessionId: latestRequest.sessionId,
+        //     roomId: latestRequest.roomId,
+        //   },
+        // });
 
         // console.log('[ChatRequestCard] BEFORE chatSocketService.acceptChatAstrologer()', { sessionId: latestRequest.sessionId, roomId: latestRequest.roomId });
         // console.log('[ACCEPT TRACE 4] emitting accept');
@@ -420,17 +420,17 @@ export const ChatRequestCard: React.FC<ChatRequestCardProps> = memo(() => {
         await chatSocketService.acceptChatAstrologer( latestRequest.sessionId, latestRequest.roomId, latestRequest.userId, );
         // console.log('[ChatRequestCard] AFTER chatSocketService.acceptChatAstrologer() resolved');
       } catch (error) {
-        logTrace({
-          traceId: traceIdForTimeout,
-          timestamp: new Date().toISOString(),
-          phase: 'terminal: chat_rejected',
-          functionEntered: 'ChatRequestCard.handleAccept() [catch]',
-          payload: {
-            error: (error as any)?.message ?? String(error),
-            sessionId: latestRequest.sessionId,
-          },
-          reduxStateBefore: (require('../../store').store as any).getState?.(),
-        });
+        // logTrace({
+        //   traceId: traceIdForTimeout,
+        //   timestamp: new Date().toISOString(),
+        //   phase: 'terminal: chat_rejected',
+        //   functionEntered: 'ChatRequestCard.handleAccept() [catch]',
+        //   payload: {
+        //     error: (error as any)?.message ?? String(error),
+        //     sessionId: latestRequest.sessionId,
+        //   },
+        //   reduxStateBefore: (require('../../store').store as any).getState?.(),
+        // });
         setAccepting(false);
         dispatch(removeChatRequest(latestRequest.sessionId));
       } finally {

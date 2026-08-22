@@ -142,8 +142,8 @@ const chatSlice = createSlice({
 
     addChatRequest: (state, action: PayloadAction<ChatRequest>) => {
       const prevLen = state.chatRequests.length;
-      console.log('[REDUX addChatRequest] BEFORE - chatRequests.length:', prevLen, 'chatStatus:', state.chatStatus, 'activeSession:', !!state.activeSession);
-      console.log('[REDUX addChatRequest] payload:', JSON.stringify(action.payload, null, 2));
+      // console.log('[REDUX addChatRequest] BEFORE - chatRequests.length:', prevLen, 'chatStatus:', state.chatStatus, 'activeSession:', !!state.activeSession);
+      // console.log('[REDUX addChatRequest] payload:', JSON.stringify(action.payload, null, 2));
 
       // SINGLE source of truth: latestRequest drives the popup.
       state.latestRequest = action.payload;
@@ -154,7 +154,7 @@ const chatSlice = createSlice({
       }
       state.chatStatus = 'REQUEST';
 
-      console.log('[REDUX addChatRequest] AFTER - chatRequests.length:', state.chatRequests.length, 'chatStatus:', state.chatStatus);
+      // console.log('[REDUX addChatRequest] AFTER - chatRequests.length:', state.chatRequests.length, 'chatStatus:', state.chatStatus);
     },
 
     // removeChatRequest: (state, action: PayloadAction<string>) => {
@@ -194,18 +194,18 @@ const chatSlice = createSlice({
     },
 
     clearChatRequests: state => {
-      console.log('[REDUX clearChatRequests] BEFORE - chatRequests.length:', state.chatRequests.length, 'chatStatus:', state.chatStatus, 'activeSession:', !!state.activeSession);
+      // console.log('[REDUX clearChatRequests] BEFORE - chatRequests.length:', state.chatRequests.length, 'chatStatus:', state.chatStatus, 'activeSession:', !!state.activeSession);
       state.chatRequests = [];
       state.latestRequest = null;
       state.chatStatus = 'IDLE';
-      console.log('[REDUX clearChatRequests] AFTER - chatRequests.length:', state.chatRequests.length, 'chatStatus:', state.chatStatus);
+      // console.log('[REDUX clearChatRequests] AFTER - chatRequests.length:', state.chatRequests.length, 'chatStatus:', state.chatStatus);
     },
     setActiveSession: (
       state,
       action: PayloadAction<ActiveChatSession | null>,
     ) => {
-      console.log('[REDUX setActiveSession] BEFORE - chatRequests.length:', state.chatRequests.length, 'chatStatus:', state.chatStatus, 'activeSession:', !!state.activeSession);
-      console.log('[REDUX setActiveSession] action.payload:', action.payload ? JSON.stringify(action.payload, null, 2) : 'null');
+      // console.log('[REDUX setActiveSession] BEFORE - chatRequests.length:', state.chatRequests.length, 'chatStatus:', state.chatStatus, 'activeSession:', !!state.activeSession);
+      // console.log('[REDUX setActiveSession] action.payload:', action.payload ? JSON.stringify(action.payload, null, 2) : 'null');
 
       if (action.payload) {
         state.activeSession = action.payload;
@@ -223,7 +223,7 @@ const chatSlice = createSlice({
         state.activeSession = action.payload;
       }
 
-      console.log('[REDUX setActiveSession] AFTER - chatRequests.length:', state.chatRequests.length, 'chatStatus:', state.chatStatus, 'activeSession:', !!state.activeSession);
+      // console.log('[REDUX setActiveSession] AFTER - chatRequests.length:', state.chatRequests.length, 'chatStatus:', state.chatStatus, 'activeSession:', !!state.activeSession);
     },
     updateSessionTime: (state, action: PayloadAction<number>) => {
       if (state.activeSession) {

@@ -382,64 +382,52 @@ const setupReceiveMessageHandler = () => {
 
 const setupChatCancelByUserHandler = () => {
   return (data: any) => {
-    // Guard stale cancellation events
-    const rootStateForGuard = store.getState() as RootState;
-    const activeSessionForGuard = rootStateForGuard.chat.activeSession;
-    const incomingSessionIdForGuard =
-      data?.session_id || data?.sessionId || data?.sessionID || null;
-    if (activeSessionForGuard?.sessionId && incomingSessionIdForGuard) {
-      if (incomingSessionIdForGuard !== activeSessionForGuard.sessionId) {
-        return;
-      }
-    }
-
-    // console.log(
-    //   `[chatSocketService] 📥 [SOCKET FLOW TRACE] EVENT: "${ChatSocketEvents.CHAT_CANCEL_BY_USER}"`,
-    // );
-    // console.log(`   🔍 Raw payload:`, JSON.stringify(data, null, 2));
-    // console.log(`   🔍 Raw keys:`, data ? Object.keys(data) : 'none');
+    console.log('[CHAT_CANCEL_HANDLER_RAW]', data);
 
     const rootState = store.getState() as RootState;
     const activeSession = rootState.chat.activeSession;
 
-    const incomingRoomId = data?.room_id || data?.roomid || data?.roomId || '';
-    const fallbackRoomId = activeSession?.roomId;
+    const incomingSessionId =
+      data?.session_id ||
+      data?.sessionId ||
+      data?.sessionID ||
+      null;
 
-    const roomId = incomingRoomId || fallbackRoomId;
+    const incomingRoomId =
+      data?.room_id ||
+      data?.roomid ||
+      data?.roomId ||
+      null;
 
-    // console.log('[CHAT CANCEL]', {
-    //   incomingRoomId,
-    //   fallbackRoomId,
-    //   resolvedRoomId: roomId,
-    // });
+    console.log('[CHAT_CANCEL_HANDLER_PARSED]', {
+      incomingSessionId,
+      incomingRoomId,
+      activeRoomId: activeSession?.roomId,
+      activeSessionId: activeSession?.sessionId,
+    });
+
+    // If server provides sessionId, reject stale session events.
+    if (
+      activeSession?.sessionId &&
+      incomingSessionId &&
+      incomingSessionId !== activeSession.sessionId
+    ) {
+      return;
+    }
 
     const normalizedData = {
       ...data,
-      room_id: roomId || fallbackRoomId || null,
-      session_id:
-        data?.session_id ||
-        data?.sessionId ||
-        data?.sessionID ||
-        activeSession?.sessionId ||
-        null,
+      room_id: incomingRoomId,
+      session_id: incomingSessionId,
       status: data?.status || 'rejected',
-      message: data?.message || 'User has cancelled the chat request',
+      message:
+        data?.message || 'User has cancelled the chat request',
     };
 
-    // console.log(
-    //   `   ✅ Normalized data:`,
-    //   JSON.stringify(normalizedData, null, 2),
-    // );
-
-    if (!normalizedData.room_id && activeSession) {
-      // console.log(
-      //   `[chatSocketService] ⚠️ No room_id in payload, using activeSession fallback`,
-      // );
-      normalizedData.room_id = activeSession.roomId;
-      normalizedData.session_id = activeSession.sessionId;
-    }
-
-    callbackManager.invokeCallbacks('onChatCancelByUser', normalizedData);
+    callbackManager.invokeCallbacks(
+      'onChatCancelByUser',
+      normalizedData,
+    );
   };
 };
 

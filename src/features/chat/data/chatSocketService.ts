@@ -95,32 +95,32 @@ class ChatSocketService {
     const astroId = state.auth.user?.id;
 
     // Instrumentation ONLY
-    console.log('[CHAT_ACCEPT_TRACE] inside acceptChatAstrologer()');
-    console.log('timestamp:', new Date().toISOString());
-    console.log('payload:', JSON.stringify({ sessionId, roomId }, null, 2));
+    // console.log('[CHAT_ACCEPT_TRACE] inside acceptChatAstrologer()');
+    // console.log('timestamp:', new Date().toISOString());
+    // console.log('payload:', JSON.stringify({ sessionId, roomId }, null, 2));
 
-    console.log('=========================')
-    console.log('AUTH USER')
-    console.log('=========================')
-    console.log('store.getState().auth.user.id:', state.auth.user?.id);
+    // console.log('=========================')
+    // console.log('AUTH USER')
+    // console.log('=========================')
+    // console.log('store.getState().auth.user.id:', state.auth.user?.id);
 
-    console.log('=========================')
-    console.log('LATEST REQUEST')
-    console.log('=========================')
-    console.log('latestRequest fields (passed as parameters):');
-    console.log('  sessionId:', sessionId);
-    console.log('  roomId:', roomId);
+    // console.log('=========================')
+    // console.log('LATEST REQUEST')
+    // console.log('=========================')
+    // console.log('latestRequest fields (passed as parameters):');
+    // console.log('  sessionId:', sessionId);
+    // console.log('  roomId:', roomId);
 
     // Instrumentation ONLY
-    console.log('[CHAT_ACCEPT_TRACE] before chat_accepted_astrologer emit');
-    console.log('timestamp:', new Date().toISOString());
-    console.log('payload:', JSON.stringify({ sessionId, roomId }, null, 2));
+    // console.log('[CHAT_ACCEPT_TRACE] before chat_accepted_astrologer emit');
+    // console.log('timestamp:', new Date().toISOString());
+    // console.log('payload:', JSON.stringify({ sessionId, roomId }, null, 2));
 
     await socketManager.waitUntilConnected();
 await chatSocketEmitters.acceptChatAstrologer( sessionId, roomId, userId, astroId, );
     // Instrumentation ONLY
-    console.log('[CHAT_ACCEPT_TRACE] after chat_accepted_astrologer emit');
-    console.log('timestamp:', new Date().toISOString());
+    // console.log('[CHAT_ACCEPT_TRACE] after chat_accepted_astrologer emit');
+    // console.log('timestamp:', new Date().toISOString());
 
     await socketManager.waitUntilConnected();
 
@@ -131,20 +131,20 @@ await chatSocketEmitters.acceptChatAstrologer( sessionId, roomId, userId, astroI
       room_id: roomId,
       joinpersonid: 'ASTROLOGER_ID_HERE',
     };
-    console.log('=========================');
-    console.log('EMIT 2');
+    // console.log('=========================');
+    // console.log('EMIT 2');
 
-    // Instrumentation ONLY
-    console.log('[CHAT_ACCEPT_TRACE] before joinChat emit');
-    console.log('timestamp:', new Date().toISOString());
-    console.log('payload:', JSON.stringify(joinChatPayload, null, 2));
-    console.log('=========================');
-    console.log('joinChat payload:', JSON.stringify(joinChatPayload, null, 2));
+    // // Instrumentation ONLY
+    // console.log('[CHAT_ACCEPT_TRACE] before joinChat emit');
+    // console.log('timestamp:', new Date().toISOString());
+    // console.log('payload:', JSON.stringify(joinChatPayload, null, 2));
+    // console.log('=========================');
+    // console.log('joinChat payload:', JSON.stringify(joinChatPayload, null, 2));
     await socketManager.emit('joinChat', joinChatPayload);
-    console.log('[CHAT_ACCEPT_TRACE] after joinChat emit');
-    console.log('timestamp:', new Date().toISOString());
-    console.log('roomId:', roomId);
-    console.log('✅ Joined room here', roomId);
+    // console.log('[CHAT_ACCEPT_TRACE] after joinChat emit');
+    // console.log('timestamp:', new Date().toISOString());
+    // console.log('roomId:', roomId);
+    // console.log('✅ Joined room here', roomId);
   }
 
   async rejectChat(sessionId: string, roomId?: string): Promise<void> {

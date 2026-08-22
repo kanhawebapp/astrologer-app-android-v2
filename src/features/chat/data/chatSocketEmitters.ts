@@ -29,10 +29,10 @@ async acceptChatAstrologer(
     astroId,
   };
 
-  console.log(
-    '[ACCEPT TRACE 6] FINAL SOCKET PAYLOAD:',
-    JSON.stringify(emitPayload, null, 2),
-  );
+  // console.log(
+  //   '[ACCEPT TRACE 6] FINAL SOCKET PAYLOAD:',
+  //   JSON.stringify(emitPayload, null, 2),
+  // );
 
 
   await socketManager.emit(
@@ -40,9 +40,9 @@ async acceptChatAstrologer(
     emitPayload,
   );
 
-  console.log(
-    '[ACCEPT TRACE 8] SOCKET EMIT COMPLETED',
-  );
+  // console.log(
+  //   '[ACCEPT TRACE 8] SOCKET EMIT COMPLETED',
+  // );
 }
 
 

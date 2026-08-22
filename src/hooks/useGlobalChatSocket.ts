@@ -410,15 +410,13 @@ const handleCompletedChat = useCallback(
   //   [dispatch],
   // );
 
-  const handleChatCancelByUser = useCallback(
+ const handleChatCancelByUser = useCallback(
   (data: {
     room_id: string | null;
     session_id: string | null;
     status: string;
     message: string;
   }) => {
-    // console.log(`${DEBUG_PREFIX} chat_cancel_by_user`, data);
-
     console.log('[CHAT_DEBUG] socket=chat_cancel_by_user', {
       data,
       isMounted: isMounted.current,
@@ -428,6 +426,35 @@ const handleCompletedChat = useCallback(
       return;
     }
 
+    const currentChat = store.getState().chat;
+    const activeRoomId = currentChat.activeSession?.roomId;
+
+    console.log('[CHAT_DEBUG] cancel vs active chat', {
+      cancelRoomId: data.room_id,
+      activeRoomId,
+      cancelSessionId: data.session_id,
+      activeSessionId: currentChat.activeSession?.sessionId,
+    });
+
+    // Cancel belongs to another/pending request.
+    // Do NOT disturb the currently active chat.
+    if (
+      data.room_id &&
+      activeRoomId &&
+      data.room_id !== activeRoomId
+    ) {
+      if (data.session_id) {
+        dispatch(removeChatRequest(data.session_id));
+      }
+
+      console.log(
+        '[CHAT_DEBUG] Ignoring cancel because roomId does not match active chat',
+      );
+
+      return;
+    }
+
+    // Only reset when cancellation belongs to active chat.
     latestNewChatRequestSessionIdRef.current = null;
 
     chatSocketService.clearRoomSessionMap();
@@ -437,15 +464,18 @@ const handleCompletedChat = useCallback(
     }
 
     dispatch(hardResetChatFlow());
-
     dispatch(setChatStatus('IDLE'));
-
     dispatch(setError(null));
+
     const stateAfter = store.getState().chat;
-    console.log('[CHAT_DEBUG] socket=chat_cancel_by_user AFTER store updates', {
-      chatStatusAfter: stateAfter.chatStatus,
-      activeSessionAfter: !!stateAfter.activeSession,
-    });
+
+    console.log(
+      '[CHAT_DEBUG] socket=chat_cancel_by_user AFTER store updates',
+      {
+        chatStatusAfter: stateAfter.chatStatus,
+        activeSessionAfter: !!stateAfter.activeSession,
+      },
+    );
   },
   [dispatch],
 );
