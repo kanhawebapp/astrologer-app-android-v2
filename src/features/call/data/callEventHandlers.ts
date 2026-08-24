@@ -490,7 +490,7 @@ socket.on(CallSocketEvents.CALL_ENDED_BY_USER, (data: any) => {
     //   `${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Array.isArray(data):`,
     //   Array.isArray(data),
     // );
-    // console.log(`${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Raw data:`, data);
+    console.log(`${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] Raw data:`, data);
     // console.log(
     //   `${DEBUG_PREFIX} 🔍 [PAYLOAD DEBUG] JSON.stringify(data):`,
     //   JSON.stringify(data),
@@ -579,14 +579,16 @@ socket.on(CallSocketEvents.CALL_ENDED_BY_USER, (data: any) => {
     const currentRoomId = store.getState().call.roomId;
     const astroId = store.getState().auth.user?.id;
 
-    // console.log(
-    //   `${DEBUG_PREFIX} CALL_CANCEL_BY_USER - roomId: ${roomId}, currentRoomId: ${currentRoomId}, astroid: ${astroid}, currentAstroId: ${astroId}`,
-    // );
+    console.log(
+      `$CALL_CANCEL_BY_USER - roomId: ${roomId}, currentRoomId: ${currentRoomId}, astroid: ${astroid}, currentAstroId: ${astroId}`,
+    );
 
     const roomMatches = roomId && roomId === currentRoomId;
     const astroMatches = astroid && astroid === astroId;
+console.log("roomMatches>>>>",roomMatches)
+console.log("astroMatches>>>>",astroMatches)
 
-    if (!roomMatches && !astroMatches) {
+    if (!roomMatches || !astroMatches) {
       console.warn(
         `${DEBUG_PREFIX} CALL_CANCEL_BY_USER: No match - roomId:${roomId} vs current:${currentRoomId}, astroid:${astroid} vs astroId:${astroId}. Ignoring.`,
       );
