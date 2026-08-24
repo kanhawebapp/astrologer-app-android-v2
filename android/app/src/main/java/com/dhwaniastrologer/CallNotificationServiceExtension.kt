@@ -10,6 +10,9 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.media.RingtoneManager
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
+import android.os.PowerManager
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.onesignal.notifications.INotification
@@ -27,7 +30,47 @@ private data class Quad(
 )
 
 class CallNotificationServiceExtension : INotificationServiceExtension {
+
+    companion object {
+        private const val SCREEN_WAKE_TAG = "ONESIGNAL_SCREEN_WAKE"
+        private const val SCREEN_WAKE_MS = 10_000L
+        private val screenWakeHandler = Handler(Looper.getMainLooper())
+        @Volatile
+        private var screenWakeLock: PowerManager.WakeLock? = null
+
+        private val releaseScreenWakeLockRunnable = Runnable {
+            releaseScreenWakeLock("timeout")
+        }
+
+        private fun releaseScreenWakeLock(reason: String) {
+            screenWakeHandler.removeCallbacks(releaseScreenWakeLockRunnable)
+            val wakeLock = screenWakeLock
+            if (wakeLock == null) {
+                android.util.Log.d(SCREEN_WAKE_TAG, "WakeLock released skipped ($reason): none held")
+                return
+            }
+            try {
+                if (wakeLock.isHeld) {
+                    wakeLock.release()
+                    android.util.Log.d(SCREEN_WAKE_TAG, "WakeLock released ($reason)")
+                } else {
+                    android.util.Log.d(SCREEN_WAKE_TAG, "WakeLock already released ($reason)")
+                }
+            } catch (e: Exception) {
+                android.util.Log.e(SCREEN_WAKE_TAG, "WakeLock release failed ($reason)", e)
+            } finally {
+                screenWakeLock = null
+            }
+        }
+    }
+
     override fun onNotificationReceived(event: INotificationReceivedEvent) {
+        android.util.Log.d(
+            SCREEN_WAKE_TAG,
+            "notification received sdk=${Build.VERSION.SDK_INT}"
+        )
+        wakeScreenIfOff(event.context)
+
         val notification = event.notification
         val additionalData = notification.additionalData
  android.util.Log.d("ONESIGNAL_PAYLOAD", "==============================")
@@ -280,6 +323,46 @@ class CallNotificationServiceExtension : INotificationServiceExtension {
                 "Non-call_request branch taken. Calling notification.display() for fallback OneSignal notification UI. notificationType=$notificationType"
             )
             notification.display()
+        }
+    }
+
+    private fun wakeScreenIfOff(context: Context) {
+        android.util.Log.d(SCREEN_WAKE_TAG, "wake code executed")
+        try {
+            val powerManager =
+                context.applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager
+            val isScreenOn = powerManager.isInteractive
+            android.util.Log.d(SCREEN_WAKE_TAG, "isInteractive=$isScreenOn")
+            if (isScreenOn) {
+                android.util.Log.d(SCREEN_WAKE_TAG, "screen already on, skip wake")
+                return
+            }
+
+            screenWakeHandler.post {
+                try {
+                    releaseScreenWakeLock("replace")
+                    @Suppress("DEPRECATION")
+                    val wakeLock = powerManager.newWakeLock(
+                        PowerManager.FULL_WAKE_LOCK or
+                            PowerManager.ACQUIRE_CAUSES_WAKEUP or
+                            PowerManager.ON_AFTER_RELEASE,
+                        "com.dhwaniastrologer:onesignal_screen_wake"
+                    )
+                    wakeLock.setReferenceCounted(false)
+                    screenWakeLock = wakeLock
+                    wakeLock.acquire(SCREEN_WAKE_MS)
+                    android.util.Log.d(
+                        SCREEN_WAKE_TAG,
+                        "WakeLock acquired held=${wakeLock.isHeld}"
+                    )
+                    screenWakeHandler.removeCallbacks(releaseScreenWakeLockRunnable)
+                    screenWakeHandler.postDelayed(releaseScreenWakeLockRunnable, SCREEN_WAKE_MS)
+                } catch (e: Exception) {
+                    android.util.Log.e(SCREEN_WAKE_TAG, "WakeLock acquire failed", e)
+                }
+            }
+        } catch (e: Exception) {
+            android.util.Log.e(SCREEN_WAKE_TAG, "wakeScreenIfOff failed", e)
         }
     }
 

@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { Animated, Easing } from 'react-native';
 
-const PAGE1_AUTO_DELAY = 4500;
-const PAGE2_AUTO_DELAY = 3000;
+const PAGE1_AUTO_DELAY = 1000;
+const PAGE2_AUTO_DELAY = 2000;
 
 interface UseSplashReturn {
   currentPage: number;

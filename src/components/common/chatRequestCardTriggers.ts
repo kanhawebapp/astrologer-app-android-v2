@@ -18,7 +18,7 @@ let rejectChatTrigger: ChatRequestTrigger = null;
 let acceptRetries = 0;
 let rejectRetries = 0;
 
-const MAX_RETRIES = 20;
+const MAX_RETRIES = 35;
 const RETRY_INTERVAL_MS = 100;
 
 export const setAcceptChatTrigger = (handler: ChatRequestTrigger): void => {
