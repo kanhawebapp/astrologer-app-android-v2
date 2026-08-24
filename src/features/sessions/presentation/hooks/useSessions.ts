@@ -60,6 +60,11 @@ const transformApiSessions = (data: AstrologerSession[]): Session[] =>
       orderId: undefined,
       notes: undefined,
       chatId: item.chatId,
+      birthDate: item.birthDate,
+      birthPlace: item.birthPlace,
+      birthTime: item.birthTime,
+      ratePerMin: item.ratePerMin,
+      reviewComment: item.reviewComment,
     };
   });
 
@@ -194,7 +199,7 @@ export const useSessions = (): UseSessionsReturn => {
         page: 1,
         limit: PAGE_LIMIT,
       });
-
+// console.log('🚀 fetchSessions API response', apiResponse.getAstrologerSessions.data);
       // Stale response — a newer fetch/refresh already started
       if (fetchGeneration !== fetchGenerationRef.current) {
         console.log('⚠️ Ignoring stale fetchSessions response', {

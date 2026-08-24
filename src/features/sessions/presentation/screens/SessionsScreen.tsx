@@ -104,6 +104,7 @@ export const SessionsScreen: React.FC = () => {
     filteredSessions,
   } = useSessions();
   const navigation = useNavigation<any>();
+      // console.log('🎨 RENDER ITEM>>>', filteredSessions);
 
   // Ignore FlatList's spurious initial onEndReached until the user scrolls
   const userHasScrolledRef = useRef(false);
@@ -134,10 +135,6 @@ export const SessionsScreen: React.FC = () => {
 
   const renderItem: ListRenderItem<Session> = useCallback(
     ({ item, index }) => {
-      // console.log('🎨 RENDER ITEM', {
-      //   index,
-      //   id: item.id,
-      // });
 
       return <SessionCard session={item} onPress={handleSessionPress} />;
     },

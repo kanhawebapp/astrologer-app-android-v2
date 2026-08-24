@@ -25,6 +25,7 @@ const SessionDetailScreen: React.FC = () => {
     const route = useRoute<any>();
 
     const { session } = route.params;
+    // console.log('SessionDetailScreen session:', session);
 
     const [showRemedyModal, setShowRemedyModal] = useState(false);
     const [messages, setMessages] = useState<SessionMessage[]>([]);
@@ -52,24 +53,14 @@ const SessionDetailScreen: React.FC = () => {
         });
     };
 
-    const formatDuration = (seconds: number) => {
-        if (!seconds) return '0 sec';
+   const formatDuration = (seconds: number) => {
+    if (!seconds) return '0 min 0 sec';
 
-        if (seconds < 60) {
-            return `${seconds} sec`;
-        }
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
 
-        const minutes = Math.floor(seconds / 60);
-
-        if (minutes < 60) {
-            return `${minutes} min`;
-        }
-
-        const hours = Math.floor(minutes / 60);
-        const remainingMinutes = minutes % 60;
-
-        return `${hours}h ${remainingMinutes}m`;
-    };
+    return `${minutes} min ${remainingSeconds} sec`;
+};
 
     const getStatusColor = () => {
         switch (session.status?.toLowerCase()) {
@@ -291,6 +282,51 @@ const SessionDetailScreen: React.FC = () => {
                         value={formatDate(session.endTime)}
                         theme={theme}
                     />
+
+                    {session.birthDate ? (
+                    <InfoRow
+                        icon="cake"
+                        label="Birth Date"
+                        value={session.birthDate}
+                        theme={theme}
+                    />
+                    ) : null}
+
+                    {session.birthPlace ? (
+                    <InfoRow
+                        icon="place"
+                        label="Birth Place"
+                        value={session.birthPlace}
+                        theme={theme}
+                    />
+                    ) : null}
+
+                    {session.birthTime ? (
+                    <InfoRow
+                        icon="access-time"
+                        label="Birth Time"
+                        value={session.birthTime}
+                        theme={theme}
+                    />
+                    ) : null}
+
+                    {session.ratePerMin != null && session.ratePerMin !== '' ? (
+                    <InfoRow
+                        icon="account-balance-wallet"
+                        label="Rate Per Min"
+                        value={`₹${session.ratePerMin}/min`}
+                        theme={theme}
+                    />
+                    ) : null}
+
+                    {session.reviewComment ? (
+                    <InfoRow
+                        icon="comment"
+                        label="Review"
+                        value={session.reviewComment}
+                        theme={theme}
+                    />
+                    ) : null}
                 </View>
 
                 {/* Actions */}
