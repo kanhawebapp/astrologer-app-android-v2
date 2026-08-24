@@ -42,7 +42,7 @@ const MAX_DISTANCE = SCREEN_WIDTH * 0.3;
 const MAX_VERTICAL_SWIPE = 120;
 
 // Auto-reject timeout in seconds (1 minute)
-const AUTO_REJECT_TIMEOUT = 30;
+const AUTO_REJECT_TIMEOUT = 60;
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
