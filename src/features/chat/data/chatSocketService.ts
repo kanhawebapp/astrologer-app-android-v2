@@ -147,8 +147,8 @@ await chatSocketEmitters.acceptChatAstrologer( sessionId, roomId, userId, astroI
     // console.log('✅ Joined room here', roomId);
   }
 
-  async rejectChat(sessionId: string, roomId?: string): Promise<void> {
-    await chatSocketEmitters.rejectChat(sessionId, roomId);
+  async rejectChat(sessionId: string, astrologerId: string, roomId?: string): Promise<void> {
+    await chatSocketEmitters.rejectChat(sessionId, astrologerId, roomId);
   }
 
   async sendMessage(message: any): Promise<void> {

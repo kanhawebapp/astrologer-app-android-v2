@@ -175,6 +175,7 @@ export const ChatRequestCard: React.FC<ChatRequestCardProps> = memo(() => {
       const endTime = Date.now() + AUTO_REJECT_TIME_MS;
       let expired = false;
       const sessionId = latestRequest.sessionId;
+      const astrologerId = latestRequest.astrologerId;
       const roomId = latestRequest.roomId;
 
       const applyRemaining = () => {
@@ -206,7 +207,7 @@ export const ChatRequestCard: React.FC<ChatRequestCardProps> = memo(() => {
 
         setTimeout(async () => {
           try {
-            await chatSocketService.rejectChat(sessionId, roomId);
+            await chatSocketService.rejectChat(sessionId, astrologerId, roomId);
           } catch (error) {
             // Silent fail
           }
@@ -467,6 +468,7 @@ export const ChatRequestCard: React.FC<ChatRequestCardProps> = memo(() => {
       // console.log('[ChatRequestCard] BEFORE chatSocketService.rejectChat()', { sessionId: latestRequest.sessionId, roomId: latestRequest.roomId });
       await chatSocketService.rejectChat(
         latestRequest.sessionId,
+        latestRequest.astrologerId,
         latestRequest.roomId,
       );
       // console.log('[ChatRequestCard] AFTER chatSocketService.rejectChat() resolved');

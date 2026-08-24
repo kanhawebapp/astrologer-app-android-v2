@@ -47,10 +47,10 @@ async acceptChatAstrologer(
 
 
 
-  async rejectChat(sessionId: string, roomId?: string): Promise<void> {
+  async rejectChat(sessionId: string, astrologerId: string, roomId?: string): Promise<void> {
     console.log("i am here for chat reject newww")
     await socketManager.emit(ChatSocketEvents.REJECT_CHAT, {
-      sessionId,
+      astro_id:astrologerId,
       room_id: roomId,
     });
   }
