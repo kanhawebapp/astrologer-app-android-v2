@@ -1,22 +1,13 @@
-import React, {useCallback, useEffect, useState} from 'react';
-import {
-  View,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  ActivityIndicator,
-  FlatList,
-} from 'react-native';
+import React, {useCallback, useState} from 'react';
+import {View, StyleSheet, ScrollView, TouchableOpacity} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {Header} from '../../../../components';
 import {AppText} from '../../../../components/common/AppText';
 import {ScreenContainer} from '../../../../components/layout/ScreenContainer';
 import {useTheme} from '../../../../hooks/useTheme';
 import {useNavigation, useRoute} from '@react-navigation/native';
-import {messagesApi} from '../../../../services/api/messageSession/messages.service';
-import {SessionMessage} from '../../../../services/api/messageSession/messages.types';
 import {Session, SessionType} from '../../domain/types';
-import {formatDate, formatTime} from '../../../../utils/helpers';
+import {formatDate} from '../../../../utils/helpers';
 import {SendRemedyModal} from '../components/SendRemedyModal';
 
 const SessionDetailScreen: React.FC = () => {
@@ -25,10 +16,6 @@ const SessionDetailScreen: React.FC = () => {
   const route = useRoute<any>();
 
   const session: Session = route.params?.session;
-
-  const [messages, setMessages] = useState<SessionMessage[]>([]);
-  const [messagesLoading, setMessagesLoading] = useState(false);
-  const [messagesError, setMessagesError] = useState<string | null>(null);
 
   const [showRemedyModal, setShowRemedyModal] = useState(false);
 
@@ -57,98 +44,6 @@ const SessionDetailScreen: React.FC = () => {
       default:
         return '#F59E0B';
     }
-  };
-
-  const fetchSessionMessages = useCallback(async (sessionId: string) => {
-    setMessages([]);
-    setMessagesLoading(true);
-    setMessagesError(null);
-
-    try {
-      const response = await messagesApi.getSessionMessages({
-        sessionId,
-      });
-
-      const messagesData = response?.getSessionMessages;
-      if (messagesData?.success) {
-        setMessages(messagesData.data || []);
-      } else {
-        setMessages([]);
-      }
-    } catch (err) {
-      console.log('session messages fetch error:', err);
-      setMessages([]);
-      setMessagesError(
-        err instanceof Error ? err.message : 'Failed to load messages',
-      );
-    } finally {
-      setMessagesLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (session?.id) {
-      fetchSessionMessages(session.id);
-    }
-  }, [session?.id, fetchSessionMessages]);
-
-  const renderMessage = ({item}: {item: SessionMessage}) => {
-    const isAstrologer = item.sender?.toLowerCase() === 'astrologer';
-
-    return (
-      <View
-        style={[
-          styles.messageRow,
-          isAstrologer ? styles.astrologerMessage : styles.userMessage,
-        ]}>
-        <View
-          style={[
-            styles.messageBubble,
-            {
-              backgroundColor: isAstrologer
-                ? theme.colors.primary
-                : theme.colors.surfaceSecondary,
-            },
-          ]}>
-          <AppText
-            variant="caption"
-            color={
-              isAstrologer ? theme.colors.white : theme.colors.textSecondary
-            }
-            style={styles.senderLabel}>
-            {item.sender}
-          </AppText>
-
-          {item.image ? (
-            <View style={styles.imageContainer}>
-              <AppText
-                variant="body2"
-                color={isAstrologer ? theme.colors.white : theme.colors.text}>
-                Image
-              </AppText>
-            </View>
-          ) : null}
-
-          {item.message ? (
-            <AppText
-              variant="body2"
-              color={isAstrologer ? theme.colors.white : theme.colors.text}
-              style={item.image ? {marginTop: 8} : undefined}>
-              {item.message}
-            </AppText>
-          ) : null}
-
-          <AppText
-            variant="caption"
-            color={
-              isAstrologer ? 'rgba(255,255,255,0.7)' : theme.colors.textTertiary
-            }
-            style={styles.messageTime}>
-            {formatTime(item.createdAt)}
-          </AppText>
-        </View>
-      </View>
-    );
   };
 
   if (!session) {
@@ -339,67 +234,6 @@ const SessionDetailScreen: React.FC = () => {
           )}
         </View>
 
-        {/* Messages */}
-        <View
-          style={[
-            styles.sectionCard,
-            {
-              backgroundColor: theme.colors.surface,
-            },
-          ]}>
-          <View style={styles.messagesHeader}>
-            <AppText variant="h2" style={styles.sectionTitle}>
-              Messages
-            </AppText>
-            {messages.length > 0 && (
-              <AppText variant="caption" color={theme.colors.textTertiary}>
-                {messages.length} messages
-              </AppText>
-            )}
-          </View>
-
-          {messagesLoading ? (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color={theme.colors.primary} />
-              <AppText
-                variant="body2"
-                color={theme.colors.textSecondary}
-                style={styles.loadingText}>
-                Loading messages...
-              </AppText>
-            </View>
-          ) : messagesError ? (
-            <View style={styles.errorContainer}>
-              <AppText variant="body2" color={theme.colors.error}>
-                {messagesError}
-              </AppText>
-            </View>
-          ) : messages.length === 0 ? (
-            <View style={styles.emptyContainer}>
-              <Icon
-                name="chat-bubble-outline"
-                size={48}
-                color={theme.colors.textTertiary}
-              />
-              <AppText
-                variant="body2"
-                color={theme.colors.textSecondary}
-                style={styles.emptyText}>
-                No messages found
-              </AppText>
-            </View>
-          ) : (
-            <FlatList
-              data={messages}
-              keyExtractor={item => item.id}
-              renderItem={renderMessage}
-              showsVerticalScrollIndicator={false}
-              contentContainerStyle={styles.messagesContent}
-              removeClippedSubviews={false}
-            />
-          )}
-        </View>
-
         <View style={styles.actionContainer}>
           <TouchableOpacity
             style={[
@@ -575,45 +409,6 @@ const styles = StyleSheet.create({
   infoValue: {
     fontWeight: '600',
     fontSize: 14,
-  },
-  messagesHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 16,
-  },
-  messagesContent: {
-    paddingBottom: 40,
-  },
-  messageRow: {
-    marginBottom: 12,
-  },
-  astrologerMessage: {
-    alignItems: 'flex-end',
-  },
-  userMessage: {
-    alignItems: 'flex-start',
-  },
-  messageBubble: {
-    maxWidth: '80%',
-    padding: 12,
-    borderRadius: 16,
-  },
-  senderLabel: {
-    marginBottom: 4,
-    fontWeight: '700',
-  },
-  messageTime: {
-    marginTop: 6,
-    fontSize: 10,
-    alignSelf: 'flex-end',
-  },
-  imageContainer: {
-    padding: 20,
-    borderRadius: 8,
-    backgroundColor: 'rgba(0,0,0,0.1)',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   actionContainer: {
     marginTop: 20,

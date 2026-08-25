@@ -85,25 +85,9 @@ export const SessionsScreen: React.FC = () => {
     [setSelectedSession, navigation],
   );
 
-  const handleViewMessages = useCallback(
-    (session: Session) => {
-      navigation.navigate('SessionMessagesScreen', {
-        sessionId: session.id,
-        userName: session.userName,
-      });
-    },
-    [navigation],
-  );
-
   const renderItem: ListRenderItem<Session> = useCallback(
-    ({item}) => (
-      <SessionCard
-        session={item}
-        onPress={handleSessionPress}
-        onViewMessages={handleViewMessages}
-      />
-    ),
-    [handleSessionPress, handleViewMessages],
+    ({item}) => <SessionCard session={item} onPress={handleSessionPress} />,
+    [handleSessionPress],
   );
 
   const keyExtractor = useCallback((item: Session) => item.id, []);

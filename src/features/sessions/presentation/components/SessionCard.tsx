@@ -8,7 +8,6 @@ import {Session, SessionStatus, SessionType} from '../../domain/types';
 interface SessionCardProps {
   session: Session;
   onPress: (session: Session) => void;
-  onViewMessages?: (session: Session) => void;
 }
 
 const STATUS_CONFIG: Record<
@@ -60,7 +59,7 @@ const formatDuration = (
 };
 
 export const SessionCard: React.FC<SessionCardProps> = React.memo(
-  ({session, onPress, onViewMessages}) => {
+  ({session, onPress}) => {
     const {theme} = useTheme();
 
     const statusConfig = STATUS_CONFIG[session.status];
@@ -184,30 +183,6 @@ export const SessionCard: React.FC<SessionCardProps> = React.memo(
             </AppText>
           </View>
         ) : null}
-
-        {onViewMessages ? (
-          <TouchableOpacity
-            style={[
-              styles.viewMessagesButton,
-              {
-                borderColor: theme.colors.primary + '40',
-                backgroundColor: theme.colors.primary + '10',
-              },
-            ]}
-            onPress={e => {
-              e.stopPropagation();
-              onViewMessages(session);
-            }}
-            activeOpacity={0.7}>
-            <Icon name="chat" size={14} color={theme.colors.primary} />
-            <AppText
-              variant="caption"
-              color={theme.colors.primary}
-              style={styles.viewMessagesText}>
-              View Message
-            </AppText>
-          </TouchableOpacity>
-        ) : null}
       </TouchableOpacity>
     );
   },
@@ -313,18 +288,5 @@ const styles = StyleSheet.create({
   sourceRow: {
     marginTop: 10,
     alignItems: 'flex-end',
-  },
-  viewMessagesButton: {
-    marginTop: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 8,
-    borderRadius: 8,
-    borderWidth: 1,
-    gap: 6,
-  },
-  viewMessagesText: {
-    fontWeight: '600',
   },
 });
