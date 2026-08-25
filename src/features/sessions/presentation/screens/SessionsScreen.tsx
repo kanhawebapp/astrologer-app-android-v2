@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef } from 'react';
+import React, {useCallback, useMemo} from 'react';
 import {
   FlatList,
   StyleSheet,
@@ -6,38 +6,24 @@ import {
   View,
   ActivityIndicator,
   RefreshControl,
-  NativeSyntheticEvent,
-  NativeScrollEvent,
   StatusBar,
   Platform,
 } from 'react-native';
-import { ScreenContainer } from '../../../../components/layout/ScreenContainer';
-import { AppText } from '../../../../components/common/AppText';
-import { useTheme } from '../../../../hooks/useTheme';
-import { useSessions } from '../hooks/useSessions';
-import { Session } from '../../domain/types';
-import {
-  SessionCard,
-  SessionFilterTabs,
-  EarningsSummaryCard,
-  EmptyState,
-} from '../components';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import {ScreenContainer} from '../../../../components/layout/ScreenContainer';
+import {AppText} from '../../../../components/common/AppText';
+import {useTheme} from '../../../../hooks/useTheme';
+import {useSessions} from '../hooks/useSessions';
+import {Session} from '../../domain/types';
+import {SessionCard, SessionFilterTabs, EmptyState} from '../components';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 
 const ItemSeparator = () => <View style={styles.separator} />;
-
-/** Distance from bottom (px) at which the next page should load. */
-const NEAR_BOTTOM_OFFSET = 200;
 
 const ListHeader: React.FC<{
   activeFilter: string;
   onFilterChange: (filter: any) => void;
   activeSessionType: string;
   onSessionTypeChange: (type: any) => void;
-  earningsToday: number;
-  earningsWeekly: number;
-  earningsMonthly: number;
-  cancelledSessions: number;
   stats: any;
   theme: any;
 }> = ({
@@ -45,10 +31,6 @@ const ListHeader: React.FC<{
   onFilterChange,
   activeSessionType,
   onSessionTypeChange,
-  earningsToday,
-  earningsWeekly,
-  earningsMonthly,
-  cancelledSessions,
   stats,
   theme,
 }) => (
@@ -60,19 +42,13 @@ const ListHeader: React.FC<{
       <View
         style={[
           styles.statsContainer,
-          { backgroundColor: theme.colors.primary + 20 },
+          {backgroundColor: theme.colors.primary + 20},
         ]}>
         <AppText variant="caption" style={styles.statsText}>
           {stats.totalSessions} sessions
         </AppText>
       </View>
     </View>
-    {/* <EarningsSummaryCard
-        today={earningsToday}
-        weekly={earningsWeekly}
-        monthly={earningsMonthly}
-        cancelled={cancelledSessions}
-      /> */}
     <SessionFilterTabs
       activeFilter={activeFilter as any}
       onFilterChange={onFilterChange}
@@ -83,7 +59,7 @@ const ListHeader: React.FC<{
 );
 
 export const SessionsScreen: React.FC = () => {
-  const { theme, mode } = useTheme();
+  const {theme, mode} = useTheme();
   const {
     activeFilter,
     setActiveFilter,
@@ -95,27 +71,15 @@ export const SessionsScreen: React.FC = () => {
     error,
     refresh,
     loadMore,
-    selectedSession,
     setSelectedSession,
-    earningsToday,
-    earningsWeekly,
-    earningsMonthly,
     stats,
     filteredSessions,
   } = useSessions();
   const navigation = useNavigation<any>();
-      // console.log('🎨 RENDER ITEM>>>', filteredSessions);
 
-  // Ignore FlatList's spurious initial onEndReached until the user scrolls
-  const userHasScrolledRef = useRef(false);
-
-  // Home leaves StatusBar translucent; reset on focus so first-open layout
-  // settles before FlatList mounts with data.
   useFocusEffect(
     useCallback(() => {
-      StatusBar.setBarStyle(
-        mode === 'dark' ? 'light-content' : 'dark-content',
-      );
+      StatusBar.setBarStyle(mode === 'dark' ? 'light-content' : 'dark-content');
       if (Platform.OS === 'android') {
         StatusBar.setTranslucent(false);
         StatusBar.setBackgroundColor(theme.colors.background);
@@ -134,64 +98,15 @@ export const SessionsScreen: React.FC = () => {
   );
 
   const renderItem: ListRenderItem<Session> = useCallback(
-    ({ item, index }) => {
-
-      return <SessionCard session={item} onPress={handleSessionPress} />;
-    },
+    ({item}) => <SessionCard session={item} onPress={handleSessionPress} />,
     [handleSessionPress],
   );
 
   const keyExtractor = useCallback((item: Session) => item.id, []);
 
   const onRefresh = useCallback(async () => {
-    userHasScrolledRef.current = false;
     await refresh();
   }, [refresh]);
-
-  const handleEndReached = useCallback(() => {
-    if (!userHasScrolledRef.current) {
-      return;
-    }
-    if (isLoading || isLoadingMore || filteredSessions.length === 0) {
-      return;
-    }
-    loadMore();
-  }, [isLoading, isLoadingMore, filteredSessions.length, loadMore]);
-
-  const handleScrollBeginDrag = useCallback(() => {
-    userHasScrolledRef.current = true;
-  }, []);
-
-  // Backup when FlatList skips later onEndReached after the empty-list fire
-  const handleScroll = useCallback(
-    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-      const { contentOffset, contentSize, layoutMeasurement } =
-        event.nativeEvent;
-
-      // console.log('📜 SESSION SCROLL', {
-      //   offsetY: contentOffset.y,
-      //   contentHeight: contentSize.height,
-      //   viewportHeight: layoutMeasurement.height,
-      // });
-
-      if (!userHasScrolledRef.current) {
-        return;
-      }
-      if (isLoading || isLoadingMore || filteredSessions.length === 0) {
-        return;
-      }
-
-      const distanceFromEnd =
-        contentSize.height - (layoutMeasurement.height + contentOffset.y);
-
-      if (distanceFromEnd > NEAR_BOTTOM_OFFSET) {
-        return;
-      }
-
-      loadMore();
-    },
-    [loadMore, isLoading, isLoadingMore, filteredSessions.length],
-  );
 
   const renderFooter = useCallback(() => {
     if (!isLoadingMore) {
@@ -204,8 +119,22 @@ export const SessionsScreen: React.FC = () => {
     );
   }, [isLoadingMore, theme.colors.primary]);
 
-  // Depend on primitive stats fields only. `setStats` on every loadMore creates
-  // a new object; remounting ListHeaderComponent breaks first-open virtualization.
+  const renderEmpty = useCallback(() => {
+    if (isLoading) {
+      return null;
+    }
+    return (
+      <EmptyState
+        title={error ? 'Something went wrong' : 'No Sessions Found'}
+        message={
+          error
+            ? error
+            : "You don't have any sessions yet. Waiting for users to book sessions."
+        }
+      />
+    );
+  }, [isLoading, error]);
+
   const listHeader = useMemo(
     () => (
       <ListHeader
@@ -213,10 +142,6 @@ export const SessionsScreen: React.FC = () => {
         onFilterChange={setActiveFilter}
         activeSessionType={activeSessionType}
         onSessionTypeChange={setActiveSessionType}
-        earningsToday={earningsToday}
-        earningsWeekly={earningsWeekly}
-        earningsMonthly={earningsMonthly}
-        cancelledSessions={stats.cancelledSessions}
         stats={stats}
         theme={theme}
       />
@@ -226,23 +151,11 @@ export const SessionsScreen: React.FC = () => {
       setActiveFilter,
       activeSessionType,
       setActiveSessionType,
-      earningsToday,
-      earningsWeekly,
-      earningsMonthly,
-      stats.totalSessions,
-      stats.cancelledSessions,
+      stats,
       theme,
     ],
   );
 
-  console.log('📦 SESSION DATA', {
-    length: filteredSessions.length,
-    isLoading,
-  });
-
-  // First-open bug: FlatList was mounting empty (flexGrow content) while the
-  // tab/StatusBar layout was still settling, then never virtualizing past 0–9
-  // until a full remount. Mount FlatList only after the first page is ready.
   const isInitialLoading = isLoading && filteredSessions.length === 0;
 
   return (
@@ -259,24 +172,16 @@ export const SessionsScreen: React.FC = () => {
           keyExtractor={keyExtractor}
           ListHeaderComponent={listHeader}
           ListFooterComponent={renderFooter}
+          ListEmptyComponent={renderEmpty}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
           ItemSeparatorComponent={ItemSeparator}
-          onScrollBeginDrag={handleScrollBeginDrag}
-          onScroll={handleScroll}
-          scrollEventThrottle={16}
-          onEndReached={handleEndReached}
+          onEndReached={loadMore}
           onEndReachedThreshold={0.5}
           initialNumToRender={10}
           maxToRenderPerBatch={10}
           windowSize={21}
           removeClippedSubviews={false}
-          onLayout={event => {
-            // console.log('📐 FLATLIST ONLAYOUT', {
-            //   width: event.nativeEvent.layout.width,
-            //   height: event.nativeEvent.layout.height,
-            // });
-          }}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
@@ -297,6 +202,7 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingBottom: 16,
+    flexGrow: 1,
   },
   separator: {
     height: 8,
