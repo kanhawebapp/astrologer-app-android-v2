@@ -10,6 +10,41 @@ import {Session, SessionType} from '../../domain/types';
 import {formatDate} from '../../../../utils/helpers';
 import {SendRemedyModal} from '../components/SendRemedyModal';
 
+const DATE_TIME_OPTIONS: Intl.DateTimeFormatOptions = {
+  year: 'numeric',
+  month: 'short',
+  day: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit',
+  hour12: true,
+};
+
+const formatDateTime = (isoTime?: string, fallback = '-'): string => {
+  if (!isoTime) {
+    return fallback;
+  }
+  return formatDate(isoTime, DATE_TIME_OPTIONS);
+};
+
+const formatDurationMinutes = (durationMinutes?: number): string => {
+  const totalSeconds = (durationMinutes ?? 0) * 60;
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = Math.floor(totalSeconds % 60);
+  return `${minutes} min ${seconds.toString().padStart(2, '0')} sec`;
+};
+
+const formatSessionId = (id?: string): string => {
+  if (!id) {
+    return '-';
+  }
+  return id.slice(0, 8);
+};
+
+const formatRatingStars = (rating?: number | null): string => {
+  const filled = Math.max(0, Math.min(5, Math.floor(Number(rating) || 0)));
+  return `${'★'.repeat(filled)}${'☆'.repeat(5 - filled)}`;
+};
+
 const SessionDetailScreen: React.FC = () => {
   const {theme} = useTheme();
   const navigation = useNavigation<any>();
@@ -143,29 +178,58 @@ const SessionDetailScreen: React.FC = () => {
           </AppText>
 
           <InfoRow
-            icon="account-balance-wallet"
-            label="Rate Per Min"
-            value={
-              session.ratePerMin != null ? `₹${session.ratePerMin}/min` : '-'
-            }
+            icon="fingerprint"
+            label="Session ID"
+            value={formatSessionId(session.id)}
             theme={theme}
           />
+
+          {session.type === SessionType.CHAT ? (
+            <InfoRow
+              icon="place"
+              label="Birth Place"
+              value={session.birthPlace || '-'}
+              theme={theme}
+            />
+          ) : null}
 
           <InfoRow
             icon="schedule"
             label="Duration"
-            value={`${
-              session.durationMinutes ??
-              Math.floor((session.durationSec || 0) / 60)
-            } min`}
+            value={formatDurationMinutes(session.durationMinutes)}
             theme={theme}
           />
 
+          {session.type === SessionType.CHAT ? (
+            <InfoRow
+              icon="event"
+              label="Created At"
+              value={formatDateTime(session.startTime)}
+              theme={theme}
+            />
+          ) : (
+            <>
+              <InfoRow
+                icon="play-circle-filled"
+                label="Started At"
+                value={formatDateTime(session.startTime)}
+                theme={theme}
+              />
+
+              <InfoRow
+                icon="stop-circle"
+                label="Ended At"
+                value={formatDateTime(session.endTime, 'Not Available')}
+                theme={theme}
+              />
+            </>
+          )}
+
           <InfoRow
-            icon="stars"
-            label="Coins Earned"
+            icon="account-balance-wallet"
+            label="Rate / Min"
             value={
-              session.coinsEarned != null ? String(session.coinsEarned) : '-'
+              session.ratePerMin != null ? `₹${session.ratePerMin}/min` : '-'
             }
             theme={theme}
           />
@@ -179,59 +243,23 @@ const SessionDetailScreen: React.FC = () => {
             theme={theme}
           />
 
-          <InfoRow
-            icon="tag"
-            label="Source"
-            value={session.source || '-'}
-            theme={theme}
-          />
+          {session.type === SessionType.CHAT || session.rating != null ? (
+            <InfoRow
+              icon="star"
+              label="Rating"
+              value={formatRatingStars(session.rating)}
+              theme={theme}
+            />
+          ) : null}
 
-          <InfoRow
-            icon="event"
-            label="Created At"
-            value={formatDate(session.startTime)}
-            theme={theme}
-          />
-
-          {session.type === SessionType.CALL && (
-            <>
-              <InfoRow
-                icon="play-circle-filled"
-                label="Started At"
-                value={formatDate(session.startTime)}
-                theme={theme}
-              />
-
-              <InfoRow
-                icon="stop-circle"
-                label="Ended At"
-                value={session.endTime ? formatDate(session.endTime) : '-'}
-                theme={theme}
-              />
-            </>
-          )}
-
-          {session.type === SessionType.CHAT && (
-            <>
-              {session.rating != null && (
-                <InfoRow
-                  icon="star"
-                  label="Rating"
-                  value={String(session.rating)}
-                  theme={theme}
-                />
-              )}
-
-              {session.reviewComment ? (
-                <InfoRow
-                  icon="comment"
-                  label="Review"
-                  value={session.reviewComment}
-                  theme={theme}
-                />
-              ) : null}
-            </>
-          )}
+          {session.type === SessionType.CHAT && session.reviewComment?.trim() ? (
+            <InfoRow
+              icon="comment"
+              label="Review Comment"
+              value={session.reviewComment}
+              theme={theme}
+            />
+          ) : null}
         </View>
 
         <View style={styles.actionContainer}>

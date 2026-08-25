@@ -24,11 +24,6 @@ const STATUS_CONFIG: Record<
   cancelled: {label: 'Cancelled', iconName: 'block', color: '#EF4444'},
 };
 
-const TYPE_CONFIG: Record<SessionType, {label: string; iconName: string}> = {
-  chat: {label: 'Chat', iconName: 'chat'},
-  call: {label: 'Call', iconName: 'phone'},
-};
-
 const formatDateTime = (isoTime: string): string => {
   if (!isoTime) {
     return '-';
@@ -44,18 +39,26 @@ const formatDateTime = (isoTime: string): string => {
   });
 };
 
-const formatDuration = (
-  minutes: number | undefined,
-  seconds: number | undefined,
-): string => {
-  const totalMinutes = minutes || 0;
-  if (totalMinutes === 0 && (!seconds || seconds === 0)) {
-    return '0 min';
+
+const formatDuration = (durationSec?: number | null): string => {
+  const totalSeconds = Math.floor(Number(durationSec || 0));
+
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+
+  return `${minutes} min ${seconds.toString().padStart(2, '0')} sec`;
+};
+
+const formatSessionId = (id?: string): string => {
+  if (!id) {
+    return '-';
   }
-  if (seconds && seconds > 0 && totalMinutes === 0) {
-    return `${Math.ceil(seconds / 60)} min`;
-  }
-  return `${totalMinutes} min`;
+  return id.slice(0, 8);
+};
+
+const formatRatingStars = (rating?: number | null): string => {
+  const filled = Math.max(0, Math.min(5, Math.floor(Number(rating) || 0)));
+  return `${'★'.repeat(filled)}${'☆'.repeat(5 - filled)}`;
 };
 
 export const SessionCard: React.FC<SessionCardProps> = React.memo(
@@ -63,16 +66,9 @@ export const SessionCard: React.FC<SessionCardProps> = React.memo(
     const {theme} = useTheme();
 
     const statusConfig = STATUS_CONFIG[session.status];
-    const typeConfig = TYPE_CONFIG[session.type];
-
     const statusColor = statusConfig.color;
-    const typeColor =
-      session.type === SessionType.CHAT
-        ? theme.colors.info
-        : theme.colors.accentPurple;
-
-    const earnedAmount = session.coinsEarned ?? session.earnings ?? 0;
-    const displayRate = session.ratePerMin ?? 0;
+    const isChat = session.type === SessionType.CHAT;
+    const showRating = isChat || session.rating != null;
 
     return (
       <TouchableOpacity
@@ -97,28 +93,13 @@ export const SessionCard: React.FC<SessionCardProps> = React.memo(
               </AppText>
             </View>
             <View style={styles.userInfo}>
-              <View style={styles.nameRow}>
-                <AppText
-                  variant="body1"
-                  color={theme.colors.text}
-                  numberOfLines={1}
-                  style={styles.userName}>
-                  {session.userName}
-                </AppText>
-              </View>
-              <View style={styles.metaRow}>
-                <Icon name={typeConfig.iconName} size={14} color={typeColor} />
-                <AppText
-                  variant="caption"
-                  color={typeColor}
-                  style={styles.typeLabel}>
-                  {typeConfig.label}
-                </AppText>
-                <View style={styles.dotSeparator} />
-                <AppText variant="caption" color={theme.colors.textTertiary}>
-                  {formatDateTime(session.startTime)}
-                </AppText>
-              </View>
+              <AppText
+                variant="body1"
+                color={theme.colors.text}
+                numberOfLines={1}
+                style={styles.userName}>
+                {session.userName}
+              </AppText>
             </View>
           </View>
           <View
@@ -137,55 +118,69 @@ export const SessionCard: React.FC<SessionCardProps> = React.memo(
           style={[styles.divider, {backgroundColor: theme.colors.border}]}
         />
 
-        <View style={styles.cardFooter}>
-          <View style={styles.metaItem}>
-            <Icon name="schedule" size={14} color={theme.colors.textTertiary} />
-            <AppText variant="caption" color={theme.colors.textSecondary}>
-              {formatDuration(session.durationMinutes, session.durationSec)} min
-            </AppText>
-          </View>
-          <View style={styles.metaItem}>
-            <Icon
-              name="account-balance-wallet"
-              size={14}
-              color={theme.colors.textTertiary}
+        <View style={styles.fields}>
+          <FieldRow
+            label="Session ID"
+            value={formatSessionId(session.id)}
+            theme={theme}
+          />
+          <FieldRow
+            label="Duration"
+            value={formatDuration(session.durationSec)}
+            theme={theme}
+          />
+          {isChat ? (
+            <FieldRow
+              label="Created At"
+              value={formatDateTime(session.startTime)}
+              theme={theme}
             />
-            <AppText variant="caption" color={theme.colors.textSecondary}>
-              ₹{displayRate}/min
-            </AppText>
-          </View>
-          <View style={styles.amountContainer}>
-            {earnedAmount > 0 ? (
-              <>
-                <AppText variant="label" color={theme.colors.success}>
-                  {session.type === SessionType.CALL ? '₹' : ''}
-                  {earnedAmount}
-                </AppText>
-                <AppText
-                  variant="caption"
-                  color={theme.colors.textTertiary}
-                  style={styles.earningsLabel}>
-                  Coins Earned
-                </AppText>
-              </>
-            ) : (
-              <AppText variant="caption" color={theme.colors.textTertiary}>
-                0 coins
-              </AppText>
-            )}
-          </View>
+          ) : null}
+          <FieldRow
+            label="Rate / Min"
+            value={
+              session.ratePerMin != null ? `₹${session.ratePerMin}/min` : '-'
+            }
+            theme={theme}
+          />
+          <FieldRow
+            label="Commission"
+            value={
+              session.commission != null ? String(session.commission) : '-'
+            }
+            theme={theme}
+          />
+          {showRating ? (
+            <FieldRow
+              label="Rating"
+              value={formatRatingStars(session.rating)}
+              theme={theme}
+              valueColor={theme.colors.accentGold}
+            />
+          ) : null}
         </View>
-
-        {session.source ? (
-          <View style={styles.sourceRow}>
-            <AppText variant="caption" color={theme.colors.textTertiary}>
-              Source: {session.source}
-            </AppText>
-          </View>
-        ) : null}
       </TouchableOpacity>
     );
   },
+);
+
+const FieldRow: React.FC<{
+  label: string;
+  value: string;
+  theme: any;
+  valueColor?: string;
+}> = ({label, value, theme, valueColor}) => (
+  <View style={styles.fieldRow}>
+    <AppText variant="caption" color={theme.colors.textTertiary}>
+      {label}
+    </AppText>
+    <AppText
+      variant="caption"
+      color={valueColor || theme.colors.textSecondary}
+      style={styles.fieldValue}>
+      {value}
+    </AppText>
+  </View>
 );
 
 const styles = StyleSheet.create({
@@ -221,32 +216,10 @@ const styles = StyleSheet.create({
   },
   userInfo: {
     flex: 1,
-  },
-  nameRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 4,
+    marginRight: 8,
   },
   userName: {
     fontWeight: '600',
-    flex: 1,
-  },
-  metaRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-  },
-  typeLabel: {
-    marginLeft: 4,
-    marginRight: 8,
-    fontWeight: '500',
-  },
-  dotSeparator: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: '#9CA3AF',
-    marginRight: 8,
   },
   statusBadge: {
     flexDirection: 'row',
@@ -265,28 +238,18 @@ const styles = StyleSheet.create({
     marginVertical: 14,
     opacity: 0.5,
   },
-  cardFooter: {
+  fields: {
+    gap: 8,
+  },
+  fieldRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    flexWrap: 'wrap',
+    justifyContent: 'space-between',
   },
-  metaItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginRight: 16,
-    gap: 4,
-  },
-  amountContainer: {
-    flex: 1,
-    alignItems: 'flex-end',
-    marginRight: 10,
-  },
-  earningsLabel: {
-    fontSize: 10,
-    marginTop: 2,
-  },
-  sourceRow: {
-    marginTop: 10,
-    alignItems: 'flex-end',
+  fieldValue: {
+    fontWeight: '500',
+    marginLeft: 12,
+    flexShrink: 1,
+    textAlign: 'right',
   },
 });
