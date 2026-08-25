@@ -1,17 +1,17 @@
-import React, {useCallback, useEffect, useState} from 'react';
-import {View, StyleSheet, FlatList, ActivityIndicator} from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { View, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import {Header} from '../../../../components';
-import {AppText} from '../../../../components/common/AppText';
-import {ScreenContainer} from '../../../../components/layout/ScreenContainer';
-import {useTheme} from '../../../../hooks/useTheme';
-import {useRoute, useNavigation} from '@react-navigation/native';
-import {messagesApi} from '../../../../services/api/messageSession/messages.service';
-import {SessionMessage} from '../../../../services/api/messageSession/messages.types';
-import {formatTime} from '../../../../utils/helpers';
+import { Header } from '../../../../components';
+import { AppText } from '../../../../components/common/AppText';
+import { ScreenContainer } from '../../../../components/layout/ScreenContainer';
+import { useTheme } from '../../../../hooks/useTheme';
+import { useRoute, useNavigation } from '@react-navigation/native';
+import { messagesApi } from '../../../../services/api/messageSession/messages.service';
+import { SessionMessage } from '../../../../services/api/messageSession/messages.types';
+import { formatTime } from '../../../../utils/helpers';
 
 const SessionMessagesScreen: React.FC = () => {
-  const {theme} = useTheme();
+  const { theme } = useTheme();
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
   const sessionId = route.params?.sessionId;
@@ -20,6 +20,22 @@ const SessionMessagesScreen: React.FC = () => {
   const [messages, setMessages] = useState<SessionMessage[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+
+  const formatMessageTime = (time?: string): string => {
+    if (!time) {
+      return '';
+    }
+
+    // "3:55:11 pm" -> "3:55 pm"
+    const match = time.match(/^(\d{1,2}:\d{2})(?::\d{2})?\s*(am|pm)?$/i);
+
+    if (!match) {
+      return time;
+    }
+
+    return `${match[1]}${match[2] ? ` ${match[2].toUpperCase()}` : ''}`;
+  };
 
   const fetchMessages = useCallback(async () => {
     if (!sessionId) {
@@ -36,6 +52,7 @@ const SessionMessagesScreen: React.FC = () => {
       });
 
       const messagesData = response?.getSessionMessages;
+      console.log("messagesData>>>", messagesData)
       if (messagesData?.success) {
         setMessages(messagesData.data || []);
       } else {
@@ -53,9 +70,9 @@ const SessionMessagesScreen: React.FC = () => {
     fetchMessages();
   }, [fetchMessages]);
 
-  const renderMessage = ({item}: {item: SessionMessage}) => {
+  const renderMessage = ({ item }: { item: SessionMessage }) => {
     const isAstrologer = item.sender?.toLowerCase() === 'astrologer';
-
+    console.log("item>>>", item)
     return (
       <View
         style={[
@@ -106,11 +123,14 @@ const SessionMessagesScreen: React.FC = () => {
           <AppText
             variant="caption"
             color={
-              isAstrologer ? 'rgba(255,255,255,0.7)' : theme.colors.textTertiary
+              isAstrologer
+                ? 'rgba(255,255,255,0.7)'
+                : theme.colors.textTertiary
             }
             style={styles.messageTime}>
-            {formatTime(item.createdAt)}
+            {formatMessageTime(item.time)}
           </AppText>
+
         </View>
       </View>
     );

@@ -2,11 +2,13 @@ export const GET_ASTROLOGER_CHAT_HISTORY_QUERY = `
   query GetAstrologerChatHistory(
     $page: Int!,
     $limit: Int!,
+    $status: SessionStatus
   ) {
     getAstrologerChatHistory(
       filter: {
         page: $page,
-        limit: $limit
+        limit: $limit,
+        status: $status
       }
     ) {
       success

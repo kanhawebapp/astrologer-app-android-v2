@@ -36,6 +36,7 @@ export const chatHistoryApi = {
       variables: {
         page: filter.page,
         limit: filter.limit,
+        status: filter.status,
       },
 
       token,

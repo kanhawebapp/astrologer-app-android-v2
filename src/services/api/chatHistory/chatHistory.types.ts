@@ -25,4 +25,5 @@ export interface GetAstrologerChatHistoryResponse {
 export interface GetAstrologerChatHistoryFilter {
   page: number;
   limit: number;
+  status?: 'COMPLETED' | 'MISSED' | 'CANCELLED' | 'ONGOING';
 }
