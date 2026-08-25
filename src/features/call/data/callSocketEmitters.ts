@@ -69,10 +69,10 @@ export class CallSocketEmitters {
     );
   }
 
-  async rejectCall(callId: string, roomId: string): Promise<void> {
-    console.log('[CallSocketEmitters] Emitting call_cancel_by_astrologer', { callId, roomId });
+  async rejectCall(astroId: string, roomId: string): Promise<void> {
+    console.log('[CallSocketEmitters] Emitting call_cancel_by_astrologer', { astroId, roomId });
     await socketManager.emit('call_cancel_by_astrologer', {
-      // callId,
+      astroId,
       roomId,
     });
   }
