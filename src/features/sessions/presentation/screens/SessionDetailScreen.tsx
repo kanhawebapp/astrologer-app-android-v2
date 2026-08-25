@@ -53,14 +53,14 @@ const SessionDetailScreen: React.FC = () => {
         });
     };
 
-   const formatDuration = (seconds: number) => {
-    if (!seconds) return '0 min 0 sec';
+    const formatDuration = (seconds: number) => {
+        if (!seconds) return '0 min 0 sec';
 
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
 
-    return `${minutes} min ${remainingSeconds} sec`;
-};
+        return `${minutes} min ${remainingSeconds} sec`;
+    };
 
     const getStatusColor = () => {
         switch (session.status?.toLowerCase()) {
@@ -113,7 +113,7 @@ const SessionDetailScreen: React.FC = () => {
             });
 
             const messagesData = response?.getSessionMessages;
-
+            console.log('Fetched messages:', messagesData);
             if (messagesData?.success) {
                 setMessages(messagesData.data || []);
             } else {
@@ -284,48 +284,48 @@ const SessionDetailScreen: React.FC = () => {
                     />
 
                     {session.birthDate ? (
-                    <InfoRow
-                        icon="cake"
-                        label="Birth Date"
-                        value={session.birthDate}
-                        theme={theme}
-                    />
+                        <InfoRow
+                            icon="cake"
+                            label="Birth Date"
+                            value={session.birthDate}
+                            theme={theme}
+                        />
                     ) : null}
 
                     {session.birthPlace ? (
-                    <InfoRow
-                        icon="place"
-                        label="Birth Place"
-                        value={session.birthPlace}
-                        theme={theme}
-                    />
+                        <InfoRow
+                            icon="place"
+                            label="Birth Place"
+                            value={session.birthPlace}
+                            theme={theme}
+                        />
                     ) : null}
 
                     {session.birthTime ? (
-                    <InfoRow
-                        icon="access-time"
-                        label="Birth Time"
-                        value={session.birthTime}
-                        theme={theme}
-                    />
+                        <InfoRow
+                            icon="access-time"
+                            label="Birth Time"
+                            value={session.birthTime}
+                            theme={theme}
+                        />
                     ) : null}
 
                     {session.ratePerMin != null && session.ratePerMin !== '' ? (
-                    <InfoRow
-                        icon="account-balance-wallet"
-                        label="Rate Per Min"
-                        value={`₹${session.ratePerMin}/min`}
-                        theme={theme}
-                    />
+                        <InfoRow
+                            icon="account-balance-wallet"
+                            label="Rate Per Min"
+                            value={`₹${session.ratePerMin}/min`}
+                            theme={theme}
+                        />
                     ) : null}
 
                     {session.reviewComment ? (
-                    <InfoRow
-                        icon="comment"
-                        label="Review"
-                        value={session.reviewComment}
-                        theme={theme}
-                    />
+                        <InfoRow
+                            icon="comment"
+                            label="Review"
+                            value={session.reviewComment}
+                            theme={theme}
+                        />
                     ) : null}
                 </View>
 

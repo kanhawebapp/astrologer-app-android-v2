@@ -12,7 +12,7 @@ interface TransactionItemProps {
 
 const TransactionItem: React.FC<TransactionItemProps> = memo(
   ({ transaction }) => {
-    console.log('🔥 TransactionItem Render', transaction);
+    // console.log('🔥 TransactionItem Render', transaction);
     const { theme } = useTheme();
 
     const formatCoins = (amount?: number): string => {
