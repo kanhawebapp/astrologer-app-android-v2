@@ -566,7 +566,7 @@ export const ChatRequestCard: React.FC<ChatRequestCardProps> = memo(() => {
             </Text>
           </View>
 
-          <View style={styles.timerContainer}>
+          {/* <View style={styles.timerContainer}>
             <Animated.View
               style={[
                 styles.timerBadge,
@@ -578,7 +578,7 @@ export const ChatRequestCard: React.FC<ChatRequestCardProps> = memo(() => {
               ]}>
               <Text style={styles.timerText}>{formatCountdown(countdown)}</Text>
             </Animated.View>
-          </View>
+          </View> */}
         </View>
 
         <View style={styles.infoSection}>
@@ -592,14 +592,14 @@ export const ChatRequestCard: React.FC<ChatRequestCardProps> = memo(() => {
             numberOfLines={1}>
             {latestRequest.issue || 'Chat Request'}
           </Text>
-          <View style={styles.metaRow}>
+          {/* <View style={styles.metaRow}>
             <Text style={[styles.metaText, { color: theme.colors.textTertiary }]}>
               ⏱ {latestRequest.maximumTime} min
             </Text>
-            {/* <Text style={[styles.metaText, { color: theme.colors.textTertiary }]}>
+            <Text style={[styles.metaText, { color: theme.colors.textTertiary }]}>
               💰 ₹{latestRequest.pricePerMinute}/min
-            </Text> */}
-          </View>
+            </Text>
+          </View> */}
         </View>
       </View>
 

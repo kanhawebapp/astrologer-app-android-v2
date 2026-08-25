@@ -29,6 +29,10 @@ const TransactionItem: React.FC<TransactionItemProps> = memo(
       });
     };
 
+    const formatTransactionId = (id?: string): string => {
+      return id ? id.slice(0, 8) : 'N/A';
+    };
+
     const getIconName = (): string => {
       switch (transaction.icon) {
         case 'chat':
@@ -90,7 +94,14 @@ const TransactionItem: React.FC<TransactionItemProps> = memo(
               style={styles.description}>
               {transaction.description}
             </AppText>
+
           )}
+          <AppText
+            variant="caption"
+            color={theme.colors.textTertiary}
+            style={styles.transactionId}>
+            Transaction ID: {formatTransactionId(transaction.id)}
+          </AppText>
         </View>
 
         <View style={styles.amountContainer}>
@@ -149,6 +160,10 @@ const styles = StyleSheet.create({
   },
   description: {
     marginTop: 2,
+  },
+  transactionId: {
+    marginTop: 4,
+    fontSize: 10,
   },
   amountContainer: {
     alignItems: 'flex-end',

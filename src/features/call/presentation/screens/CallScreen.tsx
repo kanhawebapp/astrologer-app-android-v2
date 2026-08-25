@@ -281,9 +281,9 @@ export const CallScreen: React.FC = () => {
               size={32}
               color={speakerOn ? theme.colors.white : theme.colors.text}
             />
-            <Text style={[styles.controlLabel, {
+            {/* <Text style={[styles.controlLabel, {
               color: speakerOn ? theme.colors.white : theme.colors.text,
-            }]}>Speaker</Text>
+            }]}>Speaker</Text> */}
           </TouchableOpacity>
 
           {/* Low Voice / Mic */}
@@ -297,9 +297,9 @@ export const CallScreen: React.FC = () => {
               size={32}
               color={isMuted ? theme.colors.white : theme.colors.text}
             />
-            <Text style={[styles.controlLabel, {
+            {/* <Text style={[styles.controlLabel, {
               color: isMuted ? theme.colors.white : theme.colors.text,
-            }]}>Low voice</Text>
+            }]}>Low voice</Text> */}
           </TouchableOpacity>
         </View>
 
@@ -307,7 +307,7 @@ export const CallScreen: React.FC = () => {
           style={[styles.controlButton, styles.endButton, { backgroundColor: theme.colors.error }]}
           onPress={handleEndCall}>
           <Icon name="call-end" size={32} color={theme.colors.white} />
-          <Text style={[styles.controlLabel, { color: theme.colors.white }]}>End</Text>
+          {/* <Text style={[styles.controlLabel, { color: theme.colors.white }]}>End</Text> */}
         </TouchableOpacity>
       </View>
     </View>
