@@ -1,143 +1,130 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import {StyleSheet, TouchableOpacity, ScrollView} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { AppText } from '../../../../components/common/AppText';
-import { useTheme } from '../../../../hooks/useTheme';
-import { FilterType, SessionTypeFilter } from '../../domain/types';
+import {AppText} from '../../../../components/common/AppText';
+import {useTheme} from '../../../../hooks/useTheme';
 
-interface SessionFilterTabsProps {
-  activeFilter: FilterType;
-  onFilterChange: (filter: FilterType) => void;
-  activeSessionType: SessionTypeFilter;
-  onSessionTypeChange: (type: SessionTypeFilter) => void;
+interface SessionTypeTabsProps {
+  activeType: 'CALL' | 'CHAT';
+  onTypeChange: (type: 'CALL' | 'CHAT') => void;
 }
 
-const STATUS_FILTERS: { key: FilterType; label: string; iconName?: string }[] =
-  [
-    { key: FilterType.ALL, label: 'All' },
-    // {
-    //   key: FilterType.ACTIVE,
-    //   label: 'Active',
-    //   iconName: 'radio-button-checked',
-    // },
-    // { key: FilterType.PENDING, label: 'Pending', iconName: 'schedule' },
-    { key: FilterType.COMPLETED, label: 'Completed', iconName: 'check-circle' },
-    { key: FilterType.CANCELLED, label: 'Cancelled', iconName: 'block' },
+interface SessionStatusTabsProps {
+  activeStatus: 'COMPLETED' | 'CANCELLED';
+  onStatusChange: (status: 'COMPLETED' | 'CANCELLED') => void;
+}
+
+export const SessionTypeTabs: React.FC<SessionTypeTabsProps> = ({
+  activeType,
+  onTypeChange,
+}) => {
+  const {theme} = useTheme();
+
+  const types = [
+    {key: 'CALL' as const, label: 'Call', iconName: 'phone'},
+    {key: 'CHAT' as const, label: 'Chat', iconName: 'chat'},
   ];
 
-const SESSION_TYPES: {
-  key: SessionTypeFilter;
-  label: string;
-  iconName: string;
-}[] = [
-  { key: SessionTypeFilter.ALL, label: 'All', iconName: 'apps' },
-  { key: SessionTypeFilter.CHAT, label: 'Chat', iconName: 'chat' },
-  { key: SessionTypeFilter.CALL, label: 'Call', iconName: 'phone' },
-];
+  return (
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={styles.typeScrollContent}>
+      {types.map(type => {
+        const isActive = activeType === type.key;
+        return (
+          <TouchableOpacity
+            key={type.key}
+            style={[
+              styles.typeTab,
+              {
+                backgroundColor: isActive
+                  ? theme.colors.primary
+                  : theme.colors.surfaceSecondary,
+                borderColor: isActive
+                  ? theme.colors.primary
+                  : theme.colors.border,
+              },
+            ]}
+            onPress={() => onTypeChange(type.key)}
+            activeOpacity={0.7}>
+            <Icon
+              name={type.iconName}
+              size={14}
+              color={isActive ? theme.colors.white : theme.colors.textSecondary}
+            />
+            <AppText
+              variant="caption"
+              color={isActive ? theme.colors.white : theme.colors.textSecondary}
+              style={styles.typeLabel}>
+              {type.label}
+            </AppText>
+          </TouchableOpacity>
+        );
+      })}
+    </ScrollView>
+  );
+};
 
-export const SessionFilterTabs: React.FC<SessionFilterTabsProps> = ({
-  activeFilter,
-  onFilterChange,
-  activeSessionType,
-  onSessionTypeChange,
+export const SessionStatusTabs: React.FC<SessionStatusTabsProps> = ({
+  activeStatus,
+  onStatusChange,
 }) => {
-  const { theme } = useTheme();
+  const {theme} = useTheme();
+
+  const statuses = [
+    {key: 'COMPLETED' as const, label: 'Completed', iconName: 'check-circle'},
+    {key: 'CANCELLED' as const, label: 'Cancelled', iconName: 'block'},
+  ];
 
   return (
-    <View style={styles.container}>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.typeScrollContent}>
-        {SESSION_TYPES.map(type => {
-          const isActive = activeSessionType === type.key;
-          return (
-            <TouchableOpacity
-              key={type.key}
-              style={[
-                styles.typeTab,
-                {
-                  backgroundColor: isActive
-                    ? theme.colors.primary
-                    : theme.colors.surfaceSecondary,
-                  borderColor: isActive
-                    ? theme.colors.primary
-                    : theme.colors.border,
-                },
-              ]}
-              onPress={() => onSessionTypeChange(type.key)}
-              activeOpacity={0.7}>
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={styles.statusScrollContent}>
+      {statuses.map(status => {
+        const isActive = activeStatus === status.key;
+        return (
+          <TouchableOpacity
+            key={status.key}
+            style={[
+              styles.statusChip,
+              {
+                backgroundColor: isActive
+                  ? theme.colors.primary + '15'
+                  : 'transparent',
+                borderColor: isActive
+                  ? theme.colors.primary
+                  : theme.colors.border,
+              },
+            ]}
+            onPress={() => onStatusChange(status.key)}
+            activeOpacity={0.7}>
+            {status.iconName && (
               <Icon
-                name={type.iconName}
-                size={14}
-                color={
-                  isActive ? theme.colors.white : theme.colors.textSecondary
-                }
-              />
-              <AppText
-                variant="caption"
-                color={
-                  isActive ? theme.colors.white : theme.colors.textSecondary
-                }
-                style={styles.typeLabel}>
-                {type.label}
-              </AppText>
-            </TouchableOpacity>
-          );
-        })}
-      </ScrollView>
-
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.filterScrollContent}>
-        {STATUS_FILTERS.map(filter => {
-          const isActive = activeFilter === filter.key;
-          return (
-            <TouchableOpacity
-              key={filter.key}
-              style={[
-                styles.filterChip,
-                {
-                  backgroundColor: isActive
-                    ? theme.colors.primary + '15'
-                    : 'transparent',
-                  borderColor: isActive
-                    ? theme.colors.primary
-                    : theme.colors.border,
-                },
-              ]}
-              onPress={() => onFilterChange(filter.key)}
-              activeOpacity={0.7}>
-              {filter.iconName && (
-                <Icon
-                  name={filter.iconName}
-                  size={12}
-                  color={
-                    isActive ? theme.colors.primary : theme.colors.textSecondary
-                  }
-                />
-              )}
-              <AppText
-                variant="caption"
+                name={status.iconName}
+                size={12}
                 color={
                   isActive ? theme.colors.primary : theme.colors.textSecondary
                 }
-                style={styles.filterLabel}>
-                {filter.label}
-              </AppText>
-            </TouchableOpacity>
-          );
-        })}
-      </ScrollView>
-    </View>
+              />
+            )}
+            <AppText
+              variant="caption"
+              color={
+                isActive ? theme.colors.primary : theme.colors.textSecondary
+              }
+              style={styles.statusLabel}>
+              {status.label}
+            </AppText>
+          </TouchableOpacity>
+        );
+      })}
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    paddingVertical: 12,
-  },
   typeScrollContent: {
     paddingHorizontal: 16,
     gap: 8,
@@ -154,12 +141,12 @@ const styles = StyleSheet.create({
   typeLabel: {
     fontWeight: '600',
   },
-  filterScrollContent: {
+  statusScrollContent: {
     paddingHorizontal: 16,
     marginTop: 12,
     gap: 8,
   },
-  filterChip: {
+  statusChip: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 6,
@@ -168,7 +155,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     gap: 4,
   },
-  filterLabel: {
+  statusLabel: {
     fontWeight: '500',
   },
 });

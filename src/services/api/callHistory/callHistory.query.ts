@@ -1,5 +1,3 @@
-// callHistory.query.ts
-
 export const GET_ASTROLOGER_CALL_HISTORY_QUERY = `
   query GetAstrologerCallHistory(
     $page: Int!,
@@ -34,6 +32,7 @@ export const GET_ASTROLOGER_CALL_HISTORY_QUERY = `
         coinsEarned
         commission
         lastMessage
+        source
       }
     }
   }

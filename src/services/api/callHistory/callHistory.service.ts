@@ -1,8 +1,8 @@
 // callHistory.service.ts
 
-import { graphqlRequest } from '../../graphqlClient';
+import {graphqlRequest} from '../../graphqlClient';
 
-import { GET_ASTROLOGER_CALL_HISTORY_QUERY } from './callHistory.query';
+import {GET_ASTROLOGER_CALL_HISTORY_QUERY} from './callHistory.query';
 
 import {
   GetAstrologerCallHistoryResponse,
@@ -14,29 +14,19 @@ export const callHistoryApi = {
     variables: GetAstrologerCallHistoryVariables,
     token?: string,
   ) => {
-    console.log(
-      '=== GET ASTROLOGER CALL HISTORY REQUEST ===',
-    );
+    console.log('=== GET ASTROLOGER CALL HISTORY REQUEST ===');
 
-    console.log(
-      'Variables:',
-      JSON.stringify(variables, null, 2),
-    );
+    console.log('Variables:', JSON.stringify(variables, null, 2));
 
-    console.log(
-      'Query:',
-      GET_ASTROLOGER_CALL_HISTORY_QUERY.trim(),
-    );
+    console.log('Query:', GET_ASTROLOGER_CALL_HISTORY_QUERY.trim());
 
-    console.log(
-      '===========================================',
-    );
+    console.log('===========================================');
 
     return graphqlRequest<{
       getAstrologerCallHistory: GetAstrologerCallHistoryResponse;
     }>({
       query: GET_ASTROLOGER_CALL_HISTORY_QUERY,
-      variables,
+      variables: variables as unknown as Record<string, unknown>,
       token,
     });
   },

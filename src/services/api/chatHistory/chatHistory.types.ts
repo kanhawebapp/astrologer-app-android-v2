@@ -1,21 +1,17 @@
-// src/features/chatHistory/api/chatHistory.types.ts
-
 export interface AstrologerChatHistoryItem {
   sessionId: string;
   roomId: string;
   userName: string;
-  userMobile: string;
-  userCountryCode: string;
-  startedAt: string;
-  endedAt: string;
-  createdAt: string;
+  birthPlace: string;
+  rating: number | null;
+  reviewComment: string | null;
   status: 'COMPLETED' | 'MISSED' | 'CANCELLED' | 'ONGOING';
-  durationSec: number;
-  durationMinutes: number;
   ratePerMin: number;
+  durationMinutes: number;
   coinsEarned: number;
   commission: number;
-  lastMessage: string;
+  source: string;
+  createdAt: string;
 }
 
 export interface GetAstrologerChatHistoryResponse {

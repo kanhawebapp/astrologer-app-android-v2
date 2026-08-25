@@ -1,4 +1,3 @@
-
 export const GET_ASTROLOGER_CHAT_HISTORY_QUERY = `
   query GetAstrologerChatHistory(
     $page: Int!,
@@ -19,18 +18,16 @@ export const GET_ASTROLOGER_CHAT_HISTORY_QUERY = `
         sessionId
         roomId
         userName
-        userMobile
-        userCountryCode
-        startedAt
-        endedAt
-        createdAt
+        birthPlace
+        rating
+        reviewComment
         status
-        durationSec
-        durationMinutes
         ratePerMin
+        durationMinutes
         coinsEarned
         commission
-        lastMessage
+        source
+        createdAt
       }
     }
   }

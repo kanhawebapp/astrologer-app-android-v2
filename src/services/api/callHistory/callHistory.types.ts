@@ -1,5 +1,3 @@
-// callHistory.types.ts
-
 export type CallHistoryStatus =
   | 'COMPLETED'
   | 'MISSED'
@@ -22,6 +20,7 @@ export interface CallHistoryItem {
   coinsEarned: number;
   commission: number;
   lastMessage: string;
+  source: string;
 }
 
 export interface GetAstrologerCallHistoryResponse {

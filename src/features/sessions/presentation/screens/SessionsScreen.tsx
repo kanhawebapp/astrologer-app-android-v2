@@ -14,66 +14,52 @@ import {AppText} from '../../../../components/common/AppText';
 import {useTheme} from '../../../../hooks/useTheme';
 import {useSessions} from '../hooks/useSessions';
 import {Session} from '../../domain/types';
-import {SessionCard, SessionFilterTabs, EmptyState} from '../components';
+import {
+  SessionCard,
+  SessionTypeTabs,
+  SessionStatusTabs,
+  EmptyState,
+} from '../components';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 
 const ItemSeparator = () => <View style={styles.separator} />;
 
 const ListHeader: React.FC<{
-  activeFilter: string;
-  onFilterChange: (filter: any) => void;
-  activeSessionType: string;
-  onSessionTypeChange: (type: any) => void;
-  stats: any;
-  theme: any;
-}> = ({
-  activeFilter,
-  onFilterChange,
-  activeSessionType,
-  onSessionTypeChange,
-  stats,
-  theme,
-}) => (
+  activeType: 'CALL' | 'CHAT';
+  onTypeChange: (type: 'CALL' | 'CHAT') => void;
+  activeStatus: 'COMPLETED' | 'CANCELLED';
+  onStatusChange: (status: 'COMPLETED' | 'CANCELLED') => void;
+}> = ({activeType, onTypeChange, activeStatus, onStatusChange}) => (
   <View>
     <View style={styles.headerTitle}>
       <AppText variant="h4" style={styles.title}>
-        Sessions
+        Session History
       </AppText>
-      <View
-        style={[
-          styles.statsContainer,
-          {backgroundColor: theme.colors.primary + 20},
-        ]}>
-        <AppText variant="caption" style={styles.statsText}>
-          {stats.totalSessions} sessions
-        </AppText>
-      </View>
     </View>
-    <SessionFilterTabs
-      activeFilter={activeFilter as any}
-      onFilterChange={onFilterChange}
-      activeSessionType={activeSessionType as any}
-      onSessionTypeChange={onSessionTypeChange}
+    <SessionTypeTabs activeType={activeType} onTypeChange={onTypeChange} />
+    <SessionStatusTabs
+      activeStatus={activeStatus}
+      onStatusChange={onStatusChange}
     />
+    <View style={styles.divider} />
   </View>
 );
 
 export const SessionsScreen: React.FC = () => {
   const {theme, mode} = useTheme();
   const {
-    activeFilter,
-    setActiveFilter,
-    activeSessionType,
-    setActiveSessionType,
+    sessions,
+    activeType,
+    setActiveType,
+    activeStatus,
+    setActiveStatus,
     refreshing,
-    isLoading,
-    isLoadingMore,
+    loading,
+    loadingMore,
     error,
     refresh,
     loadMore,
     setSelectedSession,
-    stats,
-    filteredSessions,
   } = useSessions();
   const navigation = useNavigation<any>();
 
@@ -88,9 +74,11 @@ export const SessionsScreen: React.FC = () => {
   );
 
   const handleSessionPress = useCallback(
-    async (session: Session) => {
+    (session: Session) => {
       setSelectedSession(session);
       navigation.navigate('SessionDetailScreen', {
+        sessionId: session.id,
+        roomId: session.roomId,
         session,
       });
     },
@@ -109,7 +97,7 @@ export const SessionsScreen: React.FC = () => {
   }, [refresh]);
 
   const renderFooter = useCallback(() => {
-    if (!isLoadingMore) {
+    if (!loadingMore) {
       return null;
     }
     return (
@@ -117,46 +105,34 @@ export const SessionsScreen: React.FC = () => {
         <ActivityIndicator size="small" color={theme.colors.primary} />
       </View>
     );
-  }, [isLoadingMore, theme.colors.primary]);
+  }, [loadingMore, theme.colors.primary]);
 
   const renderEmpty = useCallback(() => {
-    if (isLoading) {
+    if (loading) {
       return null;
     }
-    return (
-      <EmptyState
-        title={error ? 'Something went wrong' : 'No Sessions Found'}
-        message={
-          error
-            ? error
-            : "You don't have any sessions yet. Waiting for users to book sessions."
-        }
-      />
-    );
-  }, [isLoading, error]);
+    const title = error
+      ? 'Something went wrong'
+      : `No ${activeStatus.toLowerCase()} ${activeType.toLowerCase()} sessions found`;
+    const message = error
+      ? error
+      : `You don't have any ${activeStatus.toLowerCase()} ${activeType.toLowerCase()} sessions yet.`;
+    return <EmptyState title={title} message={message} />;
+  }, [loading, error, activeStatus, activeType]);
 
   const listHeader = useMemo(
     () => (
       <ListHeader
-        activeFilter={activeFilter}
-        onFilterChange={setActiveFilter}
-        activeSessionType={activeSessionType}
-        onSessionTypeChange={setActiveSessionType}
-        stats={stats}
-        theme={theme}
+        activeType={activeType}
+        onTypeChange={setActiveType}
+        activeStatus={activeStatus}
+        onStatusChange={setActiveStatus}
       />
     ),
-    [
-      activeFilter,
-      setActiveFilter,
-      activeSessionType,
-      setActiveSessionType,
-      stats,
-      theme,
-    ],
+    [activeType, activeStatus, setActiveType, setActiveStatus],
   );
 
-  const isInitialLoading = isLoading && filteredSessions.length === 0;
+  const isInitialLoading = loading && sessions.length === 0;
 
   return (
     <ScreenContainer scrollable={false} withPadding={false}>
@@ -167,7 +143,7 @@ export const SessionsScreen: React.FC = () => {
       ) : (
         <FlatList
           style={styles.list}
-          data={filteredSessions}
+          data={sessions}
           renderItem={renderItem}
           keyExtractor={keyExtractor}
           ListHeaderComponent={listHeader}
@@ -234,13 +210,11 @@ const styles = StyleSheet.create({
   title: {
     fontWeight: '700',
   },
-  statsContainer: {
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  statsText: {
-    color: '#6C63FF',
-    fontWeight: '600',
+  divider: {
+    height: 1,
+    backgroundColor: '#E8E0CF',
+    marginHorizontal: 16,
+    marginTop: 12,
+    marginBottom: 4,
   },
 });

@@ -1,5 +1,5 @@
-import { ERROR_MESSAGES } from './constants';
-import { ApiError } from '../types';
+import {ERROR_MESSAGES} from './constants';
+import {ApiError} from '../types';
 
 export const getErrorMessage = (error: unknown): string => {
   if (typeof error === 'string') {
@@ -64,6 +64,16 @@ export const formatDate = (
     year: 'numeric',
     month: 'short',
     day: 'numeric',
+  },
+  locale = 'en-IN',
+): string => new Intl.DateTimeFormat(locale, options).format(new Date(date));
+
+export const formatTime = (
+  date: string | Date,
+  options: Intl.DateTimeFormatOptions = {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
   },
   locale = 'en-IN',
 ): string => new Intl.DateTimeFormat(locale, options).format(new Date(date));

@@ -1,9 +1,9 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import {View, StyleSheet, TouchableOpacity} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { AppText } from '../../../../components/common/AppText';
-import { useTheme } from '../../../../hooks/useTheme';
-import { Session, SessionStatus, SessionType } from '../../domain/types';
+import {AppText} from '../../../../components/common/AppText';
+import {useTheme} from '../../../../hooks/useTheme';
+import {Session, SessionStatus, SessionType} from '../../domain/types';
 
 interface SessionCardProps {
   session: Session;
@@ -12,53 +12,55 @@ interface SessionCardProps {
 
 const STATUS_CONFIG: Record<
   SessionStatus,
-  { label: string; iconName: string; color: string }
+  {label: string; iconName: string; color: string}
 > = {
   active: {
     label: 'Active',
     iconName: 'radio-button-checked',
     color: '#22C55E',
   },
-  pending: { label: 'Pending', iconName: 'schedule', color: '#F59E0B' },
-  completed: { label: 'Completed', iconName: 'check-circle', color: '#6B7280' },
-  cancelled: { label: 'Cancelled', iconName: 'block', color: '#EF4444' },
+  pending: {label: 'Pending', iconName: 'schedule', color: '#F59E0B'},
+  completed: {label: 'Completed', iconName: 'check-circle', color: '#6B7280'},
+  cancelled: {label: 'Cancelled', iconName: 'block', color: '#EF4444'},
 };
 
-const TYPE_CONFIG: Record<SessionType, { label: string; iconName: string }> = {
-  chat: { label: 'Chat', iconName: 'chat' },
-  call: { label: 'Call', iconName: 'phone' },
-  video: { label: 'Video', iconName: 'videocam' },
+const TYPE_CONFIG: Record<SessionType, {label: string; iconName: string}> = {
+  chat: {label: 'Chat', iconName: 'chat'},
+  call: {label: 'Call', iconName: 'phone'},
 };
 
-const formatTime = (isoTime: string): string => {
+const formatDateTime = (isoTime: string): string => {
+  if (!isoTime) {
+    return '-';
+  }
   const date = new Date(isoTime);
-  return date.toLocaleTimeString('en-IN', {
+  return date.toLocaleString('en-IN', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
     hour12: true,
   });
 };
 
-const formatDuration = (seconds: number): string => {
-  if (seconds === 0) return '--';
-  const minutes = Math.floor(seconds / 60);
-  const remainingSec = seconds % 60;
-  if (minutes === 0) return `${seconds} sec`;
-  if (remainingSec === 0) return `${minutes} min`;
-  return `${minutes} min ${remainingSec} sec`;
-};
-
-const formatDate = (isoTime: string): string => {
-  const date = new Date(isoTime);
-  return date.toLocaleDateString('en-IN', {
-    day: 'numeric',
-    month: 'short',
-  });
+const formatDuration = (
+  minutes: number | undefined,
+  seconds: number | undefined,
+): string => {
+  const totalMinutes = minutes || 0;
+  if (totalMinutes === 0 && (!seconds || seconds === 0)) {
+    return '0 min';
+  }
+  if (seconds && seconds > 0 && totalMinutes === 0) {
+    return `${Math.ceil(seconds / 60)} min`;
+  }
+  return `${totalMinutes} min`;
 };
 
 export const SessionCard: React.FC<SessionCardProps> = React.memo(
-  ({ session, onPress }) => {
-    const { theme } = useTheme();
+  ({session, onPress}) => {
+    const {theme} = useTheme();
 
     const statusConfig = STATUS_CONFIG[session.status];
     const typeConfig = TYPE_CONFIG[session.type];
@@ -69,9 +71,8 @@ export const SessionCard: React.FC<SessionCardProps> = React.memo(
         ? theme.colors.info
         : theme.colors.accentPurple;
 
-    const earnedAmount =
-      session.commission != null ? session.commission : session.earnings;
-    const truncatedSessionId = session.id?.slice(0, 8) ?? '';
+    const earnedAmount = session.coinsEarned ?? session.earnings ?? 0;
+    const displayRate = session.ratePerMin ?? 0;
 
     return (
       <TouchableOpacity
@@ -89,7 +90,7 @@ export const SessionCard: React.FC<SessionCardProps> = React.memo(
             <View
               style={[
                 styles.avatar,
-                { backgroundColor: theme.colors.primary + 20 },
+                {backgroundColor: theme.colors.primary + '20'},
               ]}>
               <AppText variant="h5" color={theme.colors.primary}>
                 {session.userName?.charAt(0).toUpperCase() || '?'}
@@ -104,14 +105,6 @@ export const SessionCard: React.FC<SessionCardProps> = React.memo(
                   style={styles.userName}>
                   {session.userName}
                 </AppText>
-                {session.isLive && (
-                  <View style={styles.liveIndicator}>
-                    <View style={styles.liveDot} />
-                    <AppText variant="caption" style={styles.liveText}>
-                      LIVE
-                    </AppText>
-                  </View>
-                )}
               </View>
               <View style={styles.metaRow}>
                 <Icon name={typeConfig.iconName} size={14} color={typeColor} />
@@ -123,24 +116,13 @@ export const SessionCard: React.FC<SessionCardProps> = React.memo(
                 </AppText>
                 <View style={styles.dotSeparator} />
                 <AppText variant="caption" color={theme.colors.textTertiary}>
-                  {formatDate(session.startTime)} • {formatTime(session.startTime)}
+                  {formatDateTime(session.startTime)}
                 </AppText>
               </View>
-              {!!truncatedSessionId && (
-                <AppText
-                  variant="caption"
-                  color={theme.colors.textTertiary}
-                  style={styles.sessionId}>
-                 Session ID: {truncatedSessionId}
-                </AppText>
-              )}
             </View>
           </View>
           <View
-            style={[
-              styles.statusBadge,
-              { backgroundColor: statusColor + '18' },
-            ]}>
+            style={[styles.statusBadge, {backgroundColor: statusColor + '18'}]}>
             <Icon name={statusConfig.iconName} size={12} color={statusColor} />
             <AppText
               variant="caption"
@@ -152,65 +134,55 @@ export const SessionCard: React.FC<SessionCardProps> = React.memo(
         </View>
 
         <View
-          style={[styles.divider, { backgroundColor: theme.colors.border }]}
+          style={[styles.divider, {backgroundColor: theme.colors.border}]}
         />
 
         <View style={styles.cardFooter}>
           <View style={styles.metaItem}>
-            <Icon name="timelapse" size={16} color={theme.colors.textTertiary} />
+            <Icon name="schedule" size={14} color={theme.colors.textTertiary} />
             <AppText variant="caption" color={theme.colors.textSecondary}>
-              {formatDuration(session.durationSec)}
+              {formatDuration(session.durationMinutes, session.durationSec)} min
             </AppText>
           </View>
           <View style={styles.metaItem}>
-            {[1, 2, 3, 4, 5].map(i => (
-              <Icon
-                key={i}
-                name={session.rating && i <= session.rating ? 'star' : 'star-outline'}
-                size={16}
-                color={theme.colors.warning}
-              />
-            ))}
+            <Icon
+              name="account-balance-wallet"
+              size={14}
+              color={theme.colors.textTertiary}
+            />
+            <AppText variant="caption" color={theme.colors.textSecondary}>
+              ₹{displayRate}/min
+            </AppText>
           </View>
           <View style={styles.amountContainer}>
             {earnedAmount > 0 ? (
               <>
                 <AppText variant="label" color={theme.colors.success}>
-                  ₹{earnedAmount}
+                  {session.type === SessionType.CALL ? '₹' : ''}
+                  {earnedAmount}
                 </AppText>
-                <AppText variant="caption" color={theme.colors.textTertiary} style={styles.earningsLabel}>
-                  Earned
+                <AppText
+                  variant="caption"
+                  color={theme.colors.textTertiary}
+                  style={styles.earningsLabel}>
+                  Coins Earned
                 </AppText>
               </>
             ) : (
               <AppText variant="caption" color={theme.colors.textTertiary}>
-                No earnings
+                0 coins
               </AppText>
             )}
           </View>
-          {/* <TouchableOpacity
-            style={[
-              styles.actionButton,
-              {
-                backgroundColor: theme.colors.primary + 20
-                // session.status === SessionStatus.ACTIVE
-                //   ? theme.colors.primary
-                //   : theme.colors.surfaceSecondary,
-              },
-            ]}
-            onPress={() => onPress(session)}
-            activeOpacity={0.7}>
-            <Icon
-              name={session.status === SessionStatus.ACTIVE ? 'phone-in-talk' : 'visibility'}
-              size={16}
-              color={
-                session.status === SessionStatus.ACTIVE
-                  ? theme.colors.white
-                  : theme.colors.primary
-              }
-            />
-          </TouchableOpacity> */}
         </View>
+
+        {session.source ? (
+          <View style={styles.sourceRow}>
+            <AppText variant="caption" color={theme.colors.textTertiary}>
+              Source: {session.source}
+            </AppText>
+          </View>
+        ) : null}
       </TouchableOpacity>
     );
   },
@@ -224,7 +196,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 16,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.05,
     shadowRadius: 8,
     elevation: 2,
@@ -258,31 +230,6 @@ const styles = StyleSheet.create({
   userName: {
     fontWeight: '600',
     flex: 1,
-  },
-  sessionId: {
-    marginTop: 2,
-    fontSize: 10,
-  },
-  liveIndicator: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(34, 197, 94, 0.15)',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 12,
-    marginLeft: 8,
-  },
-  liveDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: '#22C55E',
-    marginRight: 4,
-  },
-  liveText: {
-    color: '#22C55E',
-    fontWeight: '600',
-    fontSize: 10,
   },
   metaRow: {
     flexDirection: 'row',
@@ -321,6 +268,7 @@ const styles = StyleSheet.create({
   cardFooter: {
     flexDirection: 'row',
     alignItems: 'center',
+    flexWrap: 'wrap',
   },
   metaItem: {
     flexDirection: 'row',
@@ -337,11 +285,8 @@ const styles = StyleSheet.create({
     fontSize: 10,
     marginTop: 2,
   },
-  actionButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    alignItems: 'center',
-    justifyContent: 'center',
+  sourceRow: {
+    marginTop: 10,
+    alignItems: 'flex-end',
   },
 });

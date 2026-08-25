@@ -1,15 +1,13 @@
-import {useState, useCallback, useEffect, useMemo, useRef} from 'react';
-import {
-  Session,
-  FilterType,
-  SessionTypeFilter,
-  SessionType,
-  SessionStatus,
-} from '../../domain/types';
-import {sessionsApi} from '../../../../services/api/sessionHistory/sessions.service';
-import {AstrologerSession} from '../../../../services/api/sessionHistory/sessions.types';
+import {useState, useCallback, useEffect, useMemo} from 'react';
+import {Session, SessionStatus, SessionType} from '../../domain/types';
+import {callHistoryApi} from '../../../../services/api/callHistory/callHistory.service';
+import {chatHistoryApi} from '../../../../services/api/chatHistory/chatHistory.service';
+import {CallHistoryItem} from '../../../../services/api/callHistory/callHistory.types';
+import {AstrologerChatHistoryItem} from '../../../../services/api/chatHistory/chatHistory.types';
 
-const PAGE_LIMIT = 10;
+const CALL_LIMIT = 10;
+const CHAT_LIMIT = 12;
+const MAX_AUTO_CHAT_PAGES = 5;
 
 const mapApiStatus = (status: string): SessionStatus => {
   switch (status?.toUpperCase()) {
@@ -27,340 +25,233 @@ const mapApiStatus = (status: string): SessionStatus => {
   }
 };
 
-const transformApiSessions = (data: AstrologerSession[]): Session[] =>
-  (data || []).map((item: AstrologerSession, index: number) => {
-    const rawId = item.sessionId ?? (item as any).id ?? item.chatId;
-    const id =
-      rawId != null && String(rawId).length > 0
-        ? String(rawId)
-        : `session-${item.userId ?? 'u'}-${item.startedAt ?? index}-${index}`;
-
-    return {
-      id,
-      userId: item.userId,
-      userName: (item.userName || '').trim(),
-      userPhone: `${item.userCountryCode} ${item.userMobile}`,
-      type: item.sessionType === 'CALL' ? SessionType.CALL : SessionType.CHAT,
-      status: mapApiStatus(item.status),
-      startTime: item.startedAt,
-      endTime: item.endedAt || undefined,
-      duration: item.durationSec,
-      durationMinutes: item.durationMinutes,
-      durationSec: item.durationSec,
-      earnings: item.coinsEarned,
-      commission: item.commission != null ? item.commission : null,
-      rating: item.rating ?? undefined,
-      isLive: item.status === 'ONGOING',
-      orderId: undefined,
-      notes: undefined,
-      chatId: item.chatId,
-      birthDate: item.birthDate,
-      birthPlace: item.birthPlace,
-      birthTime: item.birthTime,
-      ratePerMin: item.ratePerMin,
-      reviewComment: item.reviewComment,
-    };
-  });
-
-interface TabData {
-  sessions: Session[];
-  page: number;
-  totalPages: number;
-  totalCount: number;
-  isLoading: boolean;
-  isLoadingMore: boolean;
-  refreshing: boolean;
-  error: string | null;
-  loaded: boolean;
-}
-
-const createEmptyTab = (): TabData => ({
-  sessions: [],
-  page: 0,
-  totalPages: 1,
-  totalCount: 0,
-  isLoading: false,
-  isLoadingMore: false,
-  refreshing: false,
-  error: null,
-  loaded: false,
+const mapCallItemToSession = (item: CallHistoryItem): Session => ({
+  id: item.sessionId,
+  userId: '',
+  userName: item.userName || 'Unknown',
+  userPhone: `${item.userCountryCode} ${item.userMobile}`.trim(),
+  type: SessionType.CALL,
+  status: mapApiStatus(item.status),
+  startTime: item.startedAt || item.createdAt,
+  endTime: item.endedAt || undefined,
+  duration: item.durationSec || 0,
+  durationMinutes: item.durationMinutes,
+  durationSec: item.durationSec,
+  earnings: item.coinsEarned,
+  commission: item.commission,
+  rating: undefined,
+  isLive: false,
+  source: item.source,
+  ratePerMin: item.ratePerMin,
+  coinsEarned: item.coinsEarned,
+  roomId: item.roomId,
+  userCountryCode: item.userCountryCode,
+  userMobile: item.userMobile,
+  lastMessage: item.lastMessage,
 });
 
-const getTabKey = (
-  sessionType: SessionTypeFilter,
-  filter: FilterType,
-): string => `${sessionType}:${filter}`;
-
-const buildApiFilter = (
-  sessionType: SessionTypeFilter,
-  page: number,
-): {page: number; limit: number; sessionType?: string} => {
-  const filter: {page: number; limit: number; sessionType?: string} = {
-    page,
-    limit: PAGE_LIMIT,
-  };
-  if (sessionType === SessionTypeFilter.CHAT) {
-    filter.sessionType = 'CHAT';
-  } else if (sessionType === SessionTypeFilter.CALL) {
-    filter.sessionType = 'CALL';
-  }
-  return filter;
-};
-
-// Safety filter so displayed data always matches the selected tab, independent
-// of how the server applies the request filter.
-const matchesTab = (
-  session: Session,
-  sessionType: SessionTypeFilter,
-  filter: FilterType,
-): boolean => {
-  if (sessionType !== SessionTypeFilter.ALL && session.type !== sessionType) {
-    return false;
-  }
-  if (filter === FilterType.COMPLETED) {
-    return session.status === SessionStatus.COMPLETED;
-  }
-  if (filter === FilterType.CANCELLED) {
-    return session.status === SessionStatus.CANCELLED;
-  }
-  return true;
-};
-
-const dedupeById = (sessions: Session[]): Session[] => {
-  const seen = new Set<string>();
-  const result: Session[] = [];
-  for (const session of sessions) {
-    if (session.id && seen.has(session.id)) {
-      continue;
-    }
-    if (session.id) {
-      seen.add(session.id);
-    }
-    result.push(session);
-  }
-  return result;
-};
+const mapChatItemToSession = (item: AstrologerChatHistoryItem): Session => ({
+  id: item.sessionId,
+  userId: '',
+  userName: item.userName || 'Unknown',
+  userPhone: undefined,
+  type: SessionType.CHAT,
+  status: mapApiStatus(item.status),
+  startTime: item.createdAt,
+  endTime: undefined,
+  duration: (item.durationMinutes || 0) * 60,
+  durationMinutes: item.durationMinutes,
+  durationSec: 0,
+  earnings: item.coinsEarned,
+  commission: item.commission,
+  rating: item.rating ?? undefined,
+  isLive: false,
+  source: item.source,
+  ratePerMin: item.ratePerMin,
+  coinsEarned: item.coinsEarned,
+  roomId: item.roomId,
+  birthPlace: item.birthPlace,
+  reviewComment: item.reviewComment ?? undefined,
+});
 
 export const useSessions = () => {
-  const [activeFilter, setActiveFilter] = useState<FilterType>(FilterType.ALL);
-  const [activeSessionType, setActiveSessionType] = useState<SessionTypeFilter>(
-    SessionTypeFilter.ALL,
+  const [activeType, setActiveType] = useState<'CALL' | 'CHAT'>('CALL');
+  const [activeStatus, setActiveStatus] = useState<'COMPLETED' | 'CANCELLED'>(
+    'COMPLETED',
   );
+
+  const [sessions, setSessions] = useState<Session[]>([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+
   const [selectedSession, setSelectedSession] = useState<Session | null>(null);
 
-  const [sessionsByTab, setSessionsByTab] = useState<Record<string, TabData>>(
-    {},
-  );
-
-  // Mirror of `sessionsByTab` for synchronous reads inside async callbacks.
-  const tabDataRef = useRef<Record<string, TabData>>({});
-  // Monotonic request counter per tab to drop stale responses.
-  const latestReqByTab = useRef<Record<string, number>>({});
-  const reqCounter = useRef(0);
-
-  const setTabState = useCallback(
-    (
-      key: string,
-      patch: Partial<TabData> | ((prev: TabData) => Partial<TabData>),
-    ) => {
-      setSessionsByTab(prev => {
-        const current = prev[key] || createEmptyTab();
-        const next = typeof patch === 'function' ? patch(current) : patch;
-        const updated = {...current, ...next};
-        tabDataRef.current = {...prev, [key]: updated};
-        return tabDataRef.current;
-      });
-    },
-    [],
-  );
-
-  const fetchTab = useCallback(
-    async (sessionType: SessionTypeFilter, filter: FilterType) => {
-      const key = getTabKey(sessionType, filter);
-      const myReq = ++reqCounter.current;
-      latestReqByTab.current[key] = myReq;
-
-      setTabState(key, {isLoading: true, error: null});
-
-      try {
-        const response = await sessionsApi.getAstrologerSessions(
-          buildApiFilter(sessionType, 1),
-        );
-        const payload = response?.getAstrologerSessions;
-
-        // Stale response — a newer request for this tab has started.
-        if (latestReqByTab.current[key] !== myReq) {
-          return;
-        }
-
-        if (!payload?.success) {
-          throw new Error('Request failed');
-        }
-
-        const transformed = transformApiSessions(payload.data).filter(session =>
-          matchesTab(session, sessionType, filter),
-        );
-
-        setTabState(key, {
-          sessions: dedupeById(transformed),
-          page: Number(payload.currentPage) || 1,
-          totalPages: Number(payload.totalPages) || 1,
-          totalCount: Number(payload.totalCount) || 0,
-          isLoading: false,
-          loaded: true,
-          error: null,
-        });
-      } catch (err) {
-        if (latestReqByTab.current[key] !== myReq) {
-          return;
-        }
-        setTabState(key, {
-          isLoading: false,
-          error: 'Failed to load sessions',
-        });
-      }
-    },
-    [setTabState],
-  );
-
-  const refresh = useCallback(async () => {
-    const key = getTabKey(activeSessionType, activeFilter);
-    const myReq = ++reqCounter.current;
-    latestReqByTab.current[key] = myReq;
-
-    setTabState(key, {refreshing: true, error: null});
+  const fetchInitial = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    setPage(1);
+    setSessions([]);
+    setLoaded(false);
 
     try {
-      const response = await sessionsApi.getAstrologerSessions(
-        buildApiFilter(activeSessionType, 1),
-      );
-      const payload = response?.getAstrologerSessions;
+      if (activeType === 'CALL') {
+        const response = await callHistoryApi.getAstrologerCallHistory({
+          page: 1,
+          limit: CALL_LIMIT,
+          status: activeStatus,
+        });
+        const payload = response?.getAstrologerCallHistory;
+        if (!payload?.success) throw new Error('Failed to load call history');
 
-      if (latestReqByTab.current[key] !== myReq) {
-        return;
+        const mapped = (payload.data || []).map(mapCallItemToSession);
+        setSessions(mapped);
+        setTotalPages(payload.totalPages || 1);
+        setTotalCount(payload.totalCount || 0);
+        setHasMore((payload.currentPage || 1) < (payload.totalPages || 1));
+      } else {
+        let currentPage = 1;
+        let allMapped: Session[] = [];
+        let filtered: Session[] = [];
+        let totalPages = 1;
+        let totalCount = 0;
+
+        while (currentPage <= MAX_AUTO_CHAT_PAGES) {
+          const response = await chatHistoryApi.getAstrologerChatHistory({
+            page: currentPage,
+            limit: CHAT_LIMIT,
+          });
+          const payload = response?.getAstrologerChatHistory;
+          if (!payload?.success) throw new Error('Failed to load chat history');
+
+          const mapped = (payload.data || []).map(mapChatItemToSession);
+          allMapped = [...allMapped, ...mapped];
+          const statusFilter = activeStatus.toLowerCase() as SessionStatus;
+          filtered = allMapped.filter(s => s.status === statusFilter);
+
+          totalPages = payload.totalPages || 1;
+          totalCount = payload.totalCount || 0;
+
+          if (filtered.length > 0 || currentPage >= totalPages) {
+            break;
+          }
+          currentPage++;
+        }
+
+        setSessions(filtered);
+        setPage(currentPage);
+        setTotalPages(totalPages);
+        setTotalCount(totalCount);
+        setHasMore(currentPage < totalPages);
       }
-
-      if (!payload?.success) {
-        throw new Error('Request failed');
-      }
-
-      const transformed = transformApiSessions(payload.data).filter(session =>
-        matchesTab(session, activeSessionType, activeFilter),
-      );
-
-      setTabState(key, {
-        sessions: dedupeById(transformed),
-        page: Number(payload.currentPage) || 1,
-        totalPages: Number(payload.totalPages) || 1,
-        totalCount: Number(payload.totalCount) || 0,
-        refreshing: false,
-        loaded: true,
-        error: null,
-      });
+      setLoaded(true);
     } catch (err) {
-      if (latestReqByTab.current[key] !== myReq) {
-        return;
-      }
-      setTabState(key, {refreshing: false, error: 'Failed to refresh'});
+      setError(err instanceof Error ? err.message : 'Failed to load sessions');
+      setLoaded(true);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
     }
-  }, [activeSessionType, activeFilter, setTabState]);
+  }, [activeType, activeStatus]);
 
-  const loadMore = useCallback(() => {
-    const key = getTabKey(activeSessionType, activeFilter);
-    const current = tabDataRef.current[key] || createEmptyTab();
+  const refresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchInitial();
+  }, [fetchInitial]);
 
-    // Only one pagination request may run at a time.
-    if (
-      current.isLoading ||
-      current.isLoadingMore ||
-      current.refreshing ||
-      current.page >= current.totalPages
-    ) {
-      return;
-    }
+  const loadMore = useCallback(async () => {
+    if (loadingMore || loading || refreshing) return;
+    const nextPage = page + 1;
+    if (nextPage > totalPages) return;
 
-    const nextPage = current.page + 1;
-    const myReq = ++reqCounter.current;
-    latestReqByTab.current[key] = myReq;
+    setLoadingMore(true);
+    try {
+      if (activeType === 'CALL') {
+        const response = await callHistoryApi.getAstrologerCallHistory({
+          page: nextPage,
+          limit: CALL_LIMIT,
+          status: activeStatus,
+        });
+        const payload = response?.getAstrologerCallHistory;
+        if (!payload?.success) throw new Error('Failed to load more');
 
-    setTabState(key, {isLoadingMore: true});
+        const mapped = (payload.data || []).map(mapCallItemToSession);
+        setSessions(prev => [...prev, ...mapped]);
+        setTotalPages(payload.totalPages || totalPages);
+        setTotalCount(payload.totalCount || totalCount);
+        setPage(nextPage);
+        setHasMore(nextPage < (payload.totalPages || totalPages));
+      } else {
+        const response = await chatHistoryApi.getAstrologerChatHistory({
+          page: nextPage,
+          limit: CHAT_LIMIT,
+        });
+        const payload = response?.getAstrologerChatHistory;
+        if (!payload?.success) throw new Error('Failed to load more');
 
-    (async () => {
-      try {
-        const response = await sessionsApi.getAstrologerSessions(
-          buildApiFilter(activeSessionType, nextPage),
-        );
-        const payload = response?.getAstrologerSessions;
-
-        if (latestReqByTab.current[key] !== myReq) {
-          return;
-        }
-
-        if (!payload?.success) {
-          throw new Error('Request failed');
-        }
-
-        const transformed = transformApiSessions(payload.data).filter(session =>
-          matchesTab(session, activeSessionType, activeFilter),
-        );
-
-        setTabState(key, prev => ({
-          sessions: dedupeById([...prev.sessions, ...transformed]),
-          page: Number(payload.currentPage) || nextPage,
-          totalPages: Number(payload.totalPages) || prev.totalPages,
-          totalCount: Number(payload.totalCount) || prev.totalCount,
-          isLoadingMore: false,
-        }));
-      } catch (err) {
-        if (latestReqByTab.current[key] !== myReq) {
-          return;
-        }
-        setTabState(key, {isLoadingMore: false});
+        const mapped = (payload.data || []).map(mapChatItemToSession);
+        const statusFilter = activeStatus.toLowerCase() as SessionStatus;
+        const filtered = mapped.filter(s => s.status === statusFilter);
+        setSessions(prev => [...prev, ...filtered]);
+        setTotalPages(payload.totalPages || totalPages);
+        setTotalCount(payload.totalCount || totalCount);
+        setPage(nextPage);
+        setHasMore(nextPage < (payload.totalPages || totalPages));
       }
-    })();
-  }, [activeSessionType, activeFilter, setTabState]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load more');
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [
+    activeType,
+    activeStatus,
+    page,
+    totalPages,
+    totalCount,
+    loadingMore,
+    loading,
+    refreshing,
+  ]);
 
-  // Refetch whenever the selected tab changes (reset to page 1).
   useEffect(() => {
-    fetchTab(activeSessionType, activeFilter);
-  }, [activeSessionType, activeFilter, fetchTab]);
-
-  const currentKey = getTabKey(activeSessionType, activeFilter);
-  const current = sessionsByTab[currentKey] || createEmptyTab();
-
-  const filteredSessions = current.sessions;
+    fetchInitial();
+  }, [fetchInitial]);
 
   const stats = useMemo(
     () => ({
-      totalSessions: current.totalCount,
+      totalSessions: totalCount,
       activeSessions: 0,
       pendingSessions: 0,
       completedSessions: 0,
       cancelledSessions: 0,
     }),
-    [current.totalCount],
+    [totalCount],
   );
 
   return {
-    sessions: filteredSessions,
-    filteredSessions,
-    activeFilter,
-    setActiveFilter,
-    activeSessionType,
-    setActiveSessionType,
-    isLoading: current.isLoading,
-    isLoadingMore: current.isLoadingMore,
-    refreshing: current.refreshing,
-    error: current.error,
+    sessions,
+    activeType,
+    setActiveType,
+    activeStatus,
+    setActiveStatus,
+    loading,
+    loadingMore,
+    refreshing,
+    error,
     refresh,
     loadMore,
+    hasMore,
     selectedSession,
     setSelectedSession,
-    earningsToday: 0,
-    earningsWeekly: 0,
-    earningsMonthly: 0,
-    earningsTotal: 0,
-    earningsPendingPayout: 0,
     stats,
+    loaded,
+    totalCount,
   };
 };

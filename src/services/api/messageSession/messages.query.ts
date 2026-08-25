@@ -1,5 +1,3 @@
-// messages.query.ts
-
 export const GET_SESSION_MESSAGES_QUERY = `
   query GetSessionMessages($sessionId: String!) {
     getSessionMessages(sessionId: $sessionId) {
@@ -11,6 +9,7 @@ export const GET_SESSION_MESSAGES_QUERY = `
         sender
         message
         image
+        time
         createdAt
       }
     }

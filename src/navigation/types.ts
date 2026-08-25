@@ -1,6 +1,7 @@
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
-import { CompositeNavigationProp, RouteProp } from '@react-navigation/native';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
+import {CompositeNavigationProp, RouteProp} from '@react-navigation/native';
+import {Session} from '../features/sessions/domain/types';
 
 export type RootStackParamList = {
   Splash: undefined;
@@ -28,7 +29,12 @@ export type RootStackParamList = {
     callerName: string;
   };
   EditProfile: undefined;
-  ChatStack: { sessionId?: string };
+  ChatStack: {sessionId?: string};
+  SessionDetailScreen: {
+    sessionId: string;
+    roomId?: string;
+    session?: Session;
+  };
 };
 
 export type AuthStackParamList = {
@@ -44,7 +50,7 @@ export type MainTabParamList = {
   Availability: undefined;
   Wallet: undefined;
   Account: undefined;
-  ChatScreen: { chatId: string };
+  ChatScreen: {chatId: string};
 };
 
 export type HomeStackParamList = {

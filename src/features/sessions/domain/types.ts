@@ -41,6 +41,15 @@ export interface Session {
   orderId?: string;
   isLive: boolean;
   notes?: string;
+  source?: string;
+  ratePerMin?: number;
+  coinsEarned?: number;
+  roomId?: string;
+  userCountryCode?: string;
+  userMobile?: string;
+  birthPlace?: string;
+  reviewComment?: string;
+  lastMessage?: string;
 }
 
 export interface Earnings {
