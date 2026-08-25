@@ -1,9 +1,9 @@
 import React from 'react';
-import {View, StyleSheet, TouchableOpacity} from 'react-native';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import {AppText} from '../../../../components/common/AppText';
-import {useTheme} from '../../../../hooks/useTheme';
-import {Session, SessionStatus, SessionType} from '../../domain/types';
+import { AppText } from '../../../../components/common/AppText';
+import { useTheme } from '../../../../hooks/useTheme';
+import { Session, SessionStatus, SessionType } from '../../domain/types';
 
 interface SessionCardProps {
   session: Session;
@@ -12,16 +12,16 @@ interface SessionCardProps {
 
 const STATUS_CONFIG: Record<
   SessionStatus,
-  {label: string; iconName: string; color: string}
+  { label: string; iconName: string; color: string }
 > = {
   active: {
     label: 'Active',
     iconName: 'radio-button-checked',
     color: '#22C55E',
   },
-  pending: {label: 'Pending', iconName: 'schedule', color: '#F59E0B'},
-  completed: {label: 'Completed', iconName: 'check-circle', color: '#6B7280'},
-  cancelled: {label: 'Cancelled', iconName: 'block', color: '#EF4444'},
+  pending: { label: 'Pending', iconName: 'schedule', color: '#F59E0B' },
+  completed: { label: 'Completed', iconName: 'check-circle', color: '#6B7280' },
+  cancelled: { label: 'Cancelled', iconName: 'block', color: '#EF4444' },
 };
 
 const formatDateTime = (isoTime: string): string => {
@@ -62,8 +62,8 @@ const formatRatingStars = (rating?: number | null): string => {
 };
 
 export const SessionCard: React.FC<SessionCardProps> = React.memo(
-  ({session, onPress}) => {
-    const {theme} = useTheme();
+  ({ session, onPress }) => {
+    const { theme } = useTheme();
 
     const statusConfig = STATUS_CONFIG[session.status];
     const statusColor = statusConfig.color;
@@ -86,7 +86,7 @@ export const SessionCard: React.FC<SessionCardProps> = React.memo(
             <View
               style={[
                 styles.avatar,
-                {backgroundColor: theme.colors.primary + '20'},
+                { backgroundColor: theme.colors.primary + '20' },
               ]}>
               <AppText variant="h5" color={theme.colors.primary}>
                 {session.userName?.charAt(0).toUpperCase() || '?'}
@@ -103,7 +103,7 @@ export const SessionCard: React.FC<SessionCardProps> = React.memo(
             </View>
           </View>
           <View
-            style={[styles.statusBadge, {backgroundColor: statusColor + '18'}]}>
+            style={[styles.statusBadge, { backgroundColor: statusColor + '18' }]}>
             <Icon name={statusConfig.iconName} size={12} color={statusColor} />
             <AppText
               variant="caption"
@@ -115,7 +115,7 @@ export const SessionCard: React.FC<SessionCardProps> = React.memo(
         </View>
 
         <View
-          style={[styles.divider, {backgroundColor: theme.colors.border}]}
+          style={[styles.divider, { backgroundColor: theme.colors.border }]}
         />
 
         <View style={styles.fields}>
@@ -144,11 +144,13 @@ export const SessionCard: React.FC<SessionCardProps> = React.memo(
             theme={theme}
           />
           <FieldRow
-            label="Commission"
+            label="Earned"
             value={
-              session.commission != null ? String(session.commission) : '-'
+              `₹${session.commission != null ? String(session.commission) : '-'}`
             }
             theme={theme}
+            valueColor="#22C55E"
+
           />
           {showRating ? (
             <FieldRow
@@ -169,7 +171,7 @@ const FieldRow: React.FC<{
   value: string;
   theme: any;
   valueColor?: string;
-}> = ({label, value, theme, valueColor}) => (
+}> = ({ label, value, theme, valueColor }) => (
   <View style={styles.fieldRow}>
     <AppText variant="caption" color={theme.colors.textTertiary}>
       {label}
@@ -191,7 +193,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 16,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 8,
     elevation: 2,
