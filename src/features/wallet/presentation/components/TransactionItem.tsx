@@ -1,21 +1,22 @@
-import React, {memo} from 'react';
-import {View, StyleSheet} from 'react-native';
+import React, { memo } from 'react';
+import { View, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import {useTheme} from '../../../../hooks/useTheme';
-import {AppText} from '../../../../components/common/AppText';
-import {spacing, borderRadius} from '../../../../theme/spacing';
-import {Transaction} from '../../domain/types';
+import { useTheme } from '../../../../hooks/useTheme';
+import { AppText } from '../../../../components/common/AppText';
+import { spacing, borderRadius } from '../../../../theme/spacing';
+import { Transaction } from '../../domain/types';
 
 interface TransactionItemProps {
   transaction: Transaction;
 }
 
 const TransactionItem: React.FC<TransactionItemProps> = memo(
-  ({transaction}) => {
-    const {theme} = useTheme();
+  ({ transaction }) => {
+    console.log('🔥 TransactionItem Render', transaction);
+    const { theme } = useTheme();
 
-    const formatCoins = (coins?: number): string => {
-      return `${coins ?? 0} coins`;
+    const formatCoins = (amount?: number): string => {
+      return `₹${amount ?? 0}`;
     };
 
     const formatDate = (dateString: string): string => {
@@ -63,11 +64,11 @@ const TransactionItem: React.FC<TransactionItemProps> = memo(
     const isCredit = transaction.type === 'credit';
 
     return (
-      <View style={[styles.container, {backgroundColor: theme.colors.surface}]}>
+      <View style={[styles.container, { backgroundColor: theme.colors.surface }]}>
         <View
           style={[
             styles.iconContainer,
-            {backgroundColor: theme.colors.primary + 20},
+            { backgroundColor: theme.colors.primary + 20 },
           ]}>
           <Icon name={getIconName()} size={22} color={theme.colors.primary} />
         </View>
@@ -97,12 +98,12 @@ const TransactionItem: React.FC<TransactionItemProps> = memo(
             variant="body1"
             color={isCredit ? theme.colors.success : theme.colors.error}
             style={styles.amount}>
-            {isCredit ? '+' : '-'} {formatCoins(transaction.coins)}
+            {isCredit ? '+' : '-'} {formatCoins(transaction.amount)}
           </AppText>
           <View
             style={[
               styles.statusBadge,
-              {backgroundColor: getStatusColor() + '20'},
+              { backgroundColor: getStatusColor() + '20' },
             ]}>
             <AppText variant="caption" color={getStatusColor()}>
               {transaction.status.charAt(0).toUpperCase() +
@@ -126,7 +127,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
     borderRadius: borderRadius.md,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 4,
     elevation: 2,
@@ -163,4 +164,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export {TransactionItem};
+export { TransactionItem };

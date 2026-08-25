@@ -40,7 +40,7 @@ const mapTransactionStatus = (
 const mapTransactionToDomain = (tx: WalletTransaction): Transaction => ({
   id: tx.id,
   type: mapTransactionType(tx.type),
-  amount: tx.coins ?? tx.amount,
+  amount:tx.amount,
   coins: tx.coins,
   status: mapTransactionStatus(tx.type),
   date: tx.createdAt,
@@ -53,9 +53,6 @@ const mapTransactionToDomain = (tx: WalletTransaction): Transaction => ({
 
 export const walletService = {
   async getWalletDashboard(): Promise<WalletDashboard> {
-    console.log('🔥 walletService.getWalletDashboard', {
-      timestamp: new Date().toISOString(),
-    });
     const earningsResponse = await earningsApi.getAstrologerEarnings();
     const earningsData = earningsResponse.getAstrologerEarnings;
     
@@ -70,6 +67,10 @@ export const walletService = {
     const transactions: Transaction[] = (transactionsData?.data || []).map(
       mapTransactionToDomain,
     );
+    console.log(
+  '🔵 Mapped Transactions:',
+  JSON.stringify(transactions, null, 2),
+);
 
     const chartData: ChartData[] = generateChartData();
 
