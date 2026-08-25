@@ -35,6 +35,10 @@ export type RootStackParamList = {
     roomId?: string;
     session?: Session;
   };
+  SessionMessagesScreen: {
+    sessionId: string;
+    userName?: string;
+  };
 };
 
 export type AuthStackParamList = {

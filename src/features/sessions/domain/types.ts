@@ -50,6 +50,7 @@ export interface Session {
   birthPlace?: string;
   reviewComment?: string;
   lastMessage?: string;
+  chatId?: string;
 }
 
 export interface Earnings {

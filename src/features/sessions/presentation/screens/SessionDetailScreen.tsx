@@ -3,6 +3,7 @@ import {
   View,
   StyleSheet,
   ScrollView,
+  TouchableOpacity,
   ActivityIndicator,
   FlatList,
 } from 'react-native';
@@ -16,6 +17,7 @@ import {messagesApi} from '../../../../services/api/messageSession/messages.serv
 import {SessionMessage} from '../../../../services/api/messageSession/messages.types';
 import {Session, SessionType} from '../../domain/types';
 import {formatDate, formatTime} from '../../../../utils/helpers';
+import {SendRemedyModal} from '../components/SendRemedyModal';
 
 const SessionDetailScreen: React.FC = () => {
   const {theme} = useTheme();
@@ -27,6 +29,21 @@ const SessionDetailScreen: React.FC = () => {
   const [messages, setMessages] = useState<SessionMessage[]>([]);
   const [messagesLoading, setMessagesLoading] = useState(false);
   const [messagesError, setMessagesError] = useState<string | null>(null);
+
+  const [showRemedyModal, setShowRemedyModal] = useState(false);
+
+  const handleRemedySend = useCallback(
+    (
+      _sessionId: string,
+      _title: string,
+      _description: string,
+      _type: 'FREE' | 'PAID',
+      _price?: number,
+    ) => {
+      setShowRemedyModal(false);
+    },
+    [],
+  );
 
   const getStatusColor = () => {
     switch (session?.status?.toLowerCase()) {
@@ -382,7 +399,73 @@ const SessionDetailScreen: React.FC = () => {
             />
           )}
         </View>
+
+        <View style={styles.actionContainer}>
+          <TouchableOpacity
+            style={[
+              styles.primaryAction,
+              {
+                borderColor: theme.colors.secondary,
+              },
+            ]}
+            onPress={() => {
+              setShowRemedyModal(true);
+            }}>
+            <Icon name="spa" size={20} color={theme.colors.primary} />
+
+            <AppText style={[styles.actionText, {color: theme.colors.primary}]}>
+              Send Remedy
+            </AppText>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.secondaryAction,
+              {
+                borderColor: theme.colors.secondary,
+              },
+            ]}
+            onPress={() =>
+              navigation.navigate('KundliScreen', {
+                session,
+              })
+            }>
+            <Icon name="chat" size={20} color={theme.colors.primary} />
+
+            <AppText style={[styles.actionText, {color: theme.colors.primary}]}>
+              Kundli
+            </AppText>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.secondaryAction,
+              {
+                borderColor: theme.colors.secondary,
+              },
+            ]}
+            onPress={() =>
+              navigation.navigate('SessionMessagesScreen', {
+                sessionId: session.id,
+                userName: session.userName,
+              })
+            }>
+            <Icon name="message" size={20} color={theme.colors.primary} />
+
+            <AppText style={[styles.actionText, {color: theme.colors.primary}]}>
+              View Message
+            </AppText>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
+
+      <SendRemedyModal
+        visible={showRemedyModal}
+        session={session}
+        existingRemedies={[]}
+        onClose={() => setShowRemedyModal(false)}
+        onSend={handleRemedySend}
+      />
     </ScreenContainer>
   );
 };
@@ -531,6 +614,35 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.1)',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  actionContainer: {
+    marginTop: 20,
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  primaryAction: {
+    padding: 8,
+    borderWidth: 1,
+    borderRadius: 14,
+    borderColor: '#EAB308',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  secondaryAction: {
+    padding: 8,
+    borderWidth: 1,
+    borderRadius: 14,
+    borderColor: '#EAB308',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  actionText: {
+    fontWeight: '600',
+    marginLeft: 1,
+    fontSize: 12,
   },
 });
 

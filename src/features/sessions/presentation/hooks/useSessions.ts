@@ -72,6 +72,7 @@ const mapChatItemToSession = (item: AstrologerChatHistoryItem): Session => ({
   roomId: item.roomId,
   birthPlace: item.birthPlace,
   reviewComment: item.reviewComment ?? undefined,
+  chatId: item.sessionId,
 });
 
 export const useSessions = () => {

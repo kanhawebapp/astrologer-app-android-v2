@@ -70,6 +70,7 @@ import InternetProvider from '../components/NoInternet/InternetProvider';
 import { navigationService } from '../services/navigation/navigationService';
 import OfferScreen from '../features/account/presentation/screens/OfferSecreen';
 import SessionDetailScreen from '../features/sessions/presentation/screens/SessionDetailScreen';
+import SessionMessagesScreen from '../features/sessions/presentation/screens/SessionMessagesScreen';
 import KundliScreen from '../features/sessions/screens/KundliScreen';
 import AllFollowers from '../features/account/presentation/screens/AllFollowers';
 import AnalytcsScreen from '../features/account/presentation/screens/AnalyticsScreen';
@@ -178,6 +179,13 @@ export const RootNavigator: React.FC = () => {
             <Stack.Screen
               name="SessionDetailScreen"
               component={SessionDetailScreen}
+              options={{
+                presentation: 'card',
+              }}
+            />
+            <Stack.Screen
+              name="SessionMessagesScreen"
+              component={SessionMessagesScreen}
               options={{
                 presentation: 'card',
               }}
