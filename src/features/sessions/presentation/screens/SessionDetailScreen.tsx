@@ -26,8 +26,8 @@ const formatDateTime = (isoTime?: string, fallback = '-'): string => {
   return formatDate(isoTime, DATE_TIME_OPTIONS);
 };
 
-const formatDuration = (durationSec?: number | null): string => {
-  const totalSeconds = Math.floor(Number(durationSec || 0));
+const formatDuration = (durationMinutes?: number | null): string => {
+  const totalSeconds = Math.floor(Number(durationMinutes || 0));
 
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
@@ -198,7 +198,7 @@ const SessionDetailScreen: React.FC = () => {
           <InfoRow
             icon="schedule"
             label="Duration"
-            value={formatDuration(session.durationSec)}
+            value={formatDuration(session.durationMinutes)}
             theme={theme}
           />
 
