@@ -48,14 +48,35 @@ class MainActivity : ReactActivity() {
       )
     }
 
-    val action = intent.action ?: return
+    val action = intent.action
     if (
       action != "com.dhwaniastrologer.ACCEPT_CALL" &&
       action != "com.dhwaniastrologer.REJECT_CALL" &&
       action != "com.dhwaniastrologer.ACCEPT_CHAT" &&
       action != "com.dhwaniastrologer.REJECT_CHAT"
     ) {
+      Log.d("MainActivity", "IGNORING non-action intent")
       return
+    }
+
+    if (
+      action == "com.dhwaniastrologer.ACCEPT_CALL" ||
+      action == "com.dhwaniastrologer.ACCEPT_CHAT"
+    ) {
+      Log.d("NATIVE_NOTIFICATION", "ACCEPT button clicked")
+    } else {
+      Log.d("NATIVE_NOTIFICATION", "REJECT button clicked")
+    }
+
+    when (action) {
+      "com.dhwaniastrologer.ACCEPT_CALL" ->
+        Log.d("MainActivity", "ACCEPT_CALL action received")
+      "com.dhwaniastrologer.REJECT_CALL" ->
+        Log.d("MainActivity", "REJECT_CALL action received")
+      "com.dhwaniastrologer.ACCEPT_CHAT" ->
+        Log.d("MainActivity", "ACCEPT_CHAT action received")
+      "com.dhwaniastrologer.REJECT_CHAT" ->
+        Log.d("MainActivity", "REJECT_CHAT action received")
     }
 
     Log.d("MainActivity", "NATIVE_ACTION_RECEIVED action=$action")

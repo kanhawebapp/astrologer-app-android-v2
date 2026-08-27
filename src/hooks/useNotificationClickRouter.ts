@@ -34,6 +34,26 @@ export const useNotificationClickRouter = () => {
       const additionalData = (event?.notification?.additionalData ??
         {}) as Record<string, any>;
 
+      const notificationType = String(
+        additionalData.type ||
+          additionalData.notificationType ||
+          additionalData.requestType ||
+          '',
+      ).toLowerCase();
+
+      const isCustomCallOrChat =
+        notificationType === 'call' ||
+        notificationType === 'call_request' ||
+        notificationType === 'chat' ||
+        notificationType === 'chat_request';
+
+      if (isCustomCallOrChat) {
+        console.log(
+          '[JS_NOTIFICATION] Ignoring custom call/chat notification click',
+        );
+        return;
+      }
+
       // Drive the incoming chat/call UI immediately from the notification
       // payload. This is the source of truth - we do NOT wait for the missed
       // socket event (Socket.IO does not replay it). The socket reconnects

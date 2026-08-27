@@ -6,7 +6,6 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.media.RingtoneManager
 import android.os.Build
@@ -19,9 +18,6 @@ import com.onesignal.notifications.INotification
 import com.onesignal.notifications.INotificationServiceExtension
 import com.onesignal.notifications.INotificationReceivedEvent
 import org.json.JSONObject
-import java.io.InputStream
-import java.net.URL
-
 private data class Quad(
     val title: String,
     val body: String,
@@ -153,10 +149,14 @@ class CallNotificationServiceExtension : INotificationServiceExtension {
         )
 
         if (normalizedType == "call" || normalizedType == "chat") {
+            android.util.Log.d(
+                "NATIVE_NOTIFICATION",
+                "notification received - no action"
+            )
             val inForeground = isAppInForeground(event.context)
             android.util.Log.d(
                 "CallExtension",
-                "ENTERED: CallStyle branch (notificationType=$notificationType). InForeground=$inForeground"
+                "ENTERED: call/chat custom notification branch (notificationType=$notificationType). InForeground=$inForeground"
             )
             android.util.Log.d(
                 "CallExtension",
@@ -501,7 +501,6 @@ class CallNotificationServiceExtension : INotificationServiceExtension {
             additionalData?.optString("issue", "")
         )
 
-        val prefs = context.getSharedPreferences("call_notification_prefs", Context.MODE_PRIVATE)
         val dataJson = JSONObject(mapOf(
             "roomId" to roomId,
             "callId" to callId,
@@ -523,19 +522,9 @@ class CallNotificationServiceExtension : INotificationServiceExtension {
 
         android.util.Log.d("TRACE_NATIVE_2", dataJson)
 
-        val pendingAction = when (requestType) {
-            "chat_request" -> "chat_request"
-            else -> "call_request"
-        }
-
         android.util.Log.d("TRACE_NATIVE_2", dataJson.toString())
 
         android.util.Log.d("TRACE_NATIVE_3", dataJson)
-
-        prefs.edit()
-            .putString("pending_action", pendingAction)
-            .putString("pending_data", dataJson)
-            .apply()
 
         val acceptAction = when (requestType) {
             "chat_request" -> "com.dhwaniastrologer.ACCEPT_CHAT"
@@ -617,85 +606,32 @@ class CallNotificationServiceExtension : INotificationServiceExtension {
         )
         createNotificationChannel(context)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && requestType != "chat_request") {
-            // Notification.CallStyle requires API 28+. Chat requests use the
-            // full-screen NotificationCompat builder below (CallStyle forces
-            // system "Answer"/"Decline" labels and its button-text setters are
-            // not available in this project's AndroidX/compile setup).
-            val personBuilder = android.app.Person.Builder()
-                .setName(callerName as CharSequence)
-
-            val avatarBitmap = loadAvatarBitmap(context, callerAvatar)
-            if (avatarBitmap != null) {
-                personBuilder.setIcon(android.graphics.drawable.Icon.createWithBitmap(avatarBitmap))
-            }
-
-            android.util.Log.d(
-                "CallExtension",
-                "API=${Build.VERSION.SDK_INT} [showCustomNotification] requestType=$requestType Building CallStyle.forIncomingCall() person=${personBuilder.build().name}"
-            )
-            val callStyle = Notification.CallStyle.forIncomingCall(
-                personBuilder.build(),
-                rejectPendingIntent,
-                acceptPendingIntent
-            )
-
-            callStyle.setAnswerButtonColorHint(
-                ContextCompat.getColor(context, R.color.call_accept_green)
-            )
-            callStyle.setDeclineButtonColorHint(
-                ContextCompat.getColor(context, R.color.call_reject_red)
-            )
-
-            val notification = Notification.Builder(context, "incoming_call_channel")
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle(title)
-                .setCategory(Notification.CATEGORY_CALL)
-                .setPriority(Notification.PRIORITY_HIGH)
-                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE))
-                .setVibrate(longArrayOf(0, 1000, 500, 1000))
-                .setOngoing(true)
-                .setFullScreenIntent(acceptPendingIntent, true)
-                .setVisibility(Notification.VISIBILITY_PUBLIC)
-                .setStyle(callStyle)
-                .setTimeoutAfter(60000)
-                .setColor(ContextCompat.getColor(context, R.color.call_accept_green))
-                .build()
-
-            android.util.Log.d(
-                "CallExtension",
-                "API=${Build.VERSION.SDK_INT} [showCustomNotification] about to call builder.setStyle(callStyle), category=${notification.category}, channelId=${notification.channelId}, smallIcon=${notification.icon}, contentTitle=$title, contentText=$body, ongoing=${notification.flags and Notification.FLAG_ONGOING_EVENT != 0}, callStyleApplied=true"
-            )
-            android.util.Log.d(
-                "CallExtension",
-                "API=${Build.VERSION.SDK_INT} [showCustomNotification] DUMP notification before notify: [icon=$title, channel=incoming_call_channel, category=CATEGORY_CALL, priority=HIGH, ongoing=true, fullScreen=true, style=CallStyle, notificationId=$notificationId, requestType=$requestType, acceptAction=$acceptAction, rejectAction=$rejectAction]"
-            )
-
-            val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            manager.notify(notificationId, notification)
-            android.util.Log.d(
-                "CallExtension",
-                "API=${Build.VERSION.SDK_INT} [showCustomNotification] NotificationManager.notify() EXECUTED with id=$notificationId notificationId=$notificationId requestType=$requestType"
-            )
-        } else {
-            // Fallback path: API < 28 (CallStyle unavailable) OR chat requests.
-            // NotificationCompat.Builder works from API 23+, and on API 26+ it
-            // posts to the incoming_call_channel created above.
-            val chatNotification = buildFullScreenNotification(
-                context,
-                title,
-                body,
-                acceptLabel,
-                rejectLabel,
-                acceptPendingIntent,
-                rejectPendingIntent
-            )
-            val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            manager.notify(notificationId, chatNotification)
-        }
+        val notification = buildActionOnlyNotification(
+            context,
+            title,
+            body,
+            acceptLabel,
+            rejectLabel,
+            acceptPendingIntent,
+            rejectPendingIntent
+        )
+        android.util.Log.d(
+            "CallExtension",
+            "API=${Build.VERSION.SDK_INT} [showCustomNotification] DUMP notification before notify: [icon=$title, channel=incoming_call_channel, category=CATEGORY_CALL, priority=HIGH, ongoing=true, fullScreen=false, contentIntent=none, style=none, notificationId=$notificationId, requestType=$requestType, acceptAction=$acceptAction, rejectAction=$rejectAction]"
+        )
+        val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        manager.notify(notificationId, notification)
+        android.util.Log.d(
+            "NATIVE_NOTIFICATION",
+            "notification displayed - action buttons only"
+        )
+        android.util.Log.d(
+            "CallExtension",
+            "API=${Build.VERSION.SDK_INT} [showCustomNotification] NotificationManager.notify() EXECUTED with id=$notificationId notificationId=$notificationId requestType=$requestType"
+        )
     }
 
-    private fun buildFullScreenNotification(
+    private fun buildActionOnlyNotification(
         context: Context,
         title: String,
         body: String,
@@ -717,34 +653,12 @@ class CallNotificationServiceExtension : INotificationServiceExtension {
             .setAutoCancel(false)
             .setOngoing(true)
             .setTimeoutAfter(60000)
-            .setFullScreenIntent(acceptPendingIntent, true)
+            .setContentIntent(null)
             .addAction(R.drawable.ic_accept_call, acceptLabel, acceptPendingIntent)
             .addAction(R.drawable.ic_reject_call, rejectLabel, rejectPendingIntent)
             .setColor(ContextCompat.getColor(context, R.color.call_accept_green))
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .build()
-    }
-
-    private fun loadAvatarBitmap(context: Context, imageUrl: String?): Bitmap? {
-        if (imageUrl.isNullOrBlank() || !imageUrl.startsWith("http")) {
-            return null
-        }
-
-        return try {
-            val url = URL(imageUrl)
-            val connection = url.openConnection() as java.net.HttpURLConnection
-            connection.doInput = true
-            connection.connectTimeout = 5000
-            connection.readTimeout = 5000
-            connection.connect()
-            val input: InputStream = connection.inputStream
-            val bitmap = BitmapFactory.decodeStream(input)
-            input.close()
-            connection.disconnect()
-            bitmap
-        } catch (e: Exception) {
-            null
-        }
     }
 
     private fun createNotificationChannel(context: Context) {

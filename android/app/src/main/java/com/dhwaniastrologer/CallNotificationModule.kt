@@ -36,6 +36,19 @@ class CallNotificationModule(reactContext: ReactApplicationContext) :
                 promise.resolve(null)
                 return
             }
+            if (
+                action != "com.dhwaniastrologer.ACCEPT_CALL" &&
+                action != "com.dhwaniastrologer.REJECT_CALL" &&
+                action != "com.dhwaniastrologer.ACCEPT_CHAT" &&
+                action != "com.dhwaniastrologer.REJECT_CHAT"
+            ) {
+                prefs.edit()
+                    .remove(KEY_PENDING_ACTION)
+                    .remove(KEY_PENDING_DATA)
+                    .apply()
+                promise.resolve(null)
+                return
+            }
             val json = prefs.getString(KEY_PENDING_DATA, null) ?: run {
                 promise.resolve(null)
                 return

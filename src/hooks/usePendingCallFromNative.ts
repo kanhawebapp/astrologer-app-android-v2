@@ -168,12 +168,27 @@ try {
     return;
   }
 
+  const isNativeButtonAction =
+    pending.action === 'com.dhwaniastrologer.ACCEPT_CALL' ||
+    pending.action === 'com.dhwaniastrologer.REJECT_CALL' ||
+    pending.action === 'com.dhwaniastrologer.ACCEPT_CHAT' ||
+    pending.action === 'com.dhwaniastrologer.REJECT_CHAT';
+
+  if (!isNativeButtonAction) {
+    try {
+      await CallNotificationModule.clearPendingAction();
+    } catch (error) {
+      console.log(
+        '[NATIVE_CALL] ❌ clearPendingAction failed =',
+        error,
+      );
+    }
+    return;
+  }
+
   processedRef.current = true;
 
-  if (pending.action === 'call_request') {
-    handleCallRequest(pending.data);
-
-  } else if (pending.action === 'com.dhwaniastrologer.ACCEPT_CALL') {
+  if (pending.action === 'com.dhwaniastrologer.ACCEPT_CALL') {
     handleAcceptCall(pending.data);
 
   } else if (pending.action === 'com.dhwaniastrologer.REJECT_CALL') {
