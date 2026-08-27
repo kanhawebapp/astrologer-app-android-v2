@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -11,12 +11,12 @@ import {
   ScrollView,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import {useTheme} from '../../../../hooks/useTheme';
-import {AppText} from '../../../../components/common/AppText';
-import {AppButton} from '../../../../components/common/AppButton';
-import {Session} from '../../domain/types';
-import {SessionRemedy} from '../../domain/types';
-import {useRemedyManager} from '../remedies/useRemedyManager';
+import { useTheme } from '../../../../hooks/useTheme';
+import { AppText } from '../../../../components/common/AppText';
+import { AppButton } from '../../../../components/common/AppButton';
+import { Session } from '../../domain/types';
+import { SessionRemedy } from '../../domain/types';
+import { useRemedyManager } from '../remedies/useRemedyManager';
 
 interface SendRemedyModalProps {
   visible: boolean;
@@ -39,7 +39,7 @@ export const SendRemedyModal: React.FC<SendRemedyModalProps> = ({
   onClose,
   onSend,
 }) => {
-  const {theme} = useTheme();
+  const { theme } = useTheme();
   const colors = theme.colors;
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -61,7 +61,7 @@ export const SendRemedyModal: React.FC<SendRemedyModalProps> = ({
     setDescription(suggestion.description);
   };
 
-  const {remedies, sendRemedy} = useRemedyManager();
+  const { remedies, sendRemedy } = useRemedyManager();
 
   const handleSend = async () => {
     if (!session) {
@@ -106,15 +106,21 @@ ${description.trim()}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.container}>
         <TouchableWithoutFeedback onPress={onClose}>
-          <View style={[styles.overlay, {backgroundColor: colors.overlay}]} />
+          <View style={[styles.overlay, { backgroundColor: colors.overlay }]} />
         </TouchableWithoutFeedback>
-        <View style={[styles.content, {backgroundColor: colors.surface}]}>
+        <View style={[styles.content, { backgroundColor: colors.surface }]}>
           <View style={styles.header}>
             <View>
-              <AppText variant="h5" style={{color: colors.text}}>
+              <AppText variant="h5" style={{ color: colors.text }}>
                 Send Remedy
               </AppText>
-              <AppText variant="caption" style={{color: colors.textSecondary}}>
+              <AppText
+                variant="caption"
+                style={{ color: colors.primary, marginTop: 4 }}>
+                Session ID: {session?.id?.slice(0, 8)}
+              </AppText>
+
+              <AppText variant="caption" style={{ color: colors.textSecondary }}>
                 To: {session?.userName}
               </AppText>
             </View>
@@ -128,7 +134,7 @@ ${description.trim()}
             showsVerticalScrollIndicator={false}>
             <AppText
               variant="caption"
-              style={{color: colors.textSecondary, marginBottom: 8}}>
+              style={{ color: colors.textSecondary, marginBottom: 8 }}>
               Quick Suggestions:
             </AppText>
 
@@ -146,7 +152,7 @@ ${description.trim()}
                 <Icon name="auto-fix-high" size={16} color={colors.primary} />
                 <AppText
                   variant="caption"
-                  style={{color: colors.text, flex: 1, marginLeft: 8}}
+                  style={{ color: colors.text, flex: 1, marginLeft: 8 }}
                   numberOfLines={1}>
                   {suggestion.title}
                 </AppText>
@@ -155,7 +161,7 @@ ${description.trim()}
           </ScrollView>
 
           <View style={styles.inputContainer}>
-            <AppText variant="caption" style={{color: colors.textSecondary}}>
+            <AppText variant="caption" style={{ color: colors.textSecondary }}>
               Remedy Title
             </AppText>
             <TextInput
@@ -175,7 +181,7 @@ ${description.trim()}
           </View>
 
           <View style={styles.inputContainer}>
-            <AppText variant="caption" style={{color: colors.textSecondary}}>
+            <AppText variant="caption" style={{ color: colors.textSecondary }}>
               Instructions
             </AppText>
             <TextInput
@@ -199,7 +205,7 @@ ${description.trim()}
 
           {remedyType === 'PAID' && (
             <View style={styles.inputContainer}>
-              <AppText variant="caption" style={{color: colors.textSecondary}}>
+              <AppText variant="caption" style={{ color: colors.textSecondary }}>
                 Price (in coins)
               </AppText>
               <TextInput
@@ -225,12 +231,12 @@ ${description.trim()}
               title="Cancel"
               variant="outline"
               onPress={onClose}
-              style={{flex: 1, marginRight: 8}}
+              style={{ flex: 1, marginRight: 8 }}
             />
             <AppButton
               title="Send Remedy"
               onPress={handleSend}
-              style={{flex: 1}}
+              style={{ flex: 1 }}
             />
           </View>
         </View>
