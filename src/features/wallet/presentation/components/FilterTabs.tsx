@@ -25,15 +25,15 @@ interface FilterTabsProps {
 export const FilterTabs: React.FC<FilterTabsProps> = ({
   selectedFilter,
   onFilterChange,
-  creditCount,
-  debitCount,
+  // creditCount,
+  // debitCount,
   onDateFilterChange,
 }) => {
   console.log('🔥 FilterTabs Render', {
     timestamp: new Date().toISOString(),
     selectedFilter,
-    creditCount,
-    debitCount,
+    // creditCount,
+    // debitCount,
   });
   const { theme } = useTheme();
   const [dateFilter, setDateFilter] = useState<DateFilterType>('all');
@@ -46,8 +46,10 @@ export const FilterTabs: React.FC<FilterTabsProps> = ({
 
   const filters: { key: FilterType; label: string; count?: number }[] = [
     { key: 'all', label: 'All' },
-    { key: 'credit', label: 'Credits', count: creditCount },
-    { key: 'debit', label: 'Debits', count: debitCount },
+    // { key: 'credit', label: 'Credits', count: creditCount },
+    // { key: 'debit', label: 'Debits', count: debitCount },
+     { key: 'credit', label: 'Credits',  },
+    { key: 'debit', label: 'Debits', },
   ];
 
   const dateFilters: { key: DateFilterType; label: string }[] = [

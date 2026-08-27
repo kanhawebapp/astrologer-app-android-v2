@@ -127,9 +127,9 @@ export const WalletScreen: React.FC = () => {
           <AppText variant="h4" color={theme.colors.text}>
             Wallet
           </AppText>
-          <AppText variant="caption" color={theme.colors.textSecondary}>
+          {/* <AppText variant="caption" color={theme.colors.textSecondary}>
             {filteredTransactions.length} items
-          </AppText>
+          </AppText> */}
         </View>
 
         {isMockData && (
@@ -162,8 +162,8 @@ export const WalletScreen: React.FC = () => {
         <FilterTabs
           selectedFilter={selectedFilter}
           onFilterChange={setSelectedFilter}
-          creditCount={creditCount}
-          debitCount={debitCount}
+          // creditCount={creditCount}
+          // debitCount={debitCount}
           onDateFilterChange={handleDateFilterChange}
         />
       </>
