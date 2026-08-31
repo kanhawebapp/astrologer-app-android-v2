@@ -54,6 +54,7 @@
 
 
 import React from 'react';
+import { View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { RootStackParamList } from './types';
@@ -78,6 +79,7 @@ import NoticeScreen from '../features/account/presentation/screens/NoticeScreen'
 import NotificationScreen from '../features/home/notification/NotificationScreen';
 import MyRemedies from '../features/account/presentation/screens/MyRemedies';
 import MyServices from '../features/account/presentation/screens/MyServices';
+import { ChatRequestCard } from '../components/common/ChatRequestCard';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -88,7 +90,9 @@ export const RootNavigator: React.FC = () => {
     <NavigationContainer
       ref={navigationService.navigationRef}
       onReady={() => navigationService.markNavigationReady()}>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <View style={{ flex: 1 }}>
+        <ChatRequestCard />
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Splash" component={SplashScreen} />
         <Stack.Screen
           name="IncomingCallFullscreen"
@@ -202,6 +206,7 @@ export const RootNavigator: React.FC = () => {
           <Stack.Screen name="AuthStack" component={AuthNavigator} />
         )}
       </Stack.Navigator>
+      </View>
     </NavigationContainer>
   );
 };
