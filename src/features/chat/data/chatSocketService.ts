@@ -159,8 +159,8 @@ await chatSocketEmitters.acceptChatAstrologer( sessionId, roomId, userId, astroI
     await typingManager.sendTyping(roomId, isTyping);
   }
 
-  async completeChat(sessionId: string, roomId: string): Promise<void> {
-    await chatSocketEmitters.completeChat(sessionId, roomId);
+  async completeChat(astroId: string, roomId: string, userId: string): Promise<void> {
+    await chatSocketEmitters.completeChat(astroId, roomId, userId);
   }
 
   async leaveChat(

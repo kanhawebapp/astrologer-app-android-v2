@@ -67,16 +67,17 @@ async acceptChatAstrologer(
     await socketManager.emit(ChatSocketEvents.TYPING_STOP, { roomId });
   }
 
-  async completeChat(sessionId: string, roomId: string): Promise<void> {
+  async completeChat(astroId: string, roomId: string, userId: string): Promise<void> {
     console.log('✅ [EMITTER] completeChat() called with:', {
-      sessionId,
+      astroId,
       roomId,
+      userId,
     });
     await socketManager.emit(ChatSocketEvents.COMPLETED_CHAT, {
-      sessionId,
-      roomId,
+      astroId,
+      room_id: roomId,
+      userId,
     });
-    // console.log('✅ [EMITTER] completeChat() emit finished');
   }
 
   async leaveChat(

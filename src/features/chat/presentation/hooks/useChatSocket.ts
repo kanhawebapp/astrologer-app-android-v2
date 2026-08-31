@@ -140,19 +140,20 @@ export const useChatSocket = () => {
     console.log('🔴 [useChatSocket] completeChat() triggered');
     if (activeSession) {
       try {
-        console.log(
-          '🔴 [useChatSocket] Emitting completeChat for session:',
-          activeSession.sessionId,
-          'room:',
-          activeSession.roomId,
-        );
+        // console.log(
+        //   '🔴 [useChatSocket] Emitting completeChat for session:',
+        //   activeSession.sessionId,
+        //   'room:',
+        //   activeSession.roomId,
+        // );
         await chatSocketService.completeChat(
-          activeSession.sessionId,
+          activeSession.astrologerId,
           activeSession.roomId,
+          activeSession.userId,
         );
-        console.log(
-          '🔴 [useChatSocket] completeChat emit succeeded, dispatching endChatSession',
-        );
+        // console.log(
+        //   '🔴 [useChatSocket] completeChat emit succeeded, dispatching endChatSession',
+        // );
         dispatch(endChatSession());
       } catch (error) {
         console.log('[useChatSocket] Error completing chat:', error);
