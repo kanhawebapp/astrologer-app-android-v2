@@ -8,6 +8,7 @@ import {
   restoreSession,
   clearError,
 } from '../store/slices/authSlice';
+import { socketClient } from '../services/socket';
 
 
 export const useAuth = () => {
@@ -38,7 +39,7 @@ export const useAuth = () => {
     await dispatch(logoutThunk()).unwrap();
 
     // 🔥 VERY IMPORTANT (your app)
-    // Socket.disconnect();
+    socketClient.disconnectSocket();
 
   } catch (error) {
     console.log('Logout error:', error);
