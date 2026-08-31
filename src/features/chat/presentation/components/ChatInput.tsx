@@ -218,13 +218,11 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 
 
 
-  const [hasText, setHasText] = useState(false);
   const isTypingRef = useRef(false);
 
   const handleTextChange = useCallback(
     (newText: string) => {
       setText(newText);
-      setHasText(newText.trim().length > 0);
 
       if (!isTypingRef.current) {
         isTypingRef.current = true;
@@ -416,7 +414,10 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 
         <TouchableOpacity
           onPress={handleSend}
-          style={[styles.sendButton, !text.trim() && { opacity: 0.5 }]}
+          style={[
+            styles.sendButton,
+            { backgroundColor: text.trim() ? '#25D366' : '#D1D5DB' },
+          ]}
           disabled={!text.trim()}>
           <Icon name="send" size={20} color="white" />
         </TouchableOpacity>
