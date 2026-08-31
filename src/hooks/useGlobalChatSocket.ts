@@ -351,7 +351,7 @@ const handleCompletedChat = useCallback(
         // set Redux to ENDED so ChatViewModel's existing navigation effect runs.
         latestNewChatRequestSessionIdRef.current = null;
         dispatch(endChatSession());
-        dispatch(setError(data.reason || 'User left the chat'));
+        dispatch(setError(data.reason));
       }
     },
     [dispatch],
