@@ -1,13 +1,14 @@
-import { useCallback, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState, AppDispatch } from '../../../../store';
+import {useCallback, useEffect} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
+import {RootState, AppDispatch} from '../../../../store';
 import {
   fetchWalletData,
   requestWithdrawal,
   setSelectedPeriod,
   clearWithdrawState,
+  loadMoreTransactions,
 } from '../../../../store/slices/walletSlice';
-import { WithdrawRequest, Transaction } from '../../domain/types';
+import {WithdrawRequest, Transaction} from '../../domain/types';
 
 export const useWallet = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -23,23 +24,31 @@ export const useWallet = () => {
     error,
     isMockData,
     selectedPeriod,
+    transactionsPage,
+    transactionsTotalPages,
+    transactionsTotalCount,
+    loadingMoreTransactions,
+    hasMoreTransactions,
   } = useSelector((state: RootState) => state.wallet);
 
   const loadWalletData = useCallback(() => {
-    console.log('🔥 fetchWalletData thunk');
     dispatch(fetchWalletData());
   }, [dispatch]);
 
-  // console.log('🔥 useWallet mounted');
+  const handleLoadMoreTransactions = useCallback(() => {
+    if (loadingMoreTransactions || loading || !hasMoreTransactions) {
+      return;
+    }
+    dispatch(loadMoreTransactions());
+  }, [dispatch, loadingMoreTransactions, loading, hasMoreTransactions]);
 
   useEffect(() => {
-    // console.log('🔥 useWallet mounted (useEffect)');
     loadWalletData();
   }, [loadWalletData]);
 
   const handleWithdrawal = useCallback(
     async (amount: number) => {
-      const request: WithdrawRequest = { amount };
+      const request: WithdrawRequest = {amount};
       await dispatch(requestWithdrawal(request));
     },
     [dispatch],
@@ -97,10 +106,16 @@ export const useWallet = () => {
     error,
     isMockData,
     selectedPeriod,
+    transactionsPage,
+    transactionsTotalPages,
+    transactionsTotalCount,
+    loadingMoreTransactions,
+    hasMoreTransactions,
     loadWalletData,
     handleWithdrawal,
     handlePeriodChange,
     clearWithdrawStatus,
+    handleLoadMoreTransactions,
     filteredTransactions,
     getFilteredTransactions,
     getEarningsForPeriod,

@@ -5,9 +5,9 @@ import {
   Transaction,
   ChartData,
 } from '../domain/types';
-import {earningsApi} from '../../../services/api/earning/earnings.service';
-import {walletTransactionsApi} from '../../../services/api/walletTransactions/walletTransactions.service';
-import {WalletTransaction} from '../../../services/api/walletTransactions/walletTransactions.type';
+import { earningsApi } from '../../../services/api/earning/earnings.service';
+import { walletTransactionsApi } from '../../../services/api/walletTransactions/walletTransactions.service';
+import { WalletTransaction } from '../../../services/api/walletTransactions/walletTransactions.type';
 
 const generateChartData = (): ChartData[] => {
   const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -32,15 +32,15 @@ const mapTransactionType = (
 };
 
 const mapTransactionStatus = (
-  type: WalletTransaction['type'],
+  _type: WalletTransaction['type'],
 ): 'success' | 'pending' | 'failed' => {
   return 'success';
 };
 
-const mapTransactionToDomain = (tx: WalletTransaction): Transaction => ({
+export const mapTransactionToDomain = (tx: WalletTransaction): Transaction => ({
   id: tx.id,
   type: mapTransactionType(tx.type),
-  amount:tx.amount,
+  amount: tx.amount,
   coins: tx.coins,
   status: mapTransactionStatus(tx.type),
   date: tx.createdAt,
@@ -55,7 +55,7 @@ export const walletService = {
   async getWalletDashboard(): Promise<WalletDashboard> {
     const earningsResponse = await earningsApi.getAstrologerEarnings();
     const earningsData = earningsResponse.getAstrologerEarnings;
-    
+
     const transactionsResponse =
       await walletTransactionsApi.getAstrologerWalletTransactions({
         page: 1,
@@ -63,14 +63,14 @@ export const walletService = {
       });
     const transactionsData =
       transactionsResponse.getAstrologerWalletTransactions;
-
+    // console.log("transactionsData>>",transactionsData)
     const transactions: Transaction[] = (transactionsData?.data || []).map(
       mapTransactionToDomain,
     );
     console.log(
-  '🔵 Mapped Transactions:',
-  JSON.stringify(transactions, null, 2),
-);
+      '🔵 Mapped Transactions:',
+      JSON.stringify(transactions, null, 2),
+    );
 
     const chartData: ChartData[] = generateChartData();
 
@@ -85,6 +85,13 @@ export const walletService = {
       },
       transactions,
       chartData,
+      transactionsPagination: transactionsData
+        ? {
+          totalCount: transactionsData.totalCount,
+          currentPage: transactionsData.currentPage,
+          totalPages: transactionsData.totalPages,
+        }
+        : undefined,
     };
   },
 
@@ -99,6 +106,26 @@ export const walletService = {
       success: true,
       message: 'Withdrawal request submitted successfully',
       transactionId: `withdraw_${Date.now()}`,
+    };
+  },
+
+  async getTransactionsPage(page: number, limit: number) {
+    const response =
+      await walletTransactionsApi.getAstrologerWalletTransactions({
+        page,
+        limit,
+      });
+    const data = response.getAstrologerWalletTransactions;
+
+    // console.log("data>>response",response)
+    if (!data?.success) {
+      throw new Error('Failed to load transactions');
+    }
+    return {
+      transactions: (data.data || []).map(mapTransactionToDomain),
+      totalCount: data.totalCount || 0,
+      currentPage: data.currentPage || page,
+      totalPages: data.totalPages || 1,
     };
   },
 };

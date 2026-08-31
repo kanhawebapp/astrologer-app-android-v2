@@ -7,6 +7,7 @@ import {
   Platform,
   FlatList,
   RefreshControl,
+  ActivityIndicator,
 } from 'react-native';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useTheme} from '../../../../hooks/useTheme';
@@ -28,7 +29,6 @@ export const WalletScreen: React.FC = () => {
   const {
     balance,
     earnings,
-    transactions,
     loading,
     withdrawing,
     withdrawError,
@@ -41,14 +41,14 @@ export const WalletScreen: React.FC = () => {
     clearWithdrawStatus,
     getFilteredTransactions,
     dashboard,
+    handleLoadMoreTransactions,
+    loadingMoreTransactions,
   } = useWallet();
 
   const [refreshing, setRefreshing] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState<FilterType>('all');
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
   const [fadeAnim] = useState(new Animated.Value(0));
-  const [dateStart, setDateStart] = useState<Date | null>(null);
-  const [dateEnd, setDateEnd] = useState<Date | null>(null);
 
   useEffect(() => {
     Animated.timing(fadeAnim, {
@@ -86,29 +86,9 @@ export const WalletScreen: React.FC = () => {
     [handleWithdrawal],
   );
 
-  const handleDateFilterChange = useCallback(
-    (startDate: Date | null, endDate: Date | null) => {
-      setDateStart(startDate);
-      setDateEnd(endDate);
-    },
-    [],
-  );
-
   const filteredTransactions = useMemo(() => {
-    let filtered = getFilteredTransactions(selectedFilter);
-
-    if (dateStart && dateEnd) {
-      filtered = filtered.filter((t: Transaction) => {
-        const transDate = new Date(t.date);
-        return transDate >= dateStart && transDate <= dateEnd;
-      });
-    }
-
-    return filtered;
-  }, [getFilteredTransactions, selectedFilter, dateStart, dateEnd]);
-
-  const creditCount = transactions.filter(t => t.type === 'credit').length;
-  const debitCount = transactions.filter(t => t.type === 'debit').length;
+    return getFilteredTransactions(selectedFilter);
+  }, [getFilteredTransactions, selectedFilter]);
 
   const keyExtractor = useCallback(
     (item: Transaction) => item.createdAt ?? String(item.id),
@@ -119,6 +99,17 @@ export const WalletScreen: React.FC = () => {
     ({item}: {item: Transaction}) => <TransactionItem transaction={item} />,
     [],
   );
+
+  const renderFooter = useCallback(() => {
+    if (!loadingMoreTransactions) {
+      return null;
+    }
+    return (
+      <View style={styles.footer}>
+        <ActivityIndicator size="small" color={theme.colors.primary} />
+      </View>
+    );
+  }, [loadingMoreTransactions, theme.colors.primary]);
 
   const listHeaderComponent = useMemo(
     () => (
@@ -162,9 +153,6 @@ export const WalletScreen: React.FC = () => {
         <FilterTabs
           selectedFilter={selectedFilter}
           onFilterChange={setSelectedFilter}
-          // creditCount={creditCount}
-          // debitCount={debitCount}
-          onDateFilterChange={handleDateFilterChange}
         />
       </>
     ),
@@ -182,9 +170,6 @@ export const WalletScreen: React.FC = () => {
       withdrawing,
       handleWithdraw,
       selectedFilter,
-      creditCount,
-      debitCount,
-      handleDateFilterChange,
     ],
   );
 
@@ -237,6 +222,9 @@ export const WalletScreen: React.FC = () => {
             />
           }
           ListHeaderComponent={listHeaderComponent}
+          ListFooterComponent={renderFooter}
+          onEndReached={handleLoadMoreTransactions}
+          onEndReachedThreshold={0.5}
         />
       </Animated.View>
     </SafeAreaView>
@@ -288,5 +276,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginHorizontal: spacing.lg,
+  },
+  footer: {
+    paddingVertical: 20,
+    alignItems: 'center',
   },
 });

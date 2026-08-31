@@ -41,6 +41,11 @@ export interface WalletDashboard {
   earnings: Earnings;
   transactions: Transaction[];
   chartData: ChartData[];
+  transactionsPagination?: {
+    totalCount: number;
+    currentPage: number;
+    totalPages: number;
+  };
 }
 
 export interface WithdrawRequest {
