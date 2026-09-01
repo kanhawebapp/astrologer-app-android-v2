@@ -6,6 +6,7 @@ export type CallHistoryStatus =
 
 export interface CallHistoryItem {
   sessionId: string;
+  userId: string;
   roomId: string;
   userName: string;
   userMobile: string;

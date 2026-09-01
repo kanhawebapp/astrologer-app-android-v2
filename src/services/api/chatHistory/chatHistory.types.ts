@@ -1,5 +1,6 @@
 export interface AstrologerChatHistoryItem {
   sessionId: string;
+  userId: string;
   roomId: string;
   userName: string;
   birthPlace: string;

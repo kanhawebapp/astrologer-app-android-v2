@@ -27,7 +27,7 @@ const mapApiStatus = (status: string): SessionStatus => {
 
 const mapCallItemToSession = (item: CallHistoryItem): Session => ({
   id: item.sessionId,
-  userId: '',
+  userId: item.userId,
   userName: item.userName || 'Unknown',
   userPhone: `${item.userCountryCode} ${item.userMobile}`.trim(),
   type: SessionType.CALL,
@@ -52,7 +52,7 @@ const mapCallItemToSession = (item: CallHistoryItem): Session => ({
 
 const mapChatItemToSession = (item: AstrologerChatHistoryItem): Session => ({
   id: item.sessionId,
-  userId: '',
+  userId: item.userId,
   userName: item.userName || 'Unknown',
   userPhone: undefined,
   type: SessionType.CHAT,

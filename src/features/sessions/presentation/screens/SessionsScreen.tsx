@@ -1,4 +1,4 @@
-import React, {useCallback, useMemo} from 'react';
+import React, { useCallback, useMemo } from 'react';
 import {
   FlatList,
   StyleSheet,
@@ -9,18 +9,18 @@ import {
   StatusBar,
   Platform,
 } from 'react-native';
-import {ScreenContainer} from '../../../../components/layout/ScreenContainer';
-import {AppText} from '../../../../components/common/AppText';
-import {useTheme} from '../../../../hooks/useTheme';
-import {useSessions} from '../hooks/useSessions';
-import {Session} from '../../domain/types';
+import { ScreenContainer } from '../../../../components/layout/ScreenContainer';
+import { AppText } from '../../../../components/common/AppText';
+import { useTheme } from '../../../../hooks/useTheme';
+import { useSessions } from '../hooks/useSessions';
+import { Session } from '../../domain/types';
 import {
   SessionCard,
   SessionTypeTabs,
   SessionStatusTabs,
   EmptyState,
 } from '../components';
-import {useFocusEffect, useNavigation} from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 
 const ItemSeparator = () => <View style={styles.separator} />;
 
@@ -29,7 +29,7 @@ const ListHeader: React.FC<{
   onTypeChange: (type: 'CALL' | 'CHAT') => void;
   activeStatus: 'COMPLETED' | 'CANCELLED';
   onStatusChange: (status: 'COMPLETED' | 'CANCELLED') => void;
-}> = ({activeType, onTypeChange, activeStatus, onStatusChange}) => (
+}> = ({ activeType, onTypeChange, activeStatus, onStatusChange }) => (
   <View>
     <View style={styles.headerTitle}>
       <AppText variant="h4" style={styles.title}>
@@ -46,7 +46,7 @@ const ListHeader: React.FC<{
 );
 
 export const SessionsScreen: React.FC = () => {
-  const {theme, mode} = useTheme();
+  const { theme, mode } = useTheme();
   const {
     sessions,
     activeType,
@@ -86,7 +86,7 @@ export const SessionsScreen: React.FC = () => {
   );
 
   const renderItem: ListRenderItem<Session> = useCallback(
-    ({item}) => <SessionCard session={item} onPress={handleSessionPress} />,
+    ({ item }) => <SessionCard session={item} onPress={handleSessionPress} />,
     [handleSessionPress],
   );
 

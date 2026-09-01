@@ -14,13 +14,13 @@ export const callHistoryApi = {
     variables: GetAstrologerCallHistoryVariables,
     token?: string,
   ) => {
-    console.log('=== GET ASTROLOGER CALL HISTORY REQUEST ===');
+    // console.log('=== GET ASTROLOGER CALL HISTORY REQUEST ===');
 
-    console.log('Variables:', JSON.stringify(variables, null, 2));
+    // console.log('Variables:', JSON.stringify(variables, null, 2));
 
-    console.log('Query:', GET_ASTROLOGER_CALL_HISTORY_QUERY.trim());
+    // console.log('Query:', GET_ASTROLOGER_CALL_HISTORY_QUERY.trim());
 
-    console.log('===========================================');
+    // console.log('===========================================');
 
     return graphqlRequest<{
       getAstrologerCallHistory: GetAstrologerCallHistoryResponse;

@@ -69,7 +69,7 @@ export const SessionCard: React.FC<SessionCardProps> = React.memo(
     const statusColor = statusConfig.color;
     const isChat = session.type === SessionType.CHAT;
     const showRating = isChat || session.rating != null;
-console.log('SessionCard rendered for session:', session);
+    console.log('SessionCard rendered for session:', session);
     return (
       <TouchableOpacity
         style={[
@@ -122,6 +122,11 @@ console.log('SessionCard rendered for session:', session);
           <FieldRow
             label="Session ID"
             value={formatSessionId(session.id)}
+            theme={theme}
+          />
+          <FieldRow
+            label="User ID"
+            value={formatSessionId(session.userId)}
             theme={theme}
           />
           <FieldRow

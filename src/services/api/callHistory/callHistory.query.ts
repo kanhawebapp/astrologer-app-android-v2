@@ -19,6 +19,7 @@ export const GET_ASTROLOGER_CALL_HISTORY_QUERY = `
       data {
         sessionId
         roomId
+        userId
         userName
         userMobile
         userCountryCode
