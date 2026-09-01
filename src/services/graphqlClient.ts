@@ -1,4 +1,5 @@
 import { Config } from '../config/env';
+import { handleUnauthorized, isUnauthorizedError } from './unauthorizedHandler';
 
 interface GraphQLError {
   message: string;
@@ -126,6 +127,10 @@ export async function graphqlRequest<T = unknown>({
     // console.log('=== GRAPHQL CATCH ERROR ===');
     // console.log('Error:', error instanceof Error ? error.message : error);
     // console.log('===========================');
+
+    if (isUnauthorizedError(error)) {
+      handleUnauthorized();
+    }
 
     if (error instanceof GraphQLClientError) {
       throw error;

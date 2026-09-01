@@ -34,9 +34,9 @@ export const useAccount = () => {
     try {
       await dispatch(fetchAccountDashboard()).unwrap();
     } catch (err) {
-      console.log('=== USE ACCOUNT HOOK ERROR ===');
+      // console.log('=== USE ACCOUNT HOOK ERROR ===');
       console.log('Error:', err);
-      console.log('=============================');
+      // console.log('=============================');
     }
   }, [dispatch]);
 

@@ -44,10 +44,31 @@ export const HomeDashboardScreen: React.FC = () => {
   const { analytics, loading, error, refreshing, refresh, dataType, setDataType } = useHomeAnalytics();
   const { profile, refreshDashboard } = useAccount();
 
-  useEffect(() => {
-    refreshDashboard();
-  }, []);
+  const handleRefresh = useCallback(async () => {
+    // console.log('🔥 Dashboard refresh');
 
+    try {
+      // console.log('🔥 Analytics refresh START');
+      await refresh();
+      // console.log('🔥 Analytics refresh DONE');
+
+      // console.log('🔥 Account refresh START');
+      await refreshDashboard();
+      // console.log('🔥 Account refresh DONE');
+    } catch (error) {
+      // console.log('❌ Dashboard refresh error:', error);
+    }
+  }, [refresh, refreshDashboard]);
+
+  useFocusEffect(
+    useCallback(() => {
+
+      refreshDashboard();
+
+      return () => {
+      };
+    }, [refreshDashboard]),
+  );
   useFocusEffect(
     useCallback(() => {
       StatusBar.setHidden(false);
@@ -163,7 +184,7 @@ export const HomeDashboardScreen: React.FC = () => {
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
-            onRefresh={refresh}
+            onRefresh={handleRefresh}
             tintColor={theme.colors.primary}
             colors={[theme.colors.primary]}
           />
