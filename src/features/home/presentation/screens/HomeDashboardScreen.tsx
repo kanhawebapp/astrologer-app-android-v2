@@ -60,23 +60,16 @@ export const HomeDashboardScreen: React.FC = () => {
     }
   }, [refresh, refreshDashboard]);
 
-  useFocusEffect(
-    useCallback(() => {
+ useFocusEffect(
+  useCallback(() => {
+    StatusBar.setHidden(false);
+    StatusBar.setBarStyle('light-content');
+    StatusBar.setBackgroundColor('transparent', true);
+    StatusBar.setTranslucent(true);
 
-      refreshDashboard();
-
-      return () => {
-      };
-    }, [refreshDashboard]),
-  );
-  useFocusEffect(
-    useCallback(() => {
-      StatusBar.setHidden(false);
-      StatusBar.setBarStyle('light-content');
-      StatusBar.setBackgroundColor('transparent', true);
-      StatusBar.setTranslucent(true);
-    }, [])
-  );
+    refreshDashboard();
+  }, [refreshDashboard])
+);
 
   const chartWidth = Math.max(Dimensions.get('window').width - 64, 200);
 
