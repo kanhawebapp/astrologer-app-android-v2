@@ -44,10 +44,10 @@ export const useChatTimer = () => {
       clearInterval(intervalRef.current);
     }
     intervalRef.current = setInterval(() => {
-      console.log(
-        '[TIMER_DEBUG] tick | intervalRunning: true | remainingTime:',
-        remainingTimeRef.current,
-      );
+      // console.log(
+      //   '[TIMER_DEBUG] tick | intervalRunning: true | remainingTime:',
+      //   remainingTimeRef.current,
+      // );
       dispatch(decrementSessionTime());
     }, 1000);
     console.log('[TIMER_DEBUG] startTimer called | intervalRef set');

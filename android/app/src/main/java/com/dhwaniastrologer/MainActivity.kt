@@ -137,7 +137,13 @@ Log.d("TRACE_NATIVE_3", "extra_call_time=$callTime")
     val astrologerName = intent.getStringExtra("extra_astrologer_name") ?: ""
     val astrologerProfilePic = intent.getStringExtra("extra_astrologer_profile_pic") ?: ""
     val issue = intent.getStringExtra("extra_issue") ?: ""
-
+val occupation = intent.getStringExtra("extra_occupation") ?: ""
+val gender = intent.getStringExtra("extra_gender") ?: ""
+val dateOfBirth = intent.getStringExtra("extra_date_of_birth") ?: ""
+val location = intent.getStringExtra("extra_location") ?: ""
+val timeOfBirth =
+    intent.getStringExtra("extra_time_of_birth") ?: ""
+    
     Log.d("TRACE_NATIVE_2", "extra_room_id = $roomId")
     Log.d("TRACE_NATIVE_2", "extra_session_id = $sessionId")
 
@@ -178,7 +184,12 @@ Log.d("TRACE_NATIVE_3", "extra_call_time=$callTime")
     userProfilePic,
     astrologerName,
     astrologerProfilePic,
-    issue
+    issue,
+      occupation,
+    gender,
+    dateOfBirth,
+    location,
+    timeOfBirth
 )
     Log.d("TRACE_NATIVE_2", "pending_data = $dataMap")
 
@@ -232,7 +243,14 @@ Log.d("TRACE_NATIVE_3", "extra_call_time=$callTime")
     userProfilePic: String,
     astrologerName: String,
     astrologerProfilePic: String,
-    issue: String
+    issue: String,
+     occupation: String,
+    gender: String,
+    dateOfBirth: String,
+    location: String,
+        timeOfBirth: String
+
+
 ): String {
     // Use JSONObject so string values are safely escaped into valid JSON.
     return JSONObject()
@@ -252,6 +270,13 @@ Log.d("TRACE_NATIVE_3", "extra_call_time=$callTime")
       .put("astrologerName", astrologerName)
       .put("astrologerProfilePic", astrologerProfilePic)
       .put("issue", issue)
+      // Chat user details
+    .put("occupation", occupation)
+    .put("gender", gender)
+    .put("dateOfBirth", dateOfBirth)
+    .put("location", location)
+        .put("timeOfBirth", timeOfBirth)
+
       .toString()
   }
 

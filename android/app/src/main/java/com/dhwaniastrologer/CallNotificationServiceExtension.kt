@@ -500,6 +500,27 @@ class CallNotificationServiceExtension : INotificationServiceExtension {
         val issue = firstNonEmpty(
             additionalData?.optString("issue", "")
         )
+        val occupation = firstNonEmpty(
+    additionalData?.optString("occupation", "")
+)
+
+val gender = firstNonEmpty(
+    additionalData?.optString("gender", "")
+)
+
+val dateOfBirth = firstNonEmpty(
+    additionalData?.optString("dateOfBirth", ""),
+    additionalData?.optString("date_of_birth", "")
+)
+
+val location = firstNonEmpty(
+    additionalData?.optString("location", "")
+)
+
+val timeOfBirth = firstNonEmpty(
+    additionalData?.optString("timeOfBirth", "")
+)
+
 
         val dataJson = JSONObject(mapOf(
             "roomId" to roomId,
@@ -517,7 +538,13 @@ class CallNotificationServiceExtension : INotificationServiceExtension {
             "userProfilePic" to userProfilePic,
             "astrologerName" to astrologerName,
             "astrologerProfilePic" to astrologerProfilePic,
-            "issue" to issue
+            "issue" to issue,
+             "occupation" to occupation,
+            "gender" to gender,
+            "dateOfBirth" to dateOfBirth,
+            "location" to location,
+            "timeOfBirth" to timeOfBirth
+
         ).toMap()).toString()
 
         android.util.Log.d("TRACE_NATIVE_2", dataJson)
@@ -556,6 +583,12 @@ class CallNotificationServiceExtension : INotificationServiceExtension {
             putExtra("extra_astrologer_name", astrologerName)
             putExtra("extra_astrologer_profile_pic", astrologerProfilePic)
             putExtra("extra_issue", issue)
+            putExtra("extra_occupation", occupation)
+            putExtra("extra_gender", gender)
+            putExtra("extra_date_of_birth", dateOfBirth)
+            putExtra("extra_location", location)
+            putExtra("extra_time_of_birth", timeOfBirth)
+
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
         }
 
@@ -580,6 +613,13 @@ class CallNotificationServiceExtension : INotificationServiceExtension {
             putExtra("extra_astrologer_name", astrologerName)
             putExtra("extra_astrologer_profile_pic", astrologerProfilePic)
             putExtra("extra_issue", issue)
+            // Chat user details
+            putExtra("extra_occupation", occupation)
+            putExtra("extra_gender", gender)
+            putExtra("extra_date_of_birth", dateOfBirth)
+            putExtra("extra_location", location)
+            putExtra("extra_time_of_birth", timeOfBirth)
+
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
         }
 

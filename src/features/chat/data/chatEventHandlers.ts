@@ -55,16 +55,33 @@ const createBasicEventHandler = (
 
 const setupNewChatRequestHandler = () => {
   return (data: any) => {
-    const rootState = store.getState() as RootState;
-    const activeSession = rootState.chat.activeSession;
 
-    // Guard against stale events during an active/ended session.
-    // If we already have an active session and the incoming request doesn't match,
-    // ignore it to avoid stale popup/state flicker.
-    const incomingSessionId =
-      data?.sessionId || data?.session_id || data?.sessionID || null;
-    if (activeSession?.sessionId && incomingSessionId) {
-      if (incomingSessionId !== activeSession.sessionId) {
+    // commented 1sep
+    // const rootState = store.getState() as RootState;
+    // const activeSession = rootState.chat.activeSession;
+
+    // // Guard against stale events during an active/ended session.
+    // // If we already have an active session and the incoming request doesn't match,
+    // // ignore it to avoid stale popup/state flicker.
+    // const incomingSessionId =
+    //   data?.sessionId || data?.session_id || data?.sessionID || null;
+    // if (activeSession?.sessionId && incomingSessionId) {
+    //   if (incomingSessionId !== activeSession.sessionId) {
+    //     return;
+    //   }
+    // }
+
+     const rootStateGuard = store.getState() as RootState;
+    const activeSessionGuard = rootStateGuard.chat.activeSession;
+    const incomingSessionIdGuard =
+      data?.session_id || data?.sessionId || data?.sessionID || null;
+    const incomingRoomIdGuard =
+      data?.room_id || data?.roomId || data?.roomID || data?.roomid || null;
+    if (activeSessionGuard?.sessionId) {
+      if (incomingSessionIdGuard && incomingSessionIdGuard !== activeSessionGuard.sessionId) {
+        return;
+      }
+      if (incomingRoomIdGuard && incomingRoomIdGuard !== activeSessionGuard.roomId) {
         return;
       }
     }
