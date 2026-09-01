@@ -1,220 +1,339 @@
-import React, { useState } from 'react';
-import {
-  View,
-  StyleSheet,
-  ScrollView,
-  RefreshControl,
-  TouchableOpacity,
-} from 'react-native';
+// import React, { useState } from 'react';
+// import {
+//   View,
+//   StyleSheet,
+//   ScrollView,
+//   RefreshControl,
+//   TouchableOpacity,
+// } from 'react-native';
+// import Icon from 'react-native-vector-icons/Ionicons';
+// import { ScreenContainer } from '../../../../components/layout/ScreenContainer';
+// import { Header } from '../../../../components/layout/Header';
+// import { AppText } from '../../../../components/common/AppText';
+// import { useTheme } from '../../../../hooks/useTheme';
+// import { useAvailability } from '../hooks/useAvailability';
+// import { useLiveSession } from '../hooks/useLiveSession';
+// import { OnlineStatusCard } from '../components/OnlineStatusCard';
+// import { SessionToggleCard } from '../components/SessionToggleCard';
+// import { ModeCard } from '../components/ModeCard';
+// import { SessionLimitCard } from '../components/SessionLimitCard';
+// import { WorkingHoursCard } from '../components/WorkingHoursCard';
+// import { InfoBanner } from '../components/InfoBanner';
+// import { LiveStatusCard } from '../components/LiveStatusCard';
+// import { GoLiveCard } from '../components/GoLiveCard';
+// import { UpcomingLiveList } from '../components/UpcomingLiveList';
+// import { ScheduleLiveModal } from '../components/ScheduleLiveModal';
+// import { ScheduleLiveInput } from '../../domain/liveTypes';
+
+// export const AvailabilityScreen: React.FC = () => {
+//   const { theme } = useTheme();
+//   const {
+//     availability,
+//     isLoading,
+//     isUpdating,
+//     isMockData,
+//     toggleOnline,
+//     toggleChat,
+//     toggleCall,
+//     toggleBusyMode,
+//     toggleAutoAccept,
+//     updateMaxSessions,
+//     updateWorkingHours,
+//     refresh,
+//   } = useAvailability();
+
+//   const {
+//     currentLive,
+//     scheduledSessions,
+//     isLoading: liveLoading,
+//     isUpdating: liveUpdating,
+//     formattedDuration,
+//     goLiveNow,
+//     endLive,
+//     cancelScheduledLive,
+//     scheduleLive,
+//     refresh: refreshLive,
+//   } = useLiveSession();
+
+//   const [showScheduleModal, setShowScheduleModal] = useState(false);
+
+//   const handleRefresh = () => {
+//     refresh();
+//     refreshLive();
+//   };
+
+//   const handleGoLiveNow = () => {
+//     goLiveNow();
+//   };
+
+//   const handleEndLive = (sessionId: string) => {
+//     endLive(sessionId);
+//   };
+
+//   const handleSchedule = (input: ScheduleLiveInput) => {
+//     scheduleLive(input);
+//   };
+
+//   const handleCancelLive = (sessionId: string) => {
+//     cancelScheduledLive(sessionId);
+//   };
+
+//   const handleStartNow = (sessionId: string) => {
+//     goLiveNow(sessionId);
+//   };
+
+//   return (
+//     <ScreenContainer scrollable={false} withPadding={false}>
+//       <Header
+//         title="Availability"
+//         rightComponent={
+//           <TouchableOpacity
+//             style={[
+//               styles.liveTab,
+//               { backgroundColor: theme.colors.errorLight },
+//             ]}
+//             onPress={() => {}}>
+//             <Icon name="videocam" size={16} color={theme.colors.error} />
+//             <AppText variant="caption" color={theme.colors.error}>
+//               Live
+//             </AppText>
+//           </TouchableOpacity>
+//         }
+//       />
+//       <ScrollView
+//         style={styles.scrollView}
+//         contentContainerStyle={styles.contentContainer}
+//         showsVerticalScrollIndicator={false}
+//         refreshControl={
+//           <RefreshControl
+//             refreshing={isLoading || liveLoading}
+//             onRefresh={handleRefresh}
+//             tintColor={theme.colors.primary}
+//           />
+//         }>
+//         {/* <View style={styles.section}>
+//           <OnlineStatusCard
+//             availability={availability}
+//             onToggleOnline={toggleOnline}
+//             isLoading={isUpdating}
+//           />
+//         </View> */}
+
+//         <View style={[styles.section, styles.liveSection]}>
+//           {currentLive ? (
+//             <LiveStatusCard
+//               currentLive={currentLive}
+//               onEndLive={handleEndLive}
+//               formattedDuration={formattedDuration}
+//               isLoading={liveUpdating}
+//             />
+//           ) : (
+//             <GoLiveCard
+//               onGoLiveNow={handleGoLiveNow}
+//               onScheduleLive={() => setShowScheduleModal(true)}
+//               isLoading={liveUpdating}
+//             />
+//           )}
+//         </View>
+
+//         <View style={styles.section}>
+//           <UpcomingLiveList
+//             sessions={scheduledSessions}
+//             onCancel={handleCancelLive}
+//             onStartNow={handleStartNow}
+//           />
+//         </View>
+
+//         <View style={styles.section}>
+//           <SessionToggleCard
+//             availability={availability}
+//             onToggleChat={toggleChat}
+//             onToggleCall={toggleCall}
+//             isLoading={isUpdating}
+//           />
+//         </View>
+
+//         {/* <View style={styles.section}>
+//           <ModeCard
+//             availability={availability}
+//             onToggleBusyMode={toggleBusyMode}
+//             onToggleAutoAccept={toggleAutoAccept}
+//             isLoading={isUpdating}
+//           />
+//         </View> */}
+
+//         {/* <View style={styles.section}>
+//           <SessionLimitCard
+//             availability={availability}
+//             onUpdateMaxSessions={updateMaxSessions}
+//             isLoading={isUpdating}
+//           />
+//         </View> */}
+
+//         <View style={styles.section}>
+//           <WorkingHoursCard
+//             availability={availability}
+//             onUpdateWorkingHours={updateWorkingHours}
+//             isLoading={isUpdating}
+//           />
+//         </View>
+
+//         <View style={[styles.section, styles.lastSection]}>
+//           <InfoBanner availability={availability} isMockData={isMockData} />
+//         </View>
+//       </ScrollView>
+
+//       <ScheduleLiveModal
+//         visible={showScheduleModal}
+//         onClose={() => setShowScheduleModal(false)}
+//         onSchedule={handleSchedule}
+//       />
+//     </ScreenContainer>
+//   );
+// };
+
+// const styles = StyleSheet.create({
+//   scrollView: {
+//     flex: 1,
+//   },
+//   contentContainer: {
+//     paddingBottom: 30,
+//   },
+//   section: {
+//     marginTop: 8,
+//   },
+//   liveSection: {
+//     marginTop: 4,
+//   },
+//   lastSection: {
+//     marginTop: 16,
+//   },
+//   liveTab: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     paddingHorizontal: 12,
+//     paddingVertical: 6,
+//     borderRadius: 16,
+//     gap: 4,
+//   },
+// });
+
+// export default AvailabilityScreen;
+
+import React from 'react';
+import {View, StyleSheet} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { ScreenContainer } from '../../../../components/layout/ScreenContainer';
-import { Header } from '../../../../components/layout/Header';
-import { AppText } from '../../../../components/common/AppText';
-import { useTheme } from '../../../../hooks/useTheme';
-import { useAvailability } from '../hooks/useAvailability';
-import { useLiveSession } from '../hooks/useLiveSession';
-import { OnlineStatusCard } from '../components/OnlineStatusCard';
-import { SessionToggleCard } from '../components/SessionToggleCard';
-import { ModeCard } from '../components/ModeCard';
-import { SessionLimitCard } from '../components/SessionLimitCard';
-import { WorkingHoursCard } from '../components/WorkingHoursCard';
-import { InfoBanner } from '../components/InfoBanner';
-import { LiveStatusCard } from '../components/LiveStatusCard';
-import { GoLiveCard } from '../components/GoLiveCard';
-import { UpcomingLiveList } from '../components/UpcomingLiveList';
-import { ScheduleLiveModal } from '../components/ScheduleLiveModal';
-import { ScheduleLiveInput } from '../../domain/liveTypes';
+
+import {ScreenContainer} from '../../../../components/layout/ScreenContainer';
+import {AppText} from '../../../../components/common/AppText';
+import {useTheme} from '../../../../hooks/useTheme';
 
 export const AvailabilityScreen: React.FC = () => {
-  const { theme } = useTheme();
-  const {
-    availability,
-    isLoading,
-    isUpdating,
-    isMockData,
-    toggleOnline,
-    toggleChat,
-    toggleCall,
-    toggleBusyMode,
-    toggleAutoAccept,
-    updateMaxSessions,
-    updateWorkingHours,
-    refresh,
-  } = useAvailability();
-
-  const {
-    currentLive,
-    scheduledSessions,
-    isLoading: liveLoading,
-    isUpdating: liveUpdating,
-    formattedDuration,
-    goLiveNow,
-    endLive,
-    cancelScheduledLive,
-    scheduleLive,
-    refresh: refreshLive,
-  } = useLiveSession();
-
-  const [showScheduleModal, setShowScheduleModal] = useState(false);
-
-  const handleRefresh = () => {
-    refresh();
-    refreshLive();
-  };
-
-  const handleGoLiveNow = () => {
-    goLiveNow();
-  };
-
-  const handleEndLive = (sessionId: string) => {
-    endLive(sessionId);
-  };
-
-  const handleSchedule = (input: ScheduleLiveInput) => {
-    scheduleLive(input);
-  };
-
-  const handleCancelLive = (sessionId: string) => {
-    cancelScheduledLive(sessionId);
-  };
-
-  const handleStartNow = (sessionId: string) => {
-    goLiveNow(sessionId);
-  };
+  const {theme} = useTheme();
 
   return (
-    <ScreenContainer scrollable={false} withPadding={false}>
-      <Header
-        title="Availability"
-        rightComponent={
-          <TouchableOpacity
+    <ScreenContainer
+      scrollable={false}
+      withPadding={false}>
+
+      <View style={styles.container}>
+
+        {/* ================= UPCOMING LIVE ================= */}
+
+        <View
+          style={[
+            styles.popup,
+            {
+              backgroundColor:
+                theme.colors.surface,
+            },
+          ]}>
+
+          <View
             style={[
-              styles.liveTab,
-              { backgroundColor: theme.colors.errorLight },
-            ]}
-            onPress={() => {}}>
-            <Icon name="videocam" size={16} color={theme.colors.error} />
-            <AppText variant="caption" color={theme.colors.error}>
-              Live
-            </AppText>
-          </TouchableOpacity>
-        }
-      />
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.contentContainer}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={isLoading || liveLoading}
-            onRefresh={handleRefresh}
-            tintColor={theme.colors.primary}
-          />
-        }>
-        {/* <View style={styles.section}>
-          <OnlineStatusCard
-            availability={availability}
-            onToggleOnline={toggleOnline}
-            isLoading={isUpdating}
-          />
-        </View> */}
-
-        <View style={[styles.section, styles.liveSection]}>
-          {currentLive ? (
-            <LiveStatusCard
-              currentLive={currentLive}
-              onEndLive={handleEndLive}
-              formattedDuration={formattedDuration}
-              isLoading={liveUpdating}
+              styles.iconCircle,
+              {
+                backgroundColor:
+                  theme.colors.errorLight,
+              },
+            ]}>
+            <Icon
+              name="videocam-outline"
+              size={30}
+              color={theme.colors.error}
             />
-          ) : (
-            <GoLiveCard
-              onGoLiveNow={handleGoLiveNow}
-              onScheduleLive={() => setShowScheduleModal(true)}
-              isLoading={liveUpdating}
-            />
-          )}
+          </View>
+
+          <AppText
+            variant="h4"
+            color={theme.colors.text}
+            style={styles.title}>
+            Upcoming Live
+          </AppText>
+
+          <AppText
+            variant="body2"
+            color={theme.colors.textSecondary}
+            style={styles.subtitle}>
+            Coming Soon
+          </AppText>
+
         </View>
-
-        <View style={styles.section}>
-          <UpcomingLiveList
-            sessions={scheduledSessions}
-            onCancel={handleCancelLive}
-            onStartNow={handleStartNow}
-          />
-        </View>
-
-        <View style={styles.section}>
-          <SessionToggleCard
-            availability={availability}
-            onToggleChat={toggleChat}
-            onToggleCall={toggleCall}
-            isLoading={isUpdating}
-          />
-        </View>
-
-        {/* <View style={styles.section}>
-          <ModeCard
-            availability={availability}
-            onToggleBusyMode={toggleBusyMode}
-            onToggleAutoAccept={toggleAutoAccept}
-            isLoading={isUpdating}
-          />
-        </View> */}
-
-        {/* <View style={styles.section}>
-          <SessionLimitCard
-            availability={availability}
-            onUpdateMaxSessions={updateMaxSessions}
-            isLoading={isUpdating}
-          />
-        </View> */}
-
-        <View style={styles.section}>
-          <WorkingHoursCard
-            availability={availability}
-            onUpdateWorkingHours={updateWorkingHours}
-            isLoading={isUpdating}
-          />
-        </View>
-
-        <View style={[styles.section, styles.lastSection]}>
-          <InfoBanner availability={availability} isMockData={isMockData} />
-        </View>
-      </ScrollView>
-
-      <ScheduleLiveModal
-        visible={showScheduleModal}
-        onClose={() => setShowScheduleModal(false)}
-        onSchedule={handleSchedule}
-      />
+      </View>
     </ScreenContainer>
   );
 };
 
 const styles = StyleSheet.create({
-  scrollView: {
+  container: {
     flex: 1,
-  },
-  contentContainer: {
-    paddingBottom: 30,
-  },
-  section: {
-    marginTop: 8,
-  },
-  liveSection: {
-    marginTop: 4,
-  },
-  lastSection: {
-    marginTop: 16,
-  },
-  liveTab: {
-    flexDirection: 'row',
+
     alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-    gap: 4,
+    justifyContent: 'center',
+
+    backgroundColor: 'transparent',
+  },
+
+  popup: {
+    width: '80%',
+    maxWidth: 320,
+
+    borderRadius: 20,
+
+    paddingVertical: 25,
+    paddingHorizontal: 20,
+
+    alignItems: 'center',
+
+    elevation: 8,
+
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.18,
+    shadowRadius: 8,
+  },
+
+  iconCircle: {
+    width: 60,
+    height: 60,
+
+    borderRadius: 30,
+
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  title: {
+    marginTop: 12,
+    textAlign: 'center',
+  },
+
+  subtitle: {
+    marginTop: 4,
+    textAlign: 'center',
   },
 });
 
