@@ -240,6 +240,8 @@ const AllFollowers = () => {
     };
 
     const renderItem = ({ item }: any) => {
+
+        console.log('item', item);
         const joinedDate = item?.createdAt
             ? new Date(item.createdAt).toLocaleDateString('en-IN', {
                 day: 'numeric',
@@ -281,8 +283,11 @@ const AllFollowers = () => {
                         {item?.user?.name || 'Unknown User'}
                     </Text>
 
-                    <Text style={styles.mobileText}>
+                    {/* <Text style={styles.mobileText}>
                         {item?.user?.countryCode} {item?.user?.mobile}
+                    </Text> */}
+                    <Text style={styles.mobileText}>
+                        {item?.userId?.slice(-8) || 'N/A'}
                     </Text>
 
                     <View style={styles.metaRow}>
@@ -392,7 +397,7 @@ export default AllFollowers;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        marginTop:50
+        marginTop: 50
     },
 
     listContent: {
