@@ -20,6 +20,7 @@ export const GET_ASTROLOGER_REVIEWS_QUERY = `
       data {
         id
         sessionId
+        userName
         sessionType
         sessionStatus
         rating

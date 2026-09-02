@@ -1,6 +1,7 @@
 export interface AstrologerReview {
   id: string;
   sessionId: string;
+  userName: string;
   sessionType: string;
   sessionStatus: string;
   rating: number;

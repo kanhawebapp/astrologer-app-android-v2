@@ -30,6 +30,7 @@ export const AllReviewScreen: React.FC = () => {
     const [averageRating, setAverageRating] = useState(0);
     const { showError, showSuccess, showWarning } = useToast();
 
+
     const [selectedReview, setSelectedReview] =
         useState<AstrologerReview | null>(null);
 
@@ -226,6 +227,10 @@ export const AllReviewScreen: React.FC = () => {
         }
     };
 
+    const formatSessionId = (sessionId: string | number) => {
+        return String(sessionId).slice(-8).padStart(8, '0');
+    };
+
     return (
         <ScreenContainer scrollable={false} withPadding={false}>
             <Header
@@ -332,7 +337,21 @@ export const AllReviewScreen: React.FC = () => {
                                                     theme.colors.surface,
                                             },
                                         ]}>
+                                        <View style={styles.sessionInfo}>
+                                            <AppText
+                                                variant="caption"
+                                                color={theme.colors.textSecondary}
+                                            >
+                                                {review.userName || 'Unknown User'}
+                                            </AppText>
 
+                                            <AppText
+                                                variant="caption"
+                                                color={theme.colors.textSecondary}
+                                            >
+                                                Session ID: {formatSessionId(review.sessionId)}
+                                            </AppText>
+                                        </View>
                                         <View style={styles.reviewCardHeader}>
                                             <View style={styles.reviewHeaderLeft}>
                                                 <View style={styles.starsRow}>{renderStars(review.rating)}</View>
@@ -502,6 +521,12 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         paddingTop: 12,
         gap: 12,
+    },
+    sessionInfo: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        gap: 10,
     },
     reviewCard: {
         borderRadius: 12,
