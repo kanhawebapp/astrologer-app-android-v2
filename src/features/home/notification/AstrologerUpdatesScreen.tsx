@@ -137,6 +137,11 @@ const AstrologerUpdatesScreen = () => {
               styles.iconContainer,
               {
                 backgroundColor: item.isPinned ? '#FFE9C7' : '#EEF2FF',
+                width: 42,
+                height: 42,
+                borderRadius: 14,
+                marginRight: 12,
+                marginBottom: 0,
               },
             ]}>
             <Ionicons
