@@ -144,77 +144,77 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   //   }
   // }, [roomId, userName, upload]);
 
- const handlePickImage = async () => {
-  try {
-    const result = await launchImageLibrary({
-      mediaType: 'photo',
-      quality: 1,
-    });
+  const handlePickImage = async () => {
+    try {
+      const result = await launchImageLibrary({
+        mediaType: 'photo',
+        quality: 1,
+      });
 
-    if (result.didCancel || !result.assets?.length) {
-      return;
+      if (result.didCancel || !result.assets?.length) {
+        return;
+      }
+
+      const image = result.assets[0];
+
+      if (!image.uri) {
+        console.log('❌ Image URI is missing');
+        return;
+      }
+
+      const file = {
+        uri: image.uri,
+        name: image.fileName || 'image.jpg',
+        type: image.type || 'image/jpeg',
+      };
+
+      console.log('========== IMAGE SELECTED ==========');
+      console.log('File:', file);
+
+      const response = await uploadImage.uploadFile(file);
+
+      console.log(
+        '========== UPLOAD RESPONSE ==========',
+      );
+      console.log(
+        JSON.stringify(response, null, 2),
+      );
+
+      const uploaded = response?.data?.uploadFile;
+
+      if (!uploaded?.success || !uploaded?.url) {
+        throw new Error('Image upload failed');
+      }
+
+      console.log('Image URL:', uploaded.url);
+      console.log('Filename:', uploaded.filename);
+
+      const messageId = generateId();
+      const indianTime = new Date().toLocaleString('en-IN', {
+        timeZone: 'Asia/Kolkata',
+      });
+      const astrologerId = authUser?.id || activeSession?.astrologerId || '';
+      const userId = activeSession?.userId || '';
+      const replyTo = replyToMessage || null;
+
+      const payloadToSend = {
+        room_id: String(roomId),
+        msg_id: messageId,
+        sender_id: astrologerId,
+        received_id: userId || '',
+        sender: 'astrologer',
+        message: '',
+        image: uploaded.url,
+        time: indianTime,
+        replyTo,
+      };
+
+      socketManager.emit(ChatSocketEvents.SEND_MESSAGE, payloadToSend);
+      onCancelReply?.();
+    } catch (error) {
+      console.log('❌ IMAGE PICK/UPLOAD ERROR:', error);
     }
-
-    const image = result.assets[0];
-
-    if (!image.uri) {
-      console.log('❌ Image URI is missing');
-      return;
-    }
-
-    const file = {
-      uri: image.uri,
-      name: image.fileName || 'image.jpg',
-      type: image.type || 'image/jpeg',
-    };
-
-    console.log('========== IMAGE SELECTED ==========');
-    console.log('File:', file);
-
-    const response = await uploadImage.uploadFile(file);
-
-    console.log(
-      '========== UPLOAD RESPONSE ==========',
-    );
-    console.log(
-      JSON.stringify(response, null, 2),
-    );
-
-    const uploaded = response?.data?.uploadFile;
-
-    if (!uploaded?.success || !uploaded?.url) {
-      throw new Error('Image upload failed');
-    }
-
-    console.log('Image URL:', uploaded.url);
-    console.log('Filename:', uploaded.filename);
-
-    const messageId = generateId();
-    const indianTime = new Date().toLocaleString('en-IN', {
-      timeZone: 'Asia/Kolkata',
-    });
-    const astrologerId = authUser?.id || activeSession?.astrologerId || '';
-    const userId = activeSession?.userId || '';
-    const replyTo = replyToMessage || null;
-
-    const payloadToSend = {
-      room_id: String(roomId),
-      msg_id: messageId,
-      sender_id: astrologerId,
-      received_id: userId || '',
-      sender: 'astrologer',
-      message: '',
-      image: uploaded.url,
-      time: indianTime,
-      replyTo,
-    };
-
-    socketManager.emit(ChatSocketEvents.SEND_MESSAGE, payloadToSend);
-    onCancelReply?.();
-  } catch (error) {
-    console.log('❌ IMAGE PICK/UPLOAD ERROR:', error);
-  }
-};
+  };
 
 
 
@@ -379,9 +379,8 @@ export const ChatInput: React.FC<ChatInputProps> = ({
       )}
 
       <View style={styles.inputRow}>
-        <TouchableOpacity onPress={handlePickImage} style={styles.imageButton}>
-          <Icon name="image" size={22} color={theme.colors.primary} />
-        </TouchableOpacity>
+
+
 
         <Animated.View
           style={[
@@ -411,6 +410,32 @@ export const ChatInput: React.FC<ChatInputProps> = ({
             placeholderTextColor={theme.colors.textTertiary}
           />
         </Animated.View>
+
+        {!text.trim() && (
+          <>
+
+            <TouchableOpacity onPress={handlePickImage} style={styles.imageButton}>
+              <Icon name="image" size={22} color={theme.colors.primary} />
+            </TouchableOpacity>
+            {/* KUNDLI */}
+            <TouchableOpacity
+              // onPress={handleKundliPress}
+              style={[
+                styles.kundliButton,
+                {
+                  backgroundColor: theme.colors.primary + '15',
+                },
+              ]}
+              activeOpacity={0.7}>
+              <Icon
+                name="auto-awesome"
+                size={21}
+                color={theme.colors.primary}
+              />
+            </TouchableOpacity>
+
+          </>
+        )}
 
         <TouchableOpacity
           onPress={handleSend}
@@ -484,6 +509,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginRight: 8,
     backgroundColor: 'rgba(37, 211, 102, 0.1)',
+  },
+  kundliButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 8,
   },
   inputWrapper: {
     flex: 1,
