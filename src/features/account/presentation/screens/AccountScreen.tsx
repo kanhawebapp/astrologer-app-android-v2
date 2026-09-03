@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, {useState, useCallback, useEffect} from 'react';
 import {
   View,
   ScrollView,
@@ -8,27 +8,27 @@ import {
   TouchableOpacity,
   Text,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { ScreenContainer } from '../../../../components/layout/ScreenContainer';
-import { Header } from '../../../../components/layout/Header';
-import { AppText } from '../../../../components/common/AppText';
-import { useTheme } from '../../../../hooks/useTheme';
-import { useAuth } from '../../../../hooks/useAuth';
-import { useAccount } from '../hooks/useAccount';
-import { ProfileHeader } from '../components/ProfileHeader';
-import { StatusToggleCard } from '../components/StatusToggleCard';
-import { StatsCard } from '../components/StatsCard';
-import { InfoCard } from '../components/InfoCard';
-import { SettingList } from '../components/SettingList';
-import { LogoutButton } from '../components/LogoutButton';
-import { astrologerServicesApi } from '../../../../services/api/AvailvalityToggle/toggleAstrologerService.service';
+import {useNavigation} from '@react-navigation/native';
+import {ScreenContainer} from '../../../../components/layout/ScreenContainer';
+import {Header} from '../../../../components/layout/Header';
+import {AppText} from '../../../../components/common/AppText';
+import {useTheme} from '../../../../hooks/useTheme';
+import {useAuth} from '../../../../hooks/useAuth';
+import {useAccount} from '../hooks/useAccount';
+import {ProfileHeader} from '../components/ProfileHeader';
+import {StatusToggleCard} from '../components/StatusToggleCard';
+import {StatsCard} from '../components/StatsCard';
+import {InfoCard} from '../components/InfoCard';
+import {SettingList} from '../components/SettingList';
+import {LogoutButton} from '../components/LogoutButton';
+import {astrologerServicesApi} from '../../../../services/api/AvailvalityToggle/toggleAstrologerService.service';
 import ReviewActionCard from './ReviewActionCard';
-import { appVersionApi } from '../../../../services/api/version/version.api';
+import {appVersionApi} from '../../../../services/api/version/version.api';
 
 export const AccountScreen: React.FC = () => {
-  const { theme } = useTheme();
+  const {theme} = useTheme();
   const navigation = useNavigation<any>();
-  const { logout } = useAuth();
+  const {logout} = useAuth();
 
   const {
     dashboard,
@@ -49,7 +49,6 @@ export const AccountScreen: React.FC = () => {
   const [availability, setAvailability] = useState<any>('');
   const [version, setVersion] = useState<any>('');
 
-
   const fetchServices = useCallback(async () => {
     try {
       const response = await astrologerServicesApi.getAstrologerServices({
@@ -62,7 +61,6 @@ export const AccountScreen: React.FC = () => {
       console.log('services fetch error:', error);
     }
   }, [profile?.id]);
-
 
   useEffect(() => {
     refreshDashboard();
@@ -77,18 +75,18 @@ export const AccountScreen: React.FC = () => {
       fetchReviews(),
     ]);
     setRefreshing(false);
-  }, [refreshDashboard,
+  }, [
+    refreshDashboard,
     //  fetchAnalytics,
-    fetchServices, fetchReviews]);
-
-
-
+    fetchServices,
+    fetchReviews,
+  ]);
 
   const handleLogout = useCallback(() => {
     console.log('Logout initiated');
     Alert.alert('Logout', 'Are you sure you want to logout?', [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Logout', style: 'destructive', onPress: logout },
+      {text: 'Cancel', style: 'cancel'},
+      {text: 'Logout', style: 'destructive', onPress: logout},
     ]);
   }, [logout]);
 
@@ -132,7 +130,6 @@ export const AccountScreen: React.FC = () => {
       );
     }
   }, []);
-
 
   useEffect(() => {
     fetchServices();
@@ -188,20 +185,17 @@ export const AccountScreen: React.FC = () => {
     },
     {
       title: 'My Remedies',
-      onPress: () =>
-        navigation.navigate('MyRemedies'),
+      onPress: () => navigation.navigate('MyRemedies'),
     },
     {
       title: 'My Services',
-      onPress: () =>
-        navigation.navigate('MyServices'),
+      onPress: () => navigation.navigate('MyServices'),
     },
   ];
 
   const isInitialLoading = loading && !dashboard;
 
   //version
-
 
   const checkAppVersion = async () => {
     try {
@@ -234,8 +228,6 @@ export const AccountScreen: React.FC = () => {
   useEffect(() => {
     checkAppVersion();
   }, []);
-
-
 
   if (isInitialLoading) {
     return (
@@ -288,11 +280,6 @@ export const AccountScreen: React.FC = () => {
           justifyContent: 'space-between',
         }}>
         <Header title="Control Center" />
-        <TouchableOpacity
-          style={[styles.noticeBtn, { backgroundColor: theme.colors.secondary }]}
-          onPress={() => navigation.navigate('NoticeScreen')}>
-          <AppText>Notice</AppText>
-        </TouchableOpacity>
       </View>
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -319,11 +306,7 @@ export const AccountScreen: React.FC = () => {
           />
         )}
 
-        {stats && profile && (
-          <StatsCard stats={stats} profile={profile} />
-        )}
-
-
+        {stats && profile && <StatsCard stats={stats} profile={profile} />}
 
         {profile && (
           <>
@@ -333,7 +316,7 @@ export const AccountScreen: React.FC = () => {
             <View
               style={[
                 styles.aboutContainer,
-                { backgroundColor: theme.colors.surface },
+                {backgroundColor: theme.colors.surface},
               ]}>
               <AppText
                 variant="label"
@@ -348,17 +331,15 @@ export const AccountScreen: React.FC = () => {
           </>
         )}
         {actions.map((item, index) =>
-          item.subtitle && !profile
-            ? null
-            : (
-              <ReviewActionCard
-                key={index}
-                title={item.title}
-                subtitle={item.subtitle}
-                theme={theme}
-                onPress={item.onPress}
-              />
-            ),
+          item.subtitle && !profile ? null : (
+            <ReviewActionCard
+              key={index}
+              title={item.title}
+              subtitle={item.subtitle}
+              theme={theme}
+              onPress={item.onPress}
+            />
+          ),
         )}
 
         {/* <SettingList
@@ -368,12 +349,14 @@ export const AccountScreen: React.FC = () => {
         /> */}
 
         <LogoutButton onLogout={handleLogout} />
-        <Text style={{
-          textAlign: 'center',
-          color: theme.colors.textSecondary,
-          marginVertical: 8
-        }}>
-          {`Version: ${version?.latestVersion || "1.0.0"}`}</Text>
+        <Text
+          style={{
+            textAlign: 'center',
+            color: theme.colors.textSecondary,
+            marginVertical: 8,
+          }}>
+          {`Version: ${version?.latestVersion || '1.0.0'}`}
+        </Text>
         <View style={styles.bottomSpacer} />
       </ScrollView>
     </ScreenContainer>
@@ -403,7 +386,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     elevation: 2,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },
@@ -470,12 +453,5 @@ const styles = StyleSheet.create({
     marginTop: 16,
     width: '100%',
     paddingHorizontal: 20,
-  },
-  noticeBtn: {
-    position: 'absolute',
-    right: 20,
-    padding: 5,
-    borderWidth: 1,
-    borderRadius: 10,
   },
 });

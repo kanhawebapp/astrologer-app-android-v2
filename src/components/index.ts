@@ -7,6 +7,7 @@ export { FadeInView } from './common/FadeInView';
 export { ChatBubble } from './common/ChatBubble';
 export { FloatingChatBubble } from './common/FloatingChatBubble';
 export { Header } from './layout/Header';
+export { GoBack } from './common/GoBack';
 export { ScreenContainer } from './layout/ScreenContainer';
 export { ErrorBoundary } from './ErrorBoundary';
 export { GlobalOverlay } from './GlobalOverlay';

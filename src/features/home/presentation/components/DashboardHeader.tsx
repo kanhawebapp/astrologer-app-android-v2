@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useEffect, useRef } from 'react';
+import React, {memo, useCallback, useEffect, useRef} from 'react';
 import {
   View,
   StyleSheet,
@@ -9,23 +9,23 @@ import {
   Image,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { AppText } from '../../../../components/common/AppText';
-import { useTheme } from '../../../../hooks/useTheme';
-import { LiveStatus } from '../../domain/types';
-import { HeaderContainer } from './header/HeaderContainer';
-import { GreetingSection } from './header/GreetingSection';
-import { PremiumBadge } from './header/PremiumBadge';
-import { NotificationButton } from './header/NotificationButton';
-import { LiveStatusCard } from './header/LiveStatusCard';
-import { EnergyFooter } from './header/EnergyFooter';
-import { DecorativeBackground } from './header/DecorativeBackground';
-import { useTimeTheme } from './header/hooks/useTimeTheme';
+import {AppText} from '../../../../components/common/AppText';
+import {useTheme} from '../../../../hooks/useTheme';
+import {LiveStatus} from '../../domain/types';
+import {HeaderContainer} from './header/HeaderContainer';
+import {GreetingSection} from './header/GreetingSection';
+import {PremiumBadge} from './header/PremiumBadge';
+import {NotificationButton} from './header/NotificationButton';
+import {LiveStatusCard} from './header/LiveStatusCard';
+import {EnergyFooter} from './header/EnergyFooter';
+import {DecorativeBackground} from './header/DecorativeBackground';
+import {useTimeTheme} from './header/hooks/useTimeTheme';
 import {
   useHeaderAnimations,
   useNotificationAnimation,
 } from './header/hooks/useHeaderAnimations';
-import { TimeOfDay } from './header/theme/timeThemeColors';
-import { useNavigation } from '@react-navigation/native';
+import {TimeOfDay} from './header/theme/timeThemeColors';
+import {useNavigation} from '@react-navigation/native';
 
 interface DashboardHeaderProps {
   profile: any;
@@ -44,20 +44,19 @@ const formatDate = (): string => {
 };
 
 export const DashboardHeader: React.FC<DashboardHeaderProps> = memo(
-  ({ profile, liveStatus, onNotificationPress, notificationCount = 0 }) => {
-    const { theme, mode } = useTheme();
+  ({profile, liveStatus, onNotificationPress, notificationCount = 0}) => {
+    const {theme, mode} = useTheme();
     const isDark = mode === 'dark';
     const timeTheme = useTimeTheme();
-    const navigation = useNavigation<any>()
+    const navigation = useNavigation<any>();
 
-    const { isOnline, hasNotification } = {
+    const {isOnline, hasNotification} = {
       isOnline: liveStatus?.isOnline,
       hasNotification: notificationCount > 0,
     };
 
-    const animations = useHeaderAnimations({ isOnline, hasNotification });
-    const { scale: notificationScale, startBounce } =
-      useNotificationAnimation();
+    const animations = useHeaderAnimations({isOnline, hasNotification});
+    const {scale: notificationScale, startBounce} = useNotificationAnimation();
 
     useEffect(() => {
       if (notificationCount > 0) {
@@ -66,7 +65,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = memo(
     }, [notificationCount, startBounce]);
 
     const handleNotificationPress = useCallback(() => {
-      navigation.navigate("NotificationScreen")
+      navigation.navigate('AstrologerUpdatesScreen');
       onNotificationPress();
     }, [onNotificationPress]);
 
@@ -78,9 +77,15 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = memo(
 
     const getActiveSessionTypes = (status: LiveStatus): string[] => {
       const types: string[] = [];
-      if (status.chatEnabled) types.push('Chat');
-      if (status.callEnabled) types.push('Call');
-      if (status.videoEnabled) types.push('Video');
+      if (status.chatEnabled) {
+        types.push('Chat');
+      }
+      if (status.callEnabled) {
+        types.push('Call');
+      }
+      if (status.videoEnabled) {
+        types.push('Video');
+      }
       return types;
     };
 
@@ -100,7 +105,6 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = memo(
         }),
       ).start();
     }, []);
-
 
     const spin = rotateAnim.interpolate({
       inputRange: [0, 1],
@@ -129,28 +133,24 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = memo(
               <View style={styles.onlineIndicator} />
             </View> */}
 
-
             <View style={styles.astrologerImageContainer}>
               <Animated.View
                 style={[
                   styles.sunRing,
                   {
-                    transform: [{ rotate: spin }],
+                    transform: [{rotate: spin}],
                   },
                 ]}
               />
 
-              <Image
-                source={{ uri: imageUrl }}
-                style={styles.astrologerImage}
-              />
+              <Image source={{uri: imageUrl}} style={styles.astrologerImage} />
             </View>
 
             <View style={styles.greetingContainer}>
               <View style={styles.greetingRow}>
                 <AppText
                   // variant="h3"
-                  style={[styles.greeting, { color: theme.colors.white }]}>
+                  style={[styles.greeting, {color: theme.colors.white}]}>
                   {getGreeting()}
                 </AppText>
               </View>
@@ -163,10 +163,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = memo(
               <View style={styles.subtitleContainer}>
                 <AppText
                   variant="body2"
-                  style={[
-                    styles.cosmicSubtitle,
-                    { color: theme.colors.white },
-                  ]}>
+                  style={[styles.cosmicSubtitle, {color: theme.colors.white}]}>
                   {timeTheme.subtitle}
                 </AppText>
               </View>
@@ -202,7 +199,6 @@ const styles = StyleSheet.create({
     // paddingBottom: 20,
     // paddingHorizontal: 20,
     // overflow: 'hidden',
-
   },
   decorativeStars: {
     position: 'absolute',
@@ -278,7 +274,7 @@ const styles = StyleSheet.create({
     shadowColor: '#FBBF24',
     shadowOpacity: 0.9,
     shadowRadius: 12,
-    shadowOffset: { width: 0, height: 0 },
+    shadowOffset: {width: 0, height: 0},
     elevation: 12,
   },
 
@@ -291,15 +287,14 @@ const styles = StyleSheet.create({
   },
 
   sunRing: {
-  position: 'absolute',
-  width: 82,
-  height: 82,
-  borderRadius: 41,
-  borderWidth: 3,
-  borderStyle: 'dashed',
-  borderColor: '#F59E0B',
-},
-
+    position: 'absolute',
+    width: 82,
+    height: 82,
+    borderRadius: 41,
+    borderWidth: 3,
+    borderStyle: 'dashed',
+    borderColor: '#F59E0B',
+  },
 
   greetingRow: {
     flexDirection: 'row',
@@ -430,7 +425,7 @@ const styles = StyleSheet.create({
     ...Platform.select({
       ios: {
         shadowColor: '#10B981',
-        shadowOffset: { width: 0, height: 4 },
+        shadowOffset: {width: 0, height: 4},
         shadowOpacity: 0.3,
         shadowRadius: 8,
       },

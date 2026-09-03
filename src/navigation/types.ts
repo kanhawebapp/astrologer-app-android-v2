@@ -39,6 +39,7 @@ export type RootStackParamList = {
     sessionId: string;
     userName?: string;
   };
+  AstrologerUpdatesScreen: undefined;
 };
 
 export type AuthStackParamList = {
