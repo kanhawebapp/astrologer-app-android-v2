@@ -262,18 +262,35 @@ const AstrologerUpdatesScreen = () => {
             style={styles.scrollView}
             contentContainerStyle={styles.scrollContent}>
             <View style={styles.section}>
-              <AppText
-                style={[styles.sectionTitle, { color: theme.colors.text }]}>
-                English
-              </AppText>
-              {ENGLISH_DOS_DONTS.map(item => (
-                <View key={item.id} style={styles.listItem}>
+              <View style={styles.sectionHeader}>
+                <Ionicons
+                  name="language-outline"
+                  size={20}
+                  color={theme.colors.primary}
+                  style={{ marginRight: 8 }}
+                />
+                <AppText
+                  style={[styles.sectionTitle, { color: theme.colors.text }]}>
+                  English
+                </AppText>
+              </View>
+              {ENGLISH_DOS_DONTS.map((item, index) => (
+                <View
+                  key={item.id}
+                  style={[
+                    styles.listItem,
+                    {
+                      backgroundColor: theme.colors.card,
+                      borderColor: theme.colors.border,
+                    },
+                  ]}>
                   <View
                     style={[
-                      styles.bullet,
+                      styles.numberBadge,
                       { backgroundColor: theme.colors.primary },
-                    ]}
-                  />
+                    ]}>
+                    <AppText style={styles.numberText}>{index + 1}</AppText>
+                  </View>
                   <AppText
                     color={theme.colors.textSecondary}
                     style={styles.listText}>
@@ -281,31 +298,56 @@ const AstrologerUpdatesScreen = () => {
                   </AppText>
                 </View>
               ))}
-              <View style={styles.note}>
+              <View
+                style={[
+                  styles.note,
+                  {
+                    backgroundColor: theme.colors.surfaceSecondary,
+                    borderColor: theme.colors.border,
+                    borderLeftColor: theme.colors.primary,
+                  },
+                ]}>
+                <AppText style={[styles.noteBold, { color: theme.colors.primary }]}>
+                  Important Note:
+                </AppText>
                 <AppText
                   color={theme.colors.textSecondary}
-                  style={styles.noteBold}>
-                  Note:{' '}
-                </AppText>
-                <AppText color={theme.colors.textSecondary}>
-                  If Dhwani Astro finds any policy being violated, strict action
-                  will be taken.
+                  style={styles.noteText}>
+                  If Dhwani Astro finds any policy being violated, strict
+                  action will be taken.
                 </AppText>
               </View>
             </View>
             <View style={[styles.section, { marginTop: spacing.xxl }]}>
-              <AppText
-                style={[styles.sectionTitle, { color: theme.colors.text }]}>
-                Hindi
-              </AppText>
-              {HINDI_DOS_DONTS.map(item => (
-                <View key={item.id} style={styles.listItem}>
+              <View style={styles.sectionHeader}>
+                <Ionicons
+                  name="language-outline"
+                  size={20}
+                  color={theme.colors.primary}
+                  style={{ marginRight: 8 }}
+                />
+                <AppText
+                  style={[styles.sectionTitle, { color: theme.colors.text }]}>
+                  Hindi
+                </AppText>
+              </View>
+              {HINDI_DOS_DONTS.map((item, index) => (
+                <View
+                  key={item.id}
+                  style={[
+                    styles.listItem,
+                    {
+                      backgroundColor: theme.colors.card,
+                      borderColor: theme.colors.border,
+                    },
+                  ]}>
                   <View
                     style={[
-                      styles.bullet,
+                      styles.numberBadge,
                       { backgroundColor: theme.colors.primary },
-                    ]}
-                  />
+                    ]}>
+                    <AppText style={styles.numberText}>{index + 1}</AppText>
+                  </View>
                   <AppText
                     color={theme.colors.textSecondary}
                     style={styles.listText}>
@@ -313,15 +355,25 @@ const AstrologerUpdatesScreen = () => {
                   </AppText>
                 </View>
               ))}
-              <View style={styles.note}>
+              <View
+                style={[
+                  styles.note,
+                  {
+                    backgroundColor: theme.colors.surfaceSecondary,
+                    borderColor: theme.colors.border,
+                    borderLeftColor: theme.colors.primary,
+                  },
+                ]}>
+                <AppText
+                  style={[styles.noteBold, { color: theme.colors.primary }]}>
+                  महत्वपूर्ण नोट:
+                </AppText>
                 <AppText
                   color={theme.colors.textSecondary}
-                  style={styles.noteBold}>
-                  नोट:{' '}
-                </AppText>
-                <AppText color={theme.colors.textSecondary}>
-                  यदि ध्वनि एस्ट्रो को किसी भी नीति के उल्लंघन का पता चलता है,
-                  तो सख्त कार्रवाई की जाएगी।
+                  style={styles.noteText}>
+                  {' '}
+                  यदि ध्वनि एस्ट्रो को किसी भी नीति के उल्लंघन का पता
+                  चलता है, तो सख्त कार्रवाई की जाएगी।
                 </AppText>
               </View>
             </View>
@@ -436,6 +488,11 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   section: {},
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: spacing.md,
+  },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '700',
@@ -444,26 +501,45 @@ const styles = StyleSheet.create({
   listItem: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginBottom: spacing.md,
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 10,
+    borderWidth: 0.5,
   },
-  bullet: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    marginTop: 8,
-    marginRight: spacing.md,
+  numberBadge: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 10,
+    marginTop: 2,
+  },
+  numberText: {
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '700',
   },
   listText: {
     flex: 1,
-    lineHeight: 22,
+    lineHeight: 20,
     fontSize: 14,
   },
   note: {
-    marginTop: spacing.lg,
-    lineHeight: 22,
+    marginTop: spacing.md,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 10,
+    borderLeftWidth: 4,
   },
   noteBold: {
-    fontWeight: '600',
+    fontWeight: '700',
+    fontSize: 13,
+  },
+  noteText: {
+    marginTop: 2,
+    lineHeight: 18,
+    fontSize: 13,
   },
   noticeCard: {
     borderRadius: 10,
