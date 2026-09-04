@@ -114,6 +114,7 @@ export const ChatScreen: React.FC = () => {
               userName="Astrologer"
               replyToMessage={vm.replyToMessage}
               onCancelReply={vm.handleCancelReply}
+              onKundliPress={vm.handleKundliPress}
             />
           </View>
         </KeyboardAvoidingView>

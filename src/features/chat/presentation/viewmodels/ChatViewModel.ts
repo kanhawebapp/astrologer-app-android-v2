@@ -72,9 +72,12 @@ const [typingUserName, setTypingUserName] = useState('');
   } = useChatTimer();
 
   // Redux state
-  const chatRequests = useSelector(
-    (state: RootState) => state.chat.chatRequests,
-  );
+   const chatRequests = useSelector(
+     (state: RootState) => state.chat.chatRequests,
+   );
+   const chatRequest = useSelector(
+     (state: RootState) => state.user.chatRequest,
+   );
   const error = useSelector((state: RootState) => state.chat.error);
   const chats = useSelector((state: RootState) => state.chat.chats);
   const authUser = useSelector((state: RootState) => state.auth.user);
@@ -413,6 +416,33 @@ console.log("data>>>>",data)
     setReplyToMessage(undefined);
   }, []);
 
+  const handleKundliPress = useCallback(() => {
+    const userName = chatRequest?.userName || '';
+    const bdate =
+      chatRequest?.dateOfBirth || chatRequest?.bdate || chatRequest?.dob || '';
+    const btime =
+      chatRequest?.timeOfBirth || chatRequest?.btime || chatRequest?.tob || '';
+    const locationplace =
+      chatRequest?.location || chatRequest?.locationplace || '';
+    const latitude = chatRequest?.latitude ?? chatRequest?.lat ?? '';
+    const longitude = chatRequest?.longitude ?? chatRequest?.lon ?? '';
+
+    const params = new URLSearchParams({
+      source: 'dashboard',
+      name: userName || '',
+      dob: bdate || '',
+      time: btime || '',
+      place: locationplace || '',
+      lat: latitude ? latitude.toString() : '',
+      lon: longitude ? longitude.toString() : '',
+      tzone: '5.5',
+    });
+console.log('Kundli URL params:', params.toString());
+    const kundliUrl = `https://dhwani-astro-v2.vercel.app/freeservices/kundali/getKundaliPage?${params.toString()}`;
+
+    navigation.navigate('KundliWebView', {kundliUrl});
+  }, [navigation, chatRequest]);
+
   // Time-critical alert (after handlers)
  useEffect(() => {
   if (isTimeCritical && remainingTime === 0) {
@@ -482,6 +512,7 @@ console.log("data>>>>",data)
       handleSendMessage,
       handleReplyPress,
       handleCancelReply,
+      handleKundliPress,
       handleContentSizeChange,
       flatListRef,
       prevMessageCountRef,
@@ -516,6 +547,7 @@ console.log("data>>>>",data)
       handleSendMessage,
       handleReplyPress,
       handleCancelReply,
+      handleKundliPress,
       handleContentSizeChange,
       flatListRef,
       prevMessageCountRef,

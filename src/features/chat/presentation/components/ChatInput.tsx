@@ -34,6 +34,7 @@ interface ChatInputProps {
   userName: string;
   replyToMessage?: ReplyToData | null;
   onCancelReply?: () => void;
+  onKundliPress?: () => void;
 }
 
 export const ChatInput: React.FC<ChatInputProps> = ({
@@ -42,6 +43,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   userName,
   replyToMessage,
   onCancelReply,
+  onKundliPress,
 }) => {
   const { theme } = useTheme();
   const [text, setText] = useState('');
@@ -419,7 +421,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
             </TouchableOpacity>
             {/* KUNDLI */}
             <TouchableOpacity
-              // onPress={handleKundliPress}
+              onPress={onKundliPress}
               style={[
                 styles.kundliButton,
                 {

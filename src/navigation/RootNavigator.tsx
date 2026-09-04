@@ -72,6 +72,7 @@ import OfferScreen from '../features/account/presentation/screens/OfferSecreen';
 import SessionDetailScreen from '../features/sessions/presentation/screens/SessionDetailScreen';
 import SessionMessagesScreen from '../features/sessions/presentation/screens/SessionMessagesScreen';
 import KundliScreen from '../features/sessions/screens/KundliScreen';
+import KundliWebViewScreen from '../features/chat/presentation/screens/KundliWebViewScreen';
 import AllFollowers from '../features/account/presentation/screens/AllFollowers';
 import AnalytcsScreen from '../features/account/presentation/screens/AnalyticsScreen';
 import AstrologerUpdatesScreen from '../features/home/notification/AstrologerUpdatesScreen';
@@ -179,6 +180,13 @@ export const RootNavigator: React.FC = () => {
               <Stack.Screen
                 name="KundliScreen"
                 component={KundliScreen}
+                options={{
+                  presentation: 'card',
+                }}
+              />
+              <Stack.Screen
+                name="KundliWebView"
+                component={KundliWebViewScreen}
                 options={{
                   presentation: 'card',
                 }}

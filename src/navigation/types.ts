@@ -22,6 +22,9 @@ export type RootStackParamList = {
     userName?: string;
     maximumTime?: number;
   };
+  KundliWebView: {
+    kundliUrl: string;
+  };
   CallScreen: {
     roomId: string;
     callId?: string;
