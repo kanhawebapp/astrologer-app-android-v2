@@ -35,3 +35,8 @@ export const STORAGE_KEYS = {
   THEME_MODE: '@theme_mode',
   ONBOARDING_DONE: '@onboarding_done',
 } as const;
+
+export const URLS = {
+  KUNDLI_WEBVIEW:
+    'https://dhwani-astro-v2.vercel.app/freeservices/kundali/getKundaliPage',
+} as const;

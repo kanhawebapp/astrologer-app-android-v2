@@ -7,8 +7,11 @@ import { setActiveChat } from '../../../../store/slices/chatSlice';
 import { selectMessagesByRoom } from '../../../../store/selectors/chatSelectors';
 import { useChatSocket, useChatMessages, useChatTimer } from '../hooks';
 import type { ChatMessage, ReplyToData } from '../../domain/chatTypes';
-import { RootStackParamList } from '../../../../navigation/types';
-import { socketManager } from '../../../../services/socket/socketManager';
+import {RootStackParamList} from '../../../../navigation/types';
+import {socketManager} from '../../../../services/socket/socketManager';
+import {geocodeAddress} from '../../../../services/location/geocoding';
+import {URLS} from '../../../../utils/constants';
+import {useToast} from '../../../../hooks/useToast';
 
 const DEBUG_PREFIX = '[ChatViewModel]';
 
@@ -81,6 +84,7 @@ const [typingUserName, setTypingUserName] = useState('');
   const error = useSelector((state: RootState) => state.chat.error);
   const chats = useSelector((state: RootState) => state.chat.chats);
   const authUser = useSelector((state: RootState) => state.auth.user);
+  const {showError} = useToast();
 
   // Derived: effective room ID
   const effectiveRoomId = useMemo((): string | undefined => {
@@ -185,7 +189,6 @@ const [typingUserName, setTypingUserName] = useState('');
  useEffect(() => {
   const handleTyping = (data: any) => {
     if (!data) return;
-console.log("data>>>>",data)
     const incomingRoomId = data.room_id || data.roomId || data.roomid;
     if (incomingRoomId !== effectiveRoomId) return;
 
@@ -416,32 +419,51 @@ console.log("data>>>>",data)
     setReplyToMessage(undefined);
   }, []);
 
-  const handleKundliPress = useCallback(() => {
-    const userName = chatRequest?.userName || '';
-    const bdate =
-      chatRequest?.dateOfBirth || chatRequest?.bdate || chatRequest?.dob || '';
-    const btime =
-      chatRequest?.timeOfBirth || chatRequest?.btime || chatRequest?.tob || '';
-    const locationplace =
-      chatRequest?.location || chatRequest?.locationplace || '';
-    const latitude = chatRequest?.latitude ?? chatRequest?.lat ?? '';
-    const longitude = chatRequest?.longitude ?? chatRequest?.lon ?? '';
+  const handleKundliPress = useCallback(async () => {
+    try {
+      const userName = chatRequest?.userName || '';
+      const bdate =
+        chatRequest?.dateOfBirth ||
+        chatRequest?.bdate ||
+        chatRequest?.dob ||
+        '';
+      const btime =
+        chatRequest?.timeOfBirth ||
+        chatRequest?.btime ||
+        chatRequest?.tob ||
+        '';
+      const locationplace =
+        chatRequest?.location ||
+        chatRequest?.locationplace ||
+        chatRequest?.address ||
+        chatRequest?.birthPlace ||
+        '';
 
-    const params = new URLSearchParams({
-      source: 'dashboard',
-      name: userName || '',
-      dob: bdate || '',
-      time: btime || '',
-      place: locationplace || '',
-      lat: latitude ? latitude.toString() : '',
-      lon: longitude ? longitude.toString() : '',
-      tzone: '5.5',
-    });
-console.log('Kundli URL params:', params.toString());
-    const kundliUrl = `https://dhwani-astro-v2.vercel.app/freeservices/kundali/getKundaliPage?${params.toString()}`;
+      const geocodeResult = await geocodeAddress(locationplace);
+      const latitude = geocodeResult.latitude;
+      const longitude = geocodeResult.longitude;
 
-    navigation.navigate('KundliWebView', {kundliUrl});
-  }, [navigation, chatRequest]);
+      const params = new URLSearchParams({
+        source: Platform.OS,
+        name: userName || '',
+        dob: bdate || '',
+        time: btime || '',
+        place: locationplace || '',
+        lat: latitude || '',
+        lon: longitude || '',
+        tzone: '5.5',
+      });
+
+      const kundliUrl = `${URLS.KUNDLI_WEBVIEW}?${params.toString()}`;
+
+      console.log('Kundli data:', params.toString());
+
+
+      navigation.navigate('KundliWebView', {kundliUrl});
+    } catch (e) {
+      showError('Unable to load Kundli. Invalid address or location data.');
+    }
+  }, [navigation, chatRequest, showError]);
 
   // Time-critical alert (after handlers)
  useEffect(() => {

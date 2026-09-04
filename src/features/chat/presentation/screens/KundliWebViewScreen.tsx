@@ -9,6 +9,20 @@ import {RootStackParamList} from '../../../../navigation/types';
 
 type KundliWebViewRouteProp = RouteProp<RootStackParamList, 'KundliWebView'>;
 
+const INJECTED_JAVASCRIPT = `
+  (function() {
+    try {
+      Object.defineProperty(Document.prototype, 'referrer', {
+        value: 'https://external-referrer.dhwaniastro.com/',
+        configurable: true,
+        writable: true,
+      });
+    } catch (e) {
+      console.warn('[KundliWebView] Failed to override document.referrer:', e);
+    }
+  })();
+`;
+
 export const KundliWebViewScreen: React.FC = () => {
   const {theme} = useTheme();
   const insets = useSafeAreaInsets();
@@ -31,6 +45,7 @@ export const KundliWebViewScreen: React.FC = () => {
         <WebView
           source={{uri: kundliUrl}}
           originWhitelist={['*']}
+          injectedJavaScriptBeforeContentLoaded={INJECTED_JAVASCRIPT}
           scrollEnabled
           javaScriptEnabled
           domStorageEnabled
