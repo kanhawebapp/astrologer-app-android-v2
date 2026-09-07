@@ -1,14 +1,14 @@
-import React, {useCallback, useState} from 'react';
-import {View, StyleSheet, ScrollView, TouchableOpacity} from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import {Header} from '../../../../components';
-import {AppText} from '../../../../components/common/AppText';
-import {ScreenContainer} from '../../../../components/layout/ScreenContainer';
-import {useTheme} from '../../../../hooks/useTheme';
-import {useNavigation, useRoute} from '@react-navigation/native';
-import {Session, SessionType} from '../../domain/types';
-import {formatDate} from '../../../../utils/helpers';
-import {SendRemedyModal} from '../components/SendRemedyModal';
+import { Header } from '../../../../components';
+import { AppText } from '../../../../components/common/AppText';
+import { ScreenContainer } from '../../../../components/layout/ScreenContainer';
+import { useTheme } from '../../../../hooks/useTheme';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { Session, SessionType } from '../../domain/types';
+import { formatDate } from '../../../../utils/helpers';
+import { SendRemedyModal } from '../components/SendRemedyModal';
 
 const DATE_TIME_OPTIONS: Intl.DateTimeFormatOptions = {
   year: 'numeric',
@@ -48,7 +48,7 @@ const formatRatingStars = (rating?: number | null): string => {
 };
 
 const SessionDetailScreen: React.FC = () => {
-  const {theme} = useTheme();
+  const { theme } = useTheme();
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
 
@@ -277,49 +277,55 @@ const SessionDetailScreen: React.FC = () => {
             }}>
             <Icon name="spa" size={20} color={theme.colors.primary} />
 
-            <AppText style={[styles.actionText, {color: theme.colors.primary}]}>
+            <AppText style={[styles.actionText, { color: theme.colors.primary }]}>
               Send Remedy
             </AppText>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[
-              styles.secondaryAction,
-              {
-                borderColor: theme.colors.secondary,
-              },
-            ]}
-            onPress={() =>
-              navigation.navigate('KundliScreen', {
-                session,
-              })
-            }>
-            <Icon name="chat" size={20} color={theme.colors.primary} />
+          {session.type === SessionType.CHAT && (
+            <>
+              {/* Kundli */}
+              <TouchableOpacity
+                style={[
+                  styles.secondaryAction,
+                  {
+                    borderColor: theme.colors.secondary,
+                  },
+                ]}
+                onPress={() =>
+                  navigation.navigate('KundliScreen', {
+                    session,
+                  })
+                }>
+                <Icon name="chat" size={20} color={theme.colors.primary} />
 
-            <AppText style={[styles.actionText, {color: theme.colors.primary}]}>
-              Kundli
-            </AppText>
-          </TouchableOpacity>
+                <AppText style={[styles.actionText, { color: theme.colors.primary }]}>
+                  Kundli
+                </AppText>
+              </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[
-              styles.secondaryAction,
-              {
-                borderColor: theme.colors.secondary,
-              },
-            ]}
-            onPress={() =>
-              navigation.navigate('SessionMessagesScreen', {
-                sessionId: session.id,
-                userName: session.userName,
-              })
-            }>
-            <Icon name="message" size={20} color={theme.colors.primary} />
+              {/* View Message */}
+              <TouchableOpacity
+                style={[
+                  styles.secondaryAction,
+                  {
+                    borderColor: theme.colors.secondary,
+                  },
+                ]}
+                onPress={() =>
+                  navigation.navigate('SessionMessagesScreen', {
+                    sessionId: session.id,
+                    userName: session.userName,
+                  })
+                }>
+                <Icon name="message" size={20} color={theme.colors.primary} />
 
-            <AppText style={[styles.actionText, {color: theme.colors.primary}]}>
-              View Message
-            </AppText>
-          </TouchableOpacity>
+                <AppText style={[styles.actionText, { color: theme.colors.primary }]}>
+                  View Message
+                </AppText>
+              </TouchableOpacity>
+            </>
+          )}
         </View>
       </ScrollView>
 
@@ -334,7 +340,7 @@ const SessionDetailScreen: React.FC = () => {
   );
 };
 
-const InfoRow = ({icon, label, value, theme}: any) => (
+const InfoRow = ({ icon, label, value, theme }: any) => (
   <View style={styles.infoRow}>
     <View
       style={[
@@ -346,7 +352,7 @@ const InfoRow = ({icon, label, value, theme}: any) => (
       <Icon name={icon} size={18} color={theme.colors.primary} />
     </View>
 
-    <View style={{flex: 1}}>
+    <View style={{ flex: 1 }}>
       <AppText style={styles.infoLabel}>{label}</AppText>
 
       <AppText style={styles.infoValue}>{value || '-'}</AppText>
