@@ -16,6 +16,7 @@ export interface WalletTransaction {
   coins: number;
   description: string;
   createdAt: string;
+  sessionId: string;
 }
 
 export interface GetAstrologerWalletTransactionsResponse {

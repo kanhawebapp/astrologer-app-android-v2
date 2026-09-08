@@ -16,6 +16,7 @@ export const GET_ASTROLOGER_WALLET_TRANSACTIONS_QUERY = `
 
       data {
         id
+        sessionId
         type
         amount
         coins

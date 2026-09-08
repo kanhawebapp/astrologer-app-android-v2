@@ -4,6 +4,7 @@ export type TimePeriod = 'daily' | 'weekly' | 'monthly';
 
 export interface Transaction {
   id: string;
+  sessionId: string;
   type: TransactionType;
   amount: number;
   coins?: number;

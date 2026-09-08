@@ -39,6 +39,7 @@ const mapTransactionStatus = (
 
 export const mapTransactionToDomain = (tx: WalletTransaction): Transaction => ({
   id: tx.id,
+  sessionId: tx.sessionId, 
   type: mapTransactionType(tx.type),
   amount: tx.amount,
   coins: tx.coins,

@@ -87,15 +87,12 @@ const TransactionItem: React.FC<TransactionItemProps> = memo(
           <AppText variant="caption" color={theme.colors.textSecondary}>
             {formatDate(transaction.date)}
           </AppText>
-          {transaction.description && (
-            <AppText
-              variant="caption"
-              color={theme.colors.textTertiary}
-              style={styles.description}>
-              {transaction.description}
-            </AppText>
-
-          )}
+          <AppText
+            variant="caption"
+            color={theme.colors.textTertiary}
+            style={styles.transactionId}>
+            Session ID: {formatTransactionId(transaction.sessionId)}
+          </AppText>
           <AppText
             variant="caption"
             color={theme.colors.textTertiary}
