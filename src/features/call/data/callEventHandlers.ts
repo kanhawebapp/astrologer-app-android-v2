@@ -183,12 +183,32 @@ export const setupEventHandlers = async (): Promise<void> => {
         if (callId && !callState.callId) {
           store.dispatch(setCallId(callId));
         }
+        const placeholderName =
+          !callState.participant?.name ||
+          callState.participant.name === 'Unknown' ||
+          callState.participant.name === 'Unknown Caller';
         if (!callState.participant?.id && callerId) {
           store.dispatch(
             setParticipant({
               id: callerId,
               name: callerName,
               avatar: callerAvatar,
+            }),
+          );
+        } else if (
+          placeholderName &&
+          callerName &&
+          callerName !== 'Unknown' &&
+          callerName !== 'Unknown Caller'
+        ) {
+          // Kill-mode notification often has callerId but no real callerName;
+          // apply the authoritative name from the socket payload without
+          // re-navigating or resetting the in-progress call.
+          store.dispatch(
+            setParticipant({
+              id: callState.participant?.id || callerId || '',
+              name: callerName,
+              avatar: callState.participant?.avatar || callerAvatar,
             }),
           );
         }

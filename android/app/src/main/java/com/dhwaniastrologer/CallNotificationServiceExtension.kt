@@ -271,12 +271,14 @@ class CallNotificationServiceExtension : INotificationServiceExtension {
                 "ACCEPTED notificationId=$sdkNotificationId key=$notificationKey pid=$pid tid=$tid -> showCustomNotification()"
             )
 
+            // Prefer additionalData name fields over OneSignal title. Title is often
+            // a generic heading ("Incoming Call") and would hide the real callerName.
             val callerName = firstNonEmpty(
-                notification.title,
                 additionalData?.optString("callerName", ""),
                 additionalData?.optString("caller_name", ""),
                 additionalData?.optString("userName", ""),
-                additionalData?.optString("user_name", "")
+                additionalData?.optString("user_name", ""),
+                notification.title
             ).ifEmpty { "Unknown Caller" }
 
             val (title, body, acceptLabel, rejectLabel) = if (normalizedType == "chat") {
@@ -428,12 +430,14 @@ class CallNotificationServiceExtension : INotificationServiceExtension {
             additionalData?.optString("chat_request_id", "")
         )
 
+        // Prefer additionalData name fields over OneSignal title so kill-mode
+        // Accept/Reject pending data carries the real callerName into JS.
         val callerName = firstNonEmpty(
-            osNotification.title,
             additionalData?.optString("callerName", ""),
             additionalData?.optString("caller_name", ""),
             additionalData?.optString("userName", ""),
-            additionalData?.optString("user_name", "")
+            additionalData?.optString("user_name", ""),
+            osNotification.title
         ).ifEmpty { "Unknown Caller" }
 
         val callerId = firstNonEmpty(
