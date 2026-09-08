@@ -328,7 +328,7 @@ export const AllReviewScreen: React.FC = () => {
                                                 return;
                                             }
 
-                                            openReplyModal(review);
+                                            // openReplyModal(review);
                                         }}
                                         style={[
                                             styles.reviewCard,
@@ -397,7 +397,7 @@ export const AllReviewScreen: React.FC = () => {
                                         }
 
                                         < View style={styles.reviewFooter} >
-                                            {
+                                            {/* {
                                                 review.isFlagged && (
                                                     <View style={[styles.flaggedBadge, { backgroundColor: theme.colors.warningLight }]}>
                                                         <Icon name="flag" size={12} color={theme.colors.warning} />
@@ -406,7 +406,7 @@ export const AllReviewScreen: React.FC = () => {
                                                         </AppText>
                                                     </View>
                                                 )
-                                            }
+                                            } */}
                                             < View style={[styles.statusBadge, { backgroundColor: theme.colors.successLight }]} >
                                                 <AppText variant="caption" color={theme.colors.success}>
                                                     {review.sessionStatus}

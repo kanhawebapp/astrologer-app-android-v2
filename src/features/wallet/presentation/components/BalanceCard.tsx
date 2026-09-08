@@ -112,7 +112,7 @@ export const BalanceCard: React.FC<BalanceCardProps> = ({
         {todayEarnings !== undefined && todayEarnings > 0 && (
           <View style={styles.todayEarnings}>
             <AppText variant="caption" color="rgba(255,255,255,0.8)">
-              Today's Earnings:{' '}
+              Total Earnings:{' '}
             </AppText>
             <AppText variant="body2" color={theme.colors.white}>
               {formatCurrency(todayEarnings)}
