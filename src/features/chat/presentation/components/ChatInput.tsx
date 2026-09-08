@@ -28,6 +28,8 @@ const generateId = (): string => {
   return Date.now().toString(36) + Math.random().toString(36).substr(2);
 };
 
+const kundliicon = require('../../../../assets/images/kundliicon.png');
+
 interface ChatInputProps {
   onSendMessage: (text: string) => Promise<void>;
   roomId: string;
@@ -429,10 +431,10 @@ export const ChatInput: React.FC<ChatInputProps> = ({
                 },
               ]}
               activeOpacity={0.7}>
-              <Icon
-                name="auto-awesome"
-                size={21}
-                color={theme.colors.primary}
+              <Image
+                source={kundliicon}
+                style={styles.kundliIcon}
+                resizeMode="contain"
               />
             </TouchableOpacity>
 
@@ -519,6 +521,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 8,
+  },
+  kundliIcon: {
+    width: 21,
+    height: 21,
   },
   inputWrapper: {
     flex: 1,
