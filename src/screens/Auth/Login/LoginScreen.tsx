@@ -46,6 +46,8 @@ export const LoginScreen: React.FC = () => {
     Array(OTP_LENGTH).fill(''),
   );
   const [resendCountdown, setResendCountdown] = useState(0);
+  const [isSendingOtp, setIsSendingOtp] = useState(false);
+  const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
   const inputRefs = useRef<(TextInput | null)[]>([]);
 
   const phoneForm = useForm<PhoneFormValues>({
@@ -76,24 +78,30 @@ export const LoginScreen: React.FC = () => {
 
   const handleRequestOtp = async (data: PhoneFormValues) => {
     Keyboard.dismiss();
+    setIsSendingOtp(true);
     try {
       await requestOtp(data.contactNo);
       setContactNo(data.contactNo);
       setStep('otp');
       setOtpDigits(Array(OTP_LENGTH).fill(''));
-      // setTimeout(() => inputRefs.current[0]?.focus(), 300);
+      setResendCountdown(30);
       showSuccess('Please check your phone for the OTP.', 'OTP Sent');
     } catch {
       // Error handled by error effect
+    } finally {
+      setIsSendingOtp(false);
     }
   };
 
   const handleVerifyOtp = async (data: OtpFormValues) => {
     Keyboard.dismiss();
+    setIsVerifyingOtp(true);
     try {
       await verifyOtp(contactNo, data.otp);
     } catch {
       // Error handled by error effect
+    } finally {
+      setIsVerifyingOtp(false);
     }
   };
 
@@ -165,6 +173,7 @@ export const LoginScreen: React.FC = () => {
     if (resendCountdown > 0 || isLoading) {
       return;
     }
+    setIsSendingOtp(true);
     try {
       await requestOtp(contactNo);
       setOtpDigits(Array(OTP_LENGTH).fill(''));
@@ -173,6 +182,8 @@ export const LoginScreen: React.FC = () => {
       showSuccess('Please check your phone for the new OTP.', 'OTP Sent');
     } catch {
       // Error handled by error effect
+    } finally {
+      setIsSendingOtp(false);
     }
   };
 
@@ -247,8 +258,8 @@ export const LoginScreen: React.FC = () => {
       </LinearGradient>
 
       <Loader
-        visible={isLoading}
-        message={step === 'phone' ? 'Sending OTP...' : 'Verifying...'}
+        visible={isSendingOtp || isVerifyingOtp}
+        message={isVerifyingOtp ? 'Verifying...' : 'Sending OTP...'}
         fullScreen
       />
     </View>
