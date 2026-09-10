@@ -38,5 +38,5 @@ export const STORAGE_KEYS = {
 
 export const URLS = {
   KUNDLI_WEBVIEW:
-    'https://dhwani-astro-v2.vercel.app/freeservices/kundali/getKundaliPage',
+    'https://dhwani-astro-website-v2.vercel.app/freeservices/kundali/getKundaliPage',
 } as const;

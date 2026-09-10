@@ -44,7 +44,7 @@
 
         <meta-data
             android:name="com.onesignal.NotificationServiceExtension"
-            android:value="com.dhwaniastrologer.CallNotificationServiceExtension" />
+            android:value="partner.dhwaniastro.com.CallNotificationServiceExtension" />
 
         <meta-data
             android:name="com.onesignal.appId"

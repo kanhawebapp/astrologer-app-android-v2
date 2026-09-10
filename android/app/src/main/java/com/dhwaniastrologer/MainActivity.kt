@@ -1,4 +1,4 @@
-package com.dhwaniastrologer
+package partner.dhwaniastro.com
 
 import android.app.Activity
 import android.app.NotificationManager
@@ -25,7 +25,7 @@ class MainActivity : ReactActivity() {
     handleIncomingNotificationIntent(intent)
   }
 
-  override fun getMainComponentName(): String = "DhwaniAstrologer"
+  override fun getMainComponentName(): String = "DhwaniPartner"
 
   override fun createReactActivityDelegate(): ReactActivityDelegate =
       DefaultReactActivityDelegate(this, mainComponentName, fabricEnabled)
@@ -50,18 +50,18 @@ class MainActivity : ReactActivity() {
 
     val action = intent.action
     if (
-      action != "com.dhwaniastrologer.ACCEPT_CALL" &&
-      action != "com.dhwaniastrologer.REJECT_CALL" &&
-      action != "com.dhwaniastrologer.ACCEPT_CHAT" &&
-      action != "com.dhwaniastrologer.REJECT_CHAT"
+      action != "partner.dhwaniastro.com.ACCEPT_CALL" &&
+      action != "partner.dhwaniastro.com.REJECT_CALL" &&
+      action != "partner.dhwaniastro.com.ACCEPT_CHAT" &&
+      action != "partner.dhwaniastro.com.REJECT_CHAT"
     ) {
       Log.d("MainActivity", "IGNORING non-action intent")
       return
     }
 
     if (
-      action == "com.dhwaniastrologer.ACCEPT_CALL" ||
-      action == "com.dhwaniastrologer.ACCEPT_CHAT"
+      action == "partner.dhwaniastro.com.ACCEPT_CALL" ||
+      action == "partner.dhwaniastro.com.ACCEPT_CHAT"
     ) {
       Log.d("NATIVE_NOTIFICATION", "ACCEPT button clicked")
     } else {
@@ -69,13 +69,13 @@ class MainActivity : ReactActivity() {
     }
 
     when (action) {
-      "com.dhwaniastrologer.ACCEPT_CALL" ->
+      "partner.dhwaniastro.com.ACCEPT_CALL" ->
         Log.d("MainActivity", "ACCEPT_CALL action received")
-      "com.dhwaniastrologer.REJECT_CALL" ->
+      "partner.dhwaniastro.com.REJECT_CALL" ->
         Log.d("MainActivity", "REJECT_CALL action received")
-      "com.dhwaniastrologer.ACCEPT_CHAT" ->
+      "partner.dhwaniastro.com.ACCEPT_CHAT" ->
         Log.d("MainActivity", "ACCEPT_CHAT action received")
-      "com.dhwaniastrologer.REJECT_CHAT" ->
+      "partner.dhwaniastro.com.REJECT_CHAT" ->
         Log.d("MainActivity", "REJECT_CHAT action received")
     }
 
@@ -111,7 +111,7 @@ val callTime = intent.getStringExtra("extra_call_time") ?: ""
       "INTENT_RECEIVED action=$action roomId=$roomId callId=$callId sessionId=$sessionId ts=${System.currentTimeMillis()}"
     )
 
-    if (action == "com.dhwaniastrologer.REJECT_CALL") {
+    if (action == "partner.dhwaniastro.com.REJECT_CALL") {
       Log.d("ANDROID_CALL_REJECT", "action=REJECT_CALL")
       Log.d(
         "ANDROID_CALL_REJECT",
@@ -291,10 +291,10 @@ val timeOfBirth =
 
   private fun dismissCustomCallNotification(action: String, intent: Intent?) {
     if (
-      action != "com.dhwaniastrologer.ACCEPT_CALL" &&
-      action != "com.dhwaniastrologer.REJECT_CALL" &&
-      action != "com.dhwaniastrologer.ACCEPT_CHAT" &&
-      action != "com.dhwaniastrologer.REJECT_CHAT"
+      action != "partner.dhwaniastro.com.ACCEPT_CALL" &&
+      action != "partner.dhwaniastro.com.REJECT_CALL" &&
+      action != "partner.dhwaniastro.com.ACCEPT_CHAT" &&
+      action != "partner.dhwaniastro.com.REJECT_CHAT"
     ) {
       return
     }
@@ -307,9 +307,9 @@ val timeOfBirth =
 
     val notificationId = notificationKey.hashCode() and 0x7fffffff
     val actionLabel = when (action) {
-      "com.dhwaniastrologer.ACCEPT_CALL" -> "ANSWER_CALL"
-      "com.dhwaniastrologer.REJECT_CALL" -> "REJECT_CALL"
-      "com.dhwaniastrologer.ACCEPT_CHAT" -> "ACCEPT_CHAT"
+      "partner.dhwaniastro.com.ACCEPT_CALL" -> "ANSWER_CALL"
+      "partner.dhwaniastro.com.REJECT_CALL" -> "REJECT_CALL"
+      "partner.dhwaniastro.com.ACCEPT_CHAT" -> "ACCEPT_CHAT"
       else -> "REJECT_CHAT"
     }
     Log.d("ANDROID_CALL_DISMISS", "action=$actionLabel notificationId=$notificationId")

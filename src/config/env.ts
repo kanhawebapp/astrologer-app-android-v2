@@ -52,7 +52,7 @@ export const Config = {
   ...ENV[currentEnv],
   ENV: currentEnv,
   APP_VERSION: '1.0.0',
-  APP_NAME: 'DhwaniAstrologer',
+  APP_NAME: 'DhwaniPartner',
   TOKEN_KEY: '@auth_token',
   USER_KEY: '@user_data',
 } as const;

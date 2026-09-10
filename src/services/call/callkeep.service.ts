@@ -4,7 +4,7 @@ const DEBUG_PREFIX = '[CallKeepService]';
 
 const CALLKEEP_OPTIONS = {
   ios: {
-    appName: 'DhwaniAstrologer',
+    appName: 'DhwaniPartner',
     iconName: 'icon_notification',
     ringtoneSound: 'ringtone.mp3',
     supportsVideo: false,
@@ -17,9 +17,9 @@ const CALLKEEP_OPTIONS = {
     okButton: 'OK',
     additionalPermissions: [],
     foregroundService: {
-      channelId: 'com.dhwaniastrologer.callkeep',
+      channelId: 'partner.dhwaniastro.com.callkeep',
       channelName: 'CallKeep Service',
-      notificationTitle: 'DhwaniAstrologer',
+      notificationTitle: 'DhwaniPartner',
       notificationIcon: 'ic_notification',
     },
   },

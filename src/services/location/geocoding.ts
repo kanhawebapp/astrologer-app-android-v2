@@ -20,7 +20,7 @@ export const geocodeAddress = async (
     headers: {
       'Content-Type': 'application/json',
       Accept: 'application/json',
-      'User-Agent': 'DhwaniAstrologer/1.0.0',
+      'User-Agent': 'DhwaniPartner/1.0.0',
     },
   });
 

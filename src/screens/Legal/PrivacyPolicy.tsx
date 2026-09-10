@@ -208,7 +208,7 @@ export const PrivacyPolicy: React.FC = () => {
             variant="body2"
             color={colors.primary}
             style={styles.contactLink}>
-            privacy@dhwaniastrologer.com
+            privacy@DhwaniPartner.com
           </AppText>
         </View>
       </View>

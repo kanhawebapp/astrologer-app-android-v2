@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "831606193551",
-    "project_id": "dhwaniastrologerandroid",
-    "storage_bucket": "dhwaniastrologerandroid.firebasestorage.app"
+    "project_number": "435494396932",
+    "project_id": "dhwaniastro-ca5a5",
+    "storage_bucket": "dhwaniastro-ca5a5.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:831606193551:android:6b43e41d0ba6c39569dffa",
+        "mobilesdk_app_id": "1:435494396932:android:043f8d6d9d12ed6bc4c151",
         "android_client_info": {
-          "package_name": "com.dhwaniastrologer"
+          "package_name": "partner.dhwaniastro.com"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDeincjG3YOAnC6THBcgvAxNLicnBwWH4Q"
+          "current_key": "AIzaSyB0I7xxZN3uEHKGhs0FqWMh914eTSa2yQY"
         }
       ],
       "services": {

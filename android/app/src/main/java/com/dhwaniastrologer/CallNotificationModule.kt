@@ -1,4 +1,4 @@
-package com.dhwaniastrologer
+package partner.dhwaniastro.com
 
 import android.app.Activity
 import android.app.NotificationManager
@@ -37,10 +37,10 @@ class CallNotificationModule(reactContext: ReactApplicationContext) :
                 return
             }
             if (
-                action != "com.dhwaniastrologer.ACCEPT_CALL" &&
-                action != "com.dhwaniastrologer.REJECT_CALL" &&
-                action != "com.dhwaniastrologer.ACCEPT_CHAT" &&
-                action != "com.dhwaniastrologer.REJECT_CHAT"
+                action != "partner.dhwaniastro.com.ACCEPT_CALL" &&
+                action != "partner.dhwaniastro.com.REJECT_CALL" &&
+                action != "partner.dhwaniastro.com.ACCEPT_CHAT" &&
+                action != "partner.dhwaniastro.com.REJECT_CHAT"
             ) {
                 prefs.edit()
                     .remove(KEY_PENDING_ACTION)

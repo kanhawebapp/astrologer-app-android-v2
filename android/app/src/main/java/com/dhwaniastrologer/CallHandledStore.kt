@@ -1,4 +1,4 @@
-package com.dhwaniastrologer
+package partner.dhwaniastro.com
 
 import android.content.Context
 import android.content.SharedPreferences

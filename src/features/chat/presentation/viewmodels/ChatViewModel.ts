@@ -7,11 +7,11 @@ import { setActiveChat } from '../../../../store/slices/chatSlice';
 import { selectMessagesByRoom } from '../../../../store/selectors/chatSelectors';
 import { useChatSocket, useChatMessages, useChatTimer } from '../hooks';
 import type { ChatMessage, ReplyToData } from '../../domain/chatTypes';
-import {RootStackParamList} from '../../../../navigation/types';
-import {socketManager} from '../../../../services/socket/socketManager';
-import {geocodeAddress} from '../../../../services/location/geocoding';
-import {URLS} from '../../../../utils/constants';
-import {useToast} from '../../../../hooks/useToast';
+import { RootStackParamList } from '../../../../navigation/types';
+import { socketManager } from '../../../../services/socket/socketManager';
+import { geocodeAddress } from '../../../../services/location/geocoding';
+import { URLS } from '../../../../utils/constants';
+import { useToast } from '../../../../hooks/useToast';
 
 const DEBUG_PREFIX = '[ChatViewModel]';
 
@@ -38,8 +38,8 @@ export const useChatViewModel = () => {
   const [replyToMessage, setReplyToMessage] = useState<ReplyToData | undefined>(
     undefined,
   );
-const [isTyping, setIsTyping] = useState(false);
-const [typingUserName, setTypingUserName] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+  const [typingUserName, setTypingUserName] = useState('');
 
   // Route params
   const routeParams = route.params || {};
@@ -75,16 +75,16 @@ const [typingUserName, setTypingUserName] = useState('');
   } = useChatTimer();
 
   // Redux state
-   const chatRequests = useSelector(
-     (state: RootState) => state.chat.chatRequests,
-   );
-   const chatRequest = useSelector(
-     (state: RootState) => state.user.chatRequest,
-   );
+  const chatRequests = useSelector(
+    (state: RootState) => state.chat.chatRequests,
+  );
+  const chatRequest = useSelector(
+    (state: RootState) => state.user.chatRequest,
+  );
   const error = useSelector((state: RootState) => state.chat.error);
   const chats = useSelector((state: RootState) => state.chat.chats);
   const authUser = useSelector((state: RootState) => state.auth.user);
-  const {showError} = useToast();
+  const { showError } = useToast();
 
   // Derived: effective room ID
   const effectiveRoomId = useMemo((): string | undefined => {
@@ -186,27 +186,27 @@ const [typingUserName, setTypingUserName] = useState('');
   }, [scrollToLatest]);
 
   // Typing listener
- useEffect(() => {
-  const handleTyping = (data: any) => {
-    if (!data) return;
-    const incomingRoomId = data.room_id || data.roomId || data.roomid;
-    if (incomingRoomId !== effectiveRoomId) return;
+  useEffect(() => {
+    const handleTyping = (data: any) => {
+      if (!data) return;
+      const incomingRoomId = data.room_id || data.roomId || data.roomid;
+      if (incomingRoomId !== effectiveRoomId) return;
 
-    const typingStatus = data.typing ?? false;
+      const typingStatus = data.typing ?? false;
 
-    // Astro ka khud ka typing ignore
-    if (data?.user_name === 'Astrologer') return;
+      // Astro ka khud ka typing ignore
+      if (data?.user_name === 'Astrologer') return;
 
-    setIsTyping(typingStatus);
-    setTypingUserName(data.user_name || "");
-  };
+      setIsTyping(typingStatus);
+      setTypingUserName(data.user_name || "");
+    };
 
-  socketManager.on('typing', handleTyping);
+    socketManager.on('typing', handleTyping);
 
-  return () => {
-    socketManager.off('typing', handleTyping);
-  };
-}, [effectiveRoomId]);
+    return () => {
+      socketManager.off('typing', handleTyping);
+    };
+  }, [effectiveRoomId]);
   // Navigate back when chat ends
   useEffect(() => {
     if (chatStatus === 'ENDED') {
@@ -422,7 +422,7 @@ const [typingUserName, setTypingUserName] = useState('');
   const handleKundliPress = useCallback(async () => {
     try {
       const userName = chatRequest?.userName || '';
-      const bdate =
+      const rawDob =
         chatRequest?.dateOfBirth ||
         chatRequest?.bdate ||
         chatRequest?.dob ||
@@ -439,6 +439,7 @@ const [typingUserName, setTypingUserName] = useState('');
         chatRequest?.birthPlace ||
         '';
 
+      const bdate = String(rawDob).split('T')[0];
       const geocodeResult = await geocodeAddress(locationplace);
       const latitude = geocodeResult.latitude;
       const longitude = geocodeResult.longitude;
@@ -459,18 +460,18 @@ const [typingUserName, setTypingUserName] = useState('');
       console.log('Kundli data:', params.toString());
 
 
-      navigation.navigate('KundliWebView', {kundliUrl});
+      navigation.navigate('KundliWebView', { kundliUrl });
     } catch (e) {
       showError('Unable to load Kundli. Invalid address or location data.');
     }
   }, [navigation, chatRequest, showError]);
 
   // Time-critical alert (after handlers)
- useEffect(() => {
-  if (isTimeCritical && remainingTime === 0) {
-    completeChat();
-  }
-}, [isTimeCritical, remainingTime, completeChat]);
+  useEffect(() => {
+    if (isTimeCritical && remainingTime === 0) {
+      completeChat();
+    }
+  }, [isTimeCritical, remainingTime, completeChat]);
 
   // Message processing memos
   const reversedMessages = useMemo(

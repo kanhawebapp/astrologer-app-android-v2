@@ -169,10 +169,10 @@ try {
   }
 
   const isNativeButtonAction =
-    pending.action === 'com.dhwaniastrologer.ACCEPT_CALL' ||
-    pending.action === 'com.dhwaniastrologer.REJECT_CALL' ||
-    pending.action === 'com.dhwaniastrologer.ACCEPT_CHAT' ||
-    pending.action === 'com.dhwaniastrologer.REJECT_CHAT';
+    pending.action === 'partner.dhwaniastro.com.ACCEPT_CALL' ||
+    pending.action === 'partner.dhwaniastro.com.REJECT_CALL' ||
+    pending.action === 'partner.dhwaniastro.com.ACCEPT_CHAT' ||
+    pending.action === 'partner.dhwaniastro.com.REJECT_CHAT';
 
   if (!isNativeButtonAction) {
     try {
@@ -188,10 +188,10 @@ try {
 
   processedRef.current = true;
 
-  if (pending.action === 'com.dhwaniastrologer.ACCEPT_CALL') {
+  if (pending.action === 'partner.dhwaniastro.com.ACCEPT_CALL') {
     handleAcceptCall(pending.data);
 
-  } else if (pending.action === 'com.dhwaniastrologer.REJECT_CALL') {
+  } else if (pending.action === 'partner.dhwaniastro.com.REJECT_CALL') {
     console.log(
       '[NATIVE_REJECT] 🔴 Going to handleRejectRequest with data =',
       JSON.stringify(pending.data, null, 2),
@@ -199,10 +199,10 @@ try {
 
     await handleRejectRequest(pending.data);
 
-  } else if (pending.action === 'com.dhwaniastrologer.ACCEPT_CHAT') {
+  } else if (pending.action === 'partner.dhwaniastro.com.ACCEPT_CHAT') {
     handleAcceptChat(pending.data);
 
-  } else if (pending.action === 'com.dhwaniastrologer.REJECT_CHAT') {
+  } else if (pending.action === 'partner.dhwaniastro.com.REJECT_CHAT') {
     handleRejectChat(pending.data);
   }
 

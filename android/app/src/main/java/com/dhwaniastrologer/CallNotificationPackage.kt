@@ -1,4 +1,4 @@
-package com.dhwaniastrologer
+package partner.dhwaniastro.com
 
 import com.facebook.react.ReactPackage
 import com.facebook.react.bridge.NativeModule

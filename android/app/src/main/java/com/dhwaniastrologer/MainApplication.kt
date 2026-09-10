@@ -1,4 +1,4 @@
-package com.dhwaniastrologer
+package partner.dhwaniastro.com
 
 import android.app.Application
 import com.facebook.react.PackageList

@@ -7,8 +7,8 @@ import type {
 
 const DEBUG_PREFIX = '[OneSignal]';
 
-// const ONESIGNAL_APP_ID = 'a26df6aa-88d3-46db-8f39-e09f50059e01'; //old key
-const ONESIGNAL_APP_ID = '39283c1e-760a-4aac-bcb0-6ee16864249d';
+const ONESIGNAL_APP_ID = 'a26df6aa-88d3-46db-8f39-e09f50059e01'; //old key
+// const ONESIGNAL_APP_ID = '39283c1e-760a-4aac-bcb0-6ee16864249d';
 
 export type { NotificationClickEvent, NotificationWillDisplayEvent } from 'react-native-onesignal';
 

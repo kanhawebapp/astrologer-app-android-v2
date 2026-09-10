@@ -187,10 +187,10 @@ export const AccountScreen: React.FC = () => {
       title: 'My Remedies',
       onPress: () => navigation.navigate('MyRemedies'),
     },
-    {
-      title: 'My Services',
-      onPress: () => navigation.navigate('MyServices'),
-    },
+    // {
+    //   title: 'My Services',
+    //   onPress: () => navigation.navigate('MyServices'),
+    // },
   ];
 
   const isInitialLoading = loading && !dashboard;

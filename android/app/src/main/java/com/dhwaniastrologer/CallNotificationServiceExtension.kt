@@ -1,4 +1,4 @@
-package com.dhwaniastrologer
+package partner.dhwaniastro.com
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -348,7 +348,7 @@ class CallNotificationServiceExtension : INotificationServiceExtension {
                         PowerManager.FULL_WAKE_LOCK or
                             PowerManager.ACQUIRE_CAUSES_WAKEUP or
                             PowerManager.ON_AFTER_RELEASE,
-                        "com.dhwaniastrologer:onesignal_screen_wake"
+                        "partner.dhwaniastro.com:onesignal_screen_wake"
                     )
                     wakeLock.setReferenceCounted(false)
                     screenWakeLock = wakeLock
@@ -558,13 +558,13 @@ val timeOfBirth = firstNonEmpty(
         android.util.Log.d("TRACE_NATIVE_3", dataJson)
 
         val acceptAction = when (requestType) {
-            "chat_request" -> "com.dhwaniastrologer.ACCEPT_CHAT"
-            else -> "com.dhwaniastrologer.ACCEPT_CALL"
+            "chat_request" -> "partner.dhwaniastro.com.ACCEPT_CHAT"
+            else -> "partner.dhwaniastro.com.ACCEPT_CALL"
         }
 
         val rejectAction = when (requestType) {
-            "chat_request" -> "com.dhwaniastrologer.REJECT_CHAT"
-            else -> "com.dhwaniastrologer.REJECT_CALL"
+            "chat_request" -> "partner.dhwaniastro.com.REJECT_CHAT"
+            else -> "partner.dhwaniastro.com.REJECT_CALL"
         }
 
         val acceptIntent = Intent(context, MainActivity::class.java).apply {

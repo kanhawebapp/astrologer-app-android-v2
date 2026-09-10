@@ -207,29 +207,29 @@ There are two notification-derived entry points:
 **Manifest**
 - `android/app/src/main/AndroidManifest.xml`:
   - registers notification service extension:
-    - `com.onesignal.NotificationServiceExtension` = `com.dhwaniastrologer.CallNotificationServiceExtension`
+    - `com.onesignal.NotificationServiceExtension` = `partner.dhwaniastro.com.CallNotificationServiceExtension`
 
 **Native module**
-- `android/app/src/main/java/com/dhwaniastrologer/CallNotificationModule.kt`
+- `android/app/src/main/java/com/DhwaniPartner/CallNotificationModule.kt`
   - `getPendingAction()` reads:
     - `pending_action` and `pending_data` from SharedPreferences `call_notification_prefs`.
   - `clearPendingAction()` clears them.
 
 **MainActivity**
-- `android/app/src/main/java/com/dhwaniastrologer/MainActivity.kt`
+- `android/app/src/main/java/com/DhwaniPartner/MainActivity.kt`
   - `onCreate` and `onNewIntent` call `handleIncomingNotificationIntent(intent)`.
   - If intent.action is one of:
-    - `com.dhwaniastrologer.ACCEPT_CALL`
-    - `com.dhwaniastrologer.REJECT_CALL`
-    - `com.dhwaniastrologer.ACCEPT_CHAT`
-    - `com.dhwaniastrologer.REJECT_CHAT`
+    - `partner.dhwaniastro.com.ACCEPT_CALL`
+    - `partner.dhwaniastro.com.REJECT_CALL`
+    - `partner.dhwaniastro.com.ACCEPT_CHAT`
+    - `partner.dhwaniastro.com.REJECT_CHAT`
   - It extracts extras (roomId, sessionId, userId, astrologerId, etc.)
   - It serializes all of them into a JSON string and writes to SharedPreferences:
     - `pending_action = action`
     - `pending_data = dataMap.toString()`
 
 **Service Extension**
-- `android/app/src/main/java/com/dhwaniastrologer/CallNotificationServiceExtension.kt`
+- `android/app/src/main/java/com/DhwaniPartner/CallNotificationServiceExtension.kt`
   - `onNotificationReceived(event)` reads `notification.additionalData`.
   - Detects type:
     - normalizes to `notificationType` → `normalizedType` among `{call, chat}`.
@@ -242,8 +242,8 @@ There are two notification-derived entry points:
     - constructs `pendingAction` string:
       - chat_request → `chat_request`
     - builds Accept/Reject PendingIntents targeting `MainActivity`.
-      - accept action for chat: `com.dhwaniastrologer.ACCEPT_CHAT`
-      - reject action for chat: `com.dhwaniastrologer.REJECT_CHAT`
+      - accept action for chat: `partner.dhwaniastro.com.ACCEPT_CHAT`
+      - reject action for chat: `partner.dhwaniastro.com.REJECT_CHAT`
     - stores pending data in Intent extras (`extra_*`) which are then handled by `MainActivity` and persisted.
 
 ### OneSignal
@@ -561,7 +561,7 @@ MainNavigator effect
 ### Native layer sequence (as implemented)
 
 1) OneSignal Service Extension receives push
-- **File**: `android/app/src/main/java/com/dhwaniastrologer/CallNotificationServiceExtension.kt`
+- **File**: `android/app/src/main/java/com/DhwaniPartner/CallNotificationServiceExtension.kt`
 - **Function**: `onNotificationReceived(event: INotificationReceivedEvent)`
 
 - Determines `normalizedType`:
@@ -575,8 +575,8 @@ MainNavigator effect
 - **Function**: `showCustomNotification()`
 
 - Creates:
-  - accept action string: `com.dhwaniastrologer.ACCEPT_CHAT`
-  - reject action string: `com.dhwaniastrologer.REJECT_CHAT`
+  - accept action string: `partner.dhwaniastro.com.ACCEPT_CHAT`
+  - reject action string: `partner.dhwaniastro.com.REJECT_CHAT`
 
 - Builds Accept Intent extras:
   - `extra_room_id`, `extra_session_id`, `extra_user_id`, `extra_astrologer_id`, `extra_user_name`, `extra_maximum_time`, `extra_price_per_minute`, `extra_user_profile_pic`, `extra_astrologer_name`, `extra_astrologer_profile_pic`, `extra_issue`, etc.
@@ -588,7 +588,7 @@ MainNavigator effect
 - Android launches `MainActivity` with intent action.
 
 4) MainActivity stores pending action into SharedPreferences
-- **File**: `android/app/src/main/java/com/dhwaniastrologer/MainActivity.kt`
+- **File**: `android/app/src/main/java/com/DhwaniPartner/MainActivity.kt`
 - **Function**: `handleIncomingNotificationIntent(intent)`
 
 - If intent.action matches ACCEPT_CHAT or REJECT_CHAT:
@@ -609,7 +609,7 @@ MainNavigator effect
   - which returns:
     - `{ action: string, data: Record<string, any> } | null`
 
-6) When action is `com.dhwaniastrologer.ACCEPT_CHAT`
+6) When action is `partner.dhwaniastro.com.ACCEPT_CHAT`
 - **File**: `src/hooks/usePendingCallFromNative.ts`
 - It calls:
   - `handleAcceptChat(pending.data)`
