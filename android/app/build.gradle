@@ -1,7 +1,16 @@
 apply plugin: "com.android.application"
 apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
+import java.util.Properties
 
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file("gradle.properties.local")
+
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withInputStream { stream ->
+        localProperties.load(stream)
+    }
+}
 /**
  * This is the configuration block to customize your React Native Android app.
  * By default you don't need to apply any configuration, just uncomment the lines you need.
@@ -89,14 +98,12 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
-       release {
-        if (project.hasProperty('MYAPP_UPLOAD_STORE_FILE')) {
-            storeFile file(MYAPP_UPLOAD_STORE_FILE)
-            storePassword MYAPP_UPLOAD_STORE_PASSWORD
-            keyAlias MYAPP_UPLOAD_KEY_ALIAS
-            keyPassword MYAPP_UPLOAD_KEY_PASSWORD
-        }
-    }
+      release {
+    storeFile file(localProperties.getProperty("MYAPP_UPLOAD_STORE_FILE"))
+    storePassword localProperties.getProperty("MYAPP_UPLOAD_STORE_PASSWORD")
+    keyAlias localProperties.getProperty("MYAPP_UPLOAD_KEY_ALIAS")
+    keyPassword localProperties.getProperty("MYAPP_UPLOAD_KEY_PASSWORD")
+}
 
     }
     buildTypes {
