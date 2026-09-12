@@ -88,8 +88,8 @@ android {
         applicationId "partner.dhwaniastro.com"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode 41
+        versionName "2.0.2"
     }
     signingConfigs {
         debug {
