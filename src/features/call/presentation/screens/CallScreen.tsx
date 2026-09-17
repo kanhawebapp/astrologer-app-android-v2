@@ -25,6 +25,7 @@ import {
 } from '../../../../store/slices/callSlice';
 import { webrtcService } from '../../../../services/call/webrtc.service';
 import { callSocketEmitters } from '../../data/callSocketEmitters';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../../../../hooks/useTheme';
 import { RootStackParamList } from '../../../../navigation/types';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -48,6 +49,7 @@ export const CallScreen: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [speakerOn, setSpeakerOnState] = React.useState(false);
   const { theme } = useTheme();
+  const insets = useSafeAreaInsets();
 
   // console.log(`${DEBUG_PREFIX} mounted`, { roomId, callerName });
 
@@ -268,7 +270,7 @@ export const CallScreen: React.FC = () => {
         )}
       </View>
 
-      <View style={styles.controls}>
+      <View style={[styles.controls, { paddingBottom: 40 + insets.bottom }]}>
         <View style={styles.middleControls}>
           {/* Speaker / Handsfree */}
           <TouchableOpacity

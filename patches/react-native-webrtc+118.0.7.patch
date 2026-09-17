@@ -1,0 +1,11 @@
+diff --git a/node_modules/react-native-webrtc/android/build.gradle b/node_modules/react-native-webrtc/android/build.gradle
+index 1a01b0f..15ccdd5 100644
+--- a/node_modules/react-native-webrtc/android/build.gradle
++++ b/node_modules/react-native-webrtc/android/build.gradle
+@@ -30,5 +30,5 @@
+ 
+ dependencies {
+     implementation 'com.facebook.react:react-native:+'
+-    api 'org.jitsi:webrtc:118.+'
++    api 'org.jitsi:webrtc:124.0.0'
+ }

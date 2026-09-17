@@ -1,10 +1,10 @@
 buildscript {
     ext {
-        buildToolsVersion = "34.0.0"
+        buildToolsVersion = "36.0.0"
         minSdkVersion = 23
-        compileSdkVersion = 34
-        targetSdkVersion = 34
-        ndkVersion = "25.1.8937393"
+        compileSdkVersion = 36
+        targetSdkVersion = 36
+        ndkVersion = "27.1.12297006"
         kotlinVersion = "1.8.0"
     }
     repositories {
@@ -12,11 +12,25 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("com.android.tools.build:gradle")
+        classpath("com.android.tools.build:gradle:8.9.1")
         classpath("com.facebook.react:react-native-gradle-plugin")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}")
         classpath("com.google.gms:google-services:4.4.2")
     }
 }
 
 apply plugin: "com.facebook.react.rootproject"
+
+allprojects {
+    configurations.configureEach {
+        resolutionStrategy.eachDependency { details ->
+            // Fresco 3.4+ and fbjni 0.7+ ship 16 KB-aligned native libraries.
+            if (details.requested.group == "com.facebook.fresco") {
+                details.useVersion "3.6.0"
+            }
+            if (details.requested.group == "com.facebook.fbjni") {
+                details.useVersion "0.7.0"
+            }
+        }
+    }
+}

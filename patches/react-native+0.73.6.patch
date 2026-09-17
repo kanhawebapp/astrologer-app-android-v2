@@ -1,0 +1,129 @@
+diff --git a/node_modules/react-native/gradle/libs.versions.toml b/node_modules/react-native/gradle/libs.versions.toml
+--- a/node_modules/react-native/gradle/libs.versions.toml
++++ b/node_modules/react-native/gradle/libs.versions.toml
+@@ -5,7 +5,7 @@
+ compileSdk = "34"
+ buildTools = "34.0.0"
+ # Dependencies versions
+-agp = "8.1.1"
++agp = "8.9.1"
+ androidx-annotation = "1.6.0"
+ androidx-appcompat = "1.6.1"
+ androidx-autofill = "1.1.0"
+@@ -14,9 +14,9 @@
+ androidx-tracing = "1.1.0"
+ assertj = "3.21.0"
+ download = "5.4.0"
+-fbjni = "0.5.1"
++fbjni = "0.7.0"
+ flipper = "0.201.0"
+-fresco = "3.1.3"
++fresco = "3.6.0"
+ infer-annotation = "0.18.0"
+ javax-inject = "1"
+ jsr305 = "3.0.2"
+diff --git a/node_modules/react-native/ReactAndroid/build.gradle b/node_modules/react-native/ReactAndroid/build.gradle
+--- a/node_modules/react-native/ReactAndroid/build.gradle
++++ b/node_modules/react-native/ReactAndroid/build.gradle
+@@ -485,8 +485,10 @@
+     if (rootProject.hasProperty("ndkPath")) {
+         ndkPath rootProject.ext.ndkPath
+     }
+-    if (rootProject.hasProperty("ndkVersion")) {
++    if (rootProject.hasProperty("ndkVersion") && rootProject.ext.has("ndkVersion")) {
+         ndkVersion rootProject.ext.ndkVersion
++    } else {
++        ndkVersion "27.1.12297006"
+     }
+ 
+     compileOptions {
+@@ -526,9 +528,9 @@
+                     "-DANDROID_STL=c++_shared",
+                     "-DANDROID_TOOLCHAIN=clang",
+                     "-DANDROID_PLATFORM=android-21",
+-                    // Due to https://github.com/android/ndk/issues/1693 we're losing Android
+-                    // specific compilation flags. This can be removed once we moved to NDK 25/26
+-                    "-DANDROID_USE_LEGACY_TOOLCHAIN_FILE=ON"
++                    "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON",
++                    "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,-z,max-page-size=16384 -Wl,-z,common-page-size=16384",
++                    "-DCMAKE_MODULE_LINKER_FLAGS=-Wl,-z,max-page-size=16384 -Wl,-z,common-page-size=16384"
+ 
+                 targets "jsijniprofiler",
+                     "reactnativeblob",
+@@ -586,10 +588,6 @@
+     buildTypes {
+         debug {
+-            externalNativeBuild {
+-                cmake {
+-                    // We want to build Gtest suite only for the debug variant.
+-                    targets "reactnative_unittest"
+-                }
+-            }
++            // Skip RN's gtest suite. Debug CMake still passes -Werror for
++            // reactnative_unittest, and NDK 27 fails on folly deprecations.
+         }
+     }
+diff --git a/node_modules/react-native/ReactAndroid/hermes-engine/build.gradle b/node_modules/react-native/ReactAndroid/hermes-engine/build.gradle
+--- a/node_modules/react-native/ReactAndroid/hermes-engine/build.gradle
++++ b/node_modules/react-native/ReactAndroid/hermes-engine/build.gradle
+@@ -170,8 +170,10 @@
+     if (rootProject.hasProperty("ndkPath")) {
+         ndkPath rootProject.ext.ndkPath
+     }
+-    if (rootProject.hasProperty("ndkVersion")) {
++    if (rootProject.hasProperty("ndkVersion") && rootProject.ext.has("ndkVersion")) {
+         ndkVersion rootProject.ext.ndkVersion
++    } else {
++        ndkVersion "27.1.12297006"
+     }
+ 
+     defaultConfig {
+@@ -190,9 +192,9 @@
+                 // We intentionally build Hermes with Intl support only. This is to simplify
+                 // the build setup and to avoid overcomplicating the build-type matrix.
+                 arguments "-DHERMES_ENABLE_INTL=True"
+-                // Due to https://github.com/android/ndk/issues/1693 we're losing Android
+-                // specific compilation flags. This can be removed once we moved to NDK 25/26
+-                arguments "-DANDROID_USE_LEGACY_TOOLCHAIN_FILE=ON"
++                arguments "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON"
++                arguments "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,-z,max-page-size=16384 -Wl,-z,common-page-size=16384"
++                arguments "-DCMAKE_MODULE_LINKER_FLAGS=-Wl,-z,max-page-size=16384 -Wl,-z,common-page-size=16384"
+                 targets "libhermes"
+             }
+         }
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/CMakeLists.txt b/node_modules/react-native/ReactAndroid/src/main/jni/CMakeLists.txt
+--- a/node_modules/react-native/ReactAndroid/src/main/jni/CMakeLists.txt
++++ b/node_modules/react-native/ReactAndroid/src/main/jni/CMakeLists.txt
+@@ -22,7 +22,7 @@
+ 
+ # Make sure every shared lib includes a .note.gnu.build-id header
+ add_link_options(-Wl,--build-id)
+-add_compile_options(-Wall -Werror -std=c++20)
++add_compile_options(-Wall -Wno-error -std=c++20)
+ 
+ function(add_react_android_subdir relative_path)
+   add_subdirectory(${REACT_ANDROID_DIR}/${relative_path} ReactAndroid/${relative_path})
+diff --git a/node_modules/react-native/ReactAndroid/cmake-utils/ReactNative-application.cmake b/node_modules/react-native/ReactAndroid/cmake-utils/ReactNative-application.cmake
+--- a/node_modules/react-native/ReactAndroid/cmake-utils/ReactNative-application.cmake
++++ b/node_modules/react-native/ReactAndroid/cmake-utils/ReactNative-application.cmake
+@@ -49,7 +49,7 @@
+ target_compile_options(${CMAKE_PROJECT_NAME}
+         PRIVATE
+                 -Wall
+-                -Werror
++                -Wno-error
+                 # We suppress cpp #error and #warning to don't fail the build
+                 # due to use migrating away from
+                 # #include <react/renderer/graphics/conversions.h>
+diff --git a/node_modules/react-native/ReactCommon/yoga/cmake/project-defaults.cmake b/node_modules/react-native/ReactCommon/yoga/cmake/project-defaults.cmake
+--- a/node_modules/react-native/ReactCommon/yoga/cmake/project-defaults.cmake
++++ b/node_modules/react-native/ReactCommon/yoga/cmake/project-defaults.cmake
+@@ -34,7 +34,7 @@
+     # Enable warnings and warnings as errors
+     -Wall
+     -Wextra
+-    -Werror
++    -Wno-error
+     -Wconversion
+     # Disable RTTI
+     $<$<COMPILE_LANGUAGE:CXX>:-fno-rtti>

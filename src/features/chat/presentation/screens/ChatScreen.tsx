@@ -83,8 +83,8 @@ export const ChatScreen: React.FC = () => {
       {vm.chatStatus === 'ACTIVE' ? (
         <KeyboardAvoidingView
           style={styles.keyboardView}
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-          keyboardVerticalOffset={0}>
+          behavior="padding"
+          keyboardVerticalOffset={Platform.OS === 'android' ? -insets.bottom : 0}>
           {vm.activeSession ? (
             <FlatList
               ref={vm.flatListRef as any}
@@ -106,7 +106,10 @@ export const ChatScreen: React.FC = () => {
           <View
             style={[
               styles.inputWrapper,
-              { backgroundColor: theme.colors.background },
+              {
+                backgroundColor: theme.colors.background,
+                paddingBottom: 10 + insets.bottom,
+              },
             ]}>
             <ChatInput
               onSendMessage={vm.handleSendMessage}

@@ -1,0 +1,1698 @@
+> Task :gradle-plugin:compileKotlin UP-TO-DATE
+> Task :gradle-plugin:compileJava NO-SOURCE
+> Task :gradle-plugin:pluginDescriptors UP-TO-DATE
+> Task :gradle-plugin:processResources UP-TO-DATE
+> Task :gradle-plugin:classes UP-TO-DATE
+> Task :gradle-plugin:jar UP-TO-DATE
+> Task :gradle-plugin:inspectClassesForKotlinIC UP-TO-DATE
+
+> Configure project :notifee_react-native
+:notifee_react-native @notifee/react-native found at /Users/sudoraj/Desktop/DhwaniAstrologer/node_modules/@notifee/react-native
+:notifee_react-native package.json found at /Users/sudoraj/Desktop/DhwaniAstrologer/node_modules/@notifee/react-native/package.json
+:notifee_react-native:version set from package.json: 9.1.8 (9,1,8 - 9001008)
+:notifee_react-native:android.compileSdk using custom value: 36
+:notifee_react-native:android.targetSdk using custom value: 36
+:notifee_react-native:android.minSdk using custom value: 23
+:notifee_react-native:reactNativeAndroidDir /Users/sudoraj/Desktop/DhwaniAstrologer/node_modules/react-native/android
+
+> Configure project :react-native-firebase_analytics
+:react-native-firebase_analytics package.json found at /Users/sudoraj/Desktop/DhwaniAstrologer/node_modules/@react-native-firebase/analytics/package.json
+:react-native-firebase_app package.json found at /Users/sudoraj/Desktop/DhwaniAstrologer/node_modules/@react-native-firebase/app/package.json
+:react-native-firebase_analytics:firebase.bom using default value: 34.8.0
+:react-native-firebase_analytics package.json found at /Users/sudoraj/Desktop/DhwaniAstrologer/node_modules/@react-native-firebase/analytics/package.json
+:react-native-firebase_analytics:version set from package.json: 23.8.6 (23,8,6 - 23008006)
+:react-native-firebase_analytics:android.compileSdk using custom value: 36
+:react-native-firebase_analytics:android.targetSdk using custom value: 36
+:react-native-firebase_analytics:android.minSdk using custom value: 23
+:react-native-firebase_analytics:reactNativeAndroidDir /Users/sudoraj/Desktop/DhwaniAstrologer/node_modules/react-native/android
+
+> Configure project :react-native-firebase_app
+:react-native-firebase_app package.json found at /Users/sudoraj/Desktop/DhwaniAstrologer/node_modules/@react-native-firebase/app/package.json
+:react-native-firebase_app:firebase.bom using default value: 34.8.0
+:react-native-firebase_app:play.play-services-auth using default value: 21.4.0
+:react-native-firebase_app package.json found at /Users/sudoraj/Desktop/DhwaniAstrologer/node_modules/@react-native-firebase/app/package.json
+:react-native-firebase_app:version set from package.json: 23.8.6 (23,8,6 - 23008006)
+:react-native-firebase_app:android.compileSdk using custom value: 36
+:react-native-firebase_app:android.targetSdk using custom value: 36
+:react-native-firebase_app:android.minSdk using custom value: 23
+:react-native-firebase_app:reactNativeAndroidDir /Users/sudoraj/Desktop/DhwaniAstrologer/node_modules/react-native/android
+
+> Configure project :react-native-firebase_messaging
+:react-native-firebase_messaging package.json found at /Users/sudoraj/Desktop/DhwaniAstrologer/node_modules/@react-native-firebase/messaging/package.json
+:react-native-firebase_app package.json found at /Users/sudoraj/Desktop/DhwaniAstrologer/node_modules/@react-native-firebase/app/package.json
+:react-native-firebase_messaging:firebase.bom using default value: 34.8.0
+:react-native-firebase_messaging package.json found at /Users/sudoraj/Desktop/DhwaniAstrologer/node_modules/@react-native-firebase/messaging/package.json
+:react-native-firebase_messaging:version set from package.json: 23.8.6 (23,8,6 - 23008006)
+:react-native-firebase_messaging:android.compileSdk using custom value: 36
+:react-native-firebase_messaging:android.targetSdk using custom value: 36
+:react-native-firebase_messaging:android.minSdk using custom value: 23
+:react-native-firebase_messaging:reactNativeAndroidDir /Users/sudoraj/Desktop/DhwaniAstrologer/node_modules/react-native/android
+
+> Configure project :react-native-reanimated
+Android gradle plugin: 8.9.1
+Gradle: 8.11.1
+WARNING: The specified Android SDK Build Tools version (34.0.0) is ignored, as it is below the minimum supported version (35.0.0) for Android Gradle Plugin 8.9.1.
+Android SDK Build Tools 35.0.0 will be used.
+To suppress this warning, remove "buildToolsVersion '34.0.0'" from your build.gradle file, as each version of the Android Gradle Plugin now has a default version of the build tools.
+
+> Task :react-native:packages:react-native:ReactAndroid:buildCodegenCLI SKIPPED
+> Task :react-native:packages:react-native:ReactAndroid:generateCodegenSchemaFromJavaScript UP-TO-DATE
+> Task :react-native:packages:react-native:ReactAndroid:generateCodegenArtifactsFromSchema UP-TO-DATE
+> Task :react-native:packages:react-native:ReactAndroid:createNativeDepsDirectories UP-TO-DATE
+
+> Task :react-native:packages:react-native:ReactAndroid:downloadBoost UP-TO-DATE
+Download https://archives.boost.io/release/1.83.0/source/boost_1_83_0.tar.gz
+
+> Task :react-native:packages:react-native:ReactAndroid:hermes-engine:downloadHermes UP-TO-DATE
+Download https://github.com/facebook/hermes/tarball/hermes-2024-02-20-RNv0.73.5-18f99ace4213052c5e7cdbcd39ee9766cd5df7e4
+
+> Task :react-native:packages:react-native:ReactAndroid:prepareBoost
+> Task :react-native:packages:react-native:ReactAndroid:hermes-engine:unzipHermes UP-TO-DATE
+
+> Task :react-native:packages:react-native:ReactAndroid:hermes-engine:configureBuildForHermes
+CMake Deprecation Warning at CMakeLists.txt:42 (cmake_policy):
+  The OLD behavior for policy CMP0026 will be removed from a future version
+  of CMake.
+
+  The cmake-policies(7) manual explains that the OLD behaviors of all
+  policies are deprecated and that a policy should be set to OLD only under
+  specific short-term circumstances.  Projects should be ported to the NEW
+  behavior and not rely on setting a policy to OLD.
+
+
+-- The C compiler identification is AppleClang 21.0.0.21000101
+-- The CXX compiler identification is AppleClang 21.0.0.21000101
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /Library/Developer/CommandLineTools/usr/bin/clang - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /Library/Developer/CommandLineTools/usr/bin/clang++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Performing Test CXX_SUPPORTS_MISSING_FIELD_INITIALIZERS_FLAG
+-- Performing Test CXX_SUPPORTS_MISSING_FIELD_INITIALIZERS_FLAG - Success
+-- Performing Test DEPRECATED_COPY_FLAG
+-- Performing Test DEPRECATED_COPY_FLAG - Success
+-- Performing Test CXX_SUPPORTS_CLASS_MEMACCESS_FLAG
+-- Performing Test CXX_SUPPORTS_CLASS_MEMACCESS_FLAG - Failed
+-- Performing Test CXX_SUPPORTS_NOEXCEPT_TYPE_FLAG
+-- Performing Test CXX_SUPPORTS_NOEXCEPT_TYPE_FLAG - Success
+-- Performing Test CXX_WONT_WARN_ON_FINAL_NONVIRTUALDTOR
+-- Performing Test CXX_WONT_WARN_ON_FINAL_NONVIRTUALDTOR - Success
+-- Performing Test C_SUPPORTS_DELETE_NON_VIRTUAL_DTOR_FLAG
+-- Performing Test C_SUPPORTS_DELETE_NON_VIRTUAL_DTOR_FLAG - Success
+-- Performing Test CXX_SUPPORTS_DELETE_NON_VIRTUAL_DTOR_FLAG
+-- Performing Test CXX_SUPPORTS_DELETE_NON_VIRTUAL_DTOR_FLAG - Success
+-- Performing Test RANGE_ANALYSIS_FLAG
+-- Performing Test RANGE_ANALYSIS_FLAG - Success
+-- Found Python: /Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/bin/python3.9 (found version "3.9.6") found components: Interpreter 
+-- Performing Test HAVE_COMPUTED_GOTO
+-- Performing Test HAVE_COMPUTED_GOTO - Success
+-- Performing Test HAVE_GC_SECTIONS
+-- Performing Test HAVE_GC_SECTIONS - Failed
+-- Performing Test HAVE_DEAD_STRIP
+-- Performing Test HAVE_DEAD_STRIP - Success
+-- Performing Test HAVE_ICF
+-- Performing Test HAVE_ICF - Failed
+-- Performing Test CXX_SUPPORTS_SHORTEN_64_TO_32
+-- Performing Test CXX_SUPPORTS_SHORTEN_64_TO_32 - Success
+-- Looking for dlfcn.h
+-- Looking for dlfcn.h - found
+-- Looking for errno.h
+-- Looking for errno.h - found
+-- Looking for fcntl.h
+-- Looking for fcntl.h - found
+-- Looking for link.h
+-- Looking for link.h - not found
+-- Looking for malloc.h
+-- Looking for malloc.h - not found
+-- Looking for malloc/malloc.h
+-- Looking for malloc/malloc.h - found
+-- Looking for pthread.h
+-- Looking for pthread.h - found
+-- Looking for signal.h
+-- Looking for signal.h - found
+-- Looking for sys/ioctl.h
+-- Looking for sys/ioctl.h - found
+-- Looking for sys/mman.h
+-- Looking for sys/mman.h - found
+-- Looking for sys/param.h
+-- Looking for sys/param.h - found
+-- Looking for sys/resource.h
+-- Looking for sys/resource.h - found
+-- Looking for sys/stat.h
+-- Looking for sys/stat.h - found
+-- Looking for sys/time.h
+-- Looking for sys/time.h - found
+-- Looking for sys/types.h
+-- Looking for sys/types.h - found
+-- Looking for termios.h
+-- Looking for termios.h - found
+-- Looking for unistd.h
+-- Looking for unistd.h - found
+-- Looking for valgrind/valgrind.h
+-- Looking for valgrind/valgrind.h - not found
+-- Looking for zlib.h
+-- Looking for zlib.h - found
+-- Looking for fenv.h
+-- Looking for fenv.h - found
+-- Looking for FE_ALL_EXCEPT
+-- Looking for FE_ALL_EXCEPT - found
+-- Looking for FE_INEXACT
+-- Looking for FE_INEXACT - found
+-- Looking for mach/mach.h
+-- Looking for mach/mach.h - found
+-- Looking for histedit.h
+-- Looking for histedit.h - found
+-- Looking for CrashReporterClient.h
+-- Looking for CrashReporterClient.h - not found
+-- Performing Test HAVE_CRASHREPORTER_INFO
+-- Performing Test HAVE_CRASHREPORTER_INFO - Success
+-- Looking for pthread_create in pthread
+-- Looking for pthread_create in pthread - found
+-- Looking for pthread_getspecific in pthread
+-- Looking for pthread_getspecific in pthread - found
+-- Looking for pthread_rwlock_init in pthread
+-- Looking for pthread_rwlock_init in pthread - found
+-- Looking for pthread_mutex_lock in pthread
+-- Looking for pthread_mutex_lock in pthread - found
+-- Looking for dlopen in dl
+-- Looking for dlopen in dl - found
+-- Looking for clock_gettime in rt
+-- Looking for clock_gettime in rt - not found
+-- Looking for pthread.h
+-- Looking for pthread.h - found
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE  
+-- Looking for xar_open in xar
+-- Looking for xar_open in xar - found
+-- Looking for arc4random
+-- Looking for arc4random - found
+-- Looking for backtrace
+-- Looking for backtrace - found
+-- backtrace facility detected in default set of libraries
+-- Found Backtrace: /Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk/usr/include  
+-- Performing Test C_SUPPORTS_WERROR_UNGUARDED_AVAILABILITY_NEW
+-- Performing Test C_SUPPORTS_WERROR_UNGUARDED_AVAILABILITY_NEW - Success
+-- Looking for _Unwind_Backtrace
+-- Looking for _Unwind_Backtrace - found
+-- Looking for getpagesize
+-- Looking for getpagesize - found
+-- Looking for sysconf
+-- Looking for sysconf - found
+-- Looking for getrusage
+
+> Task :app:createBundleReleaseJsAndAssets
+debug Reading Metro config from /Users/sudoraj/Desktop/DhwaniAstrologer/metro.config.js
+warning: the transform cache was reset.
+                Welcome to Metro v0.80.12
+              Fast - Scalable - Integrated
+
+
+warning: Watchman `watch-project` returned a warning: Recrawled this watch 3 times, most recently because:
+MustScanSubDirs UserDroppedTo resolve, please review the information on
+https://facebook.github.io/watchman/docs/troubleshooting.html#recrawl
+To clear this warning, run:
+`watchman watch-del '/Users/sudoraj/Desktop/DhwaniAstrologer' ; watchman watch-project '/Users/sudoraj/Desktop/DhwaniAstrologer'`
+
+warning: Watchman `query` returned a warning: Recrawled this watch 3 times, most recently because:
+MustScanSubDirs UserDroppedTo resolve, please review the information on
+https://facebook.github.io/watchman/docs/troubleshooting.html#recrawl
+To clear this warning, run:
+`watchman watch-del '/Users/sudoraj/Desktop/DhwaniAstrologer' ; watchman watch-project '/Users/sudoraj/Desktop/DhwaniAstrologer'`
+
+Recrawled this watch 3 times, most recently because:
+MustScanSubDirs UserDroppedTo resolve, please review the information on
+https://facebook.github.io/watchman/docs/troubleshooting.html#recrawl
+To clear this warning, run:
+`watchman watch-del '/Users/sudoraj/Desktop/DhwaniAstrologer' ; watchman watch-project '/Users/sudoraj/Desktop/DhwaniAstrologer'`
+
+transform[stderr]: (node:15675) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+transform[stderr]: (Use `node --trace-warnings ...` to show where the warning was created)
+transform[stderr]: (node:15676) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+transform[stderr]: (Use `node --trace-warnings ...` to show where the warning was created)
+transform[stderr]: (node:15678) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+transform[stderr]: (Use `node --trace-warnings ...` to show where the warning was created)
+transform[stderr]: (node:15677) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+transform[stderr]: (Use `node --trace-warnings ...` to show where the warning was created)
+transform[stderr]: (node:15680) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+transform[stderr]: (Use `node --trace-warnings ...` to show where the warning was created)
+transform[stderr]: (node:15681) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+transform[stderr]: (Use `node --trace-warnings ...` to show where the warning was created)
+info Writing bundle output to: /Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle
+info Writing sourcemap output to: /Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/intermediates/sourcemaps/react/release/index.android.bundle.packager.map
+info Done writing bundle output
+info Done writing sourcemap output
+info Copying 10 asset files
+info Done copying assets
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:2515:18: warning: the variable "DebuggerInternal" was not declared in function "__shouldPauseOnThrow"
+          typeof DebuggerInternal !== 'undefined' &&
+                 ^~~~~~~~~~~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:6169:7: warning: the variable "setTimeout" was not declared in function "logCapturedError"
+      setTimeout(function () {
+      ^~~~~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:4138:108: warning: the variable "nativeFabricUIManager" was not declared in function "onChange"
+...lInstanceHandle ? (from && nativeFabricUIManager.setIsJSResponder(from.sta...
+                              ^~~~~~~~~~~~~~~~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:4750:21: warning: the variable "clearTimeout" was not declared in anonymous function " 118#"
+    cancelTimeout = clearTimeout;
+                    ^~~~~~~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:8500:30: warning: the variable "__REACT_DEVTOOLS_GLOBAL_HOOK__" was not declared in anonymous function " 118#"
+  if ("undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__) {
+                             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:10861:5: warning: the variable "setImmediate" was not declared in function "handleResolved"
+    setImmediate(function () {
+    ^~~~~~~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:15136:12: warning: the variable "fetch" was not declared in anonymous function " 358#"
+    fetch: fetch,
+           ^~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:15137:14: warning: the variable "Headers" was not declared in anonymous function " 358#"
+    Headers: Headers,
+             ^~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:15138:14: warning: the variable "Request" was not declared in anonymous function " 358#"
+    Request: Request,
+             ^~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:15139:15: warning: the variable "Response" was not declared in anonymous function " 358#"
+    Response: Response
+              ^~~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:15296:24: warning: the variable "FileReader" was not declared in function "readBlobAsArrayBuffer"
+      var reader = new FileReader();
+                       ^~~~~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:15347:36: warning: the variable "Blob" was not declared in anonymous function " 369#"
+        } else if (support.blob && Blob.prototype.isPrototypeOf(body)) {
+                                   ^~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:15349:40: warning: the variable "FormData" was not declared in anonymous function " 369#"
+        } else if (support.formData && FormData.prototype.isPrototypeOf(body)) {
+                                       ^~~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:15351:44: warning: the variable "URLSearchParams" was not declared in anonymous function " 369#"
+...e if (support.searchParams && URLSearchParams.prototype.isPrototypeOf(body...
+                                 ^~~~~~~~~~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:15470:26: warning: the variable "AbortController" was not declared in anonymous function " 375#"
+          var ctrl = new AbortController();
+                         ^~~~~~~~~~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:15604:23: warning: the variable "XMLHttpRequest" was not declared in anonymous function " 379#"
+        var xhr = new XMLHttpRequest();
+                      ^~~~~~~~~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:15149:71: warning: the variable "self" was not declared in anonymous function " 361#"
+...undefined' && globalThis || typeof self !== 'undefined' && self ||
+                                      ^~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:25686:27: warning: the variable "performance" was not declared in anonymous function " 683#"
+  if ("object" === typeof performance && "function" === typeof performance.no...
+                          ^~~~~~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:25709:26: warning: the variable "navigator" was not declared in anonymous function " 683#"
+  "undefined" !== typeof navigator && undefined !== navigator.scheduling && u...
+                         ^~~~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:25819:37: warning: the variable "MessageChannel" was not declared in anonymous function " 683#"
+  };else if ("undefined" !== typeof MessageChannel) {
+                                    ^~~~~~~~~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:25834:34: warning: the variable "nativeRuntimeScheduler" was not declared in anonymous function " 683#"
+... = "undefined" !== typeof nativeRuntimeScheduler ? nativeRuntimeScheduler....
+                             ^~~~~~~~~~~~~~~~~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:35115:34: warning: the variable "requestAnimationFrame" was not declared in function "start 9#"
+...    this._animationFrame = requestAnimationFrame(this.onUpdate.bind(this));
+                              ^~~~~~~~~~~~~~~~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:60956:20: warning: the variable "WeakRef" was not declared in anonymous function " 1608#"
+  var Ref = typeof WeakRef !== "undefined" ? WeakRef : StrongRef;
+                   ^~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:64571:76: warning: the variable "Buffer" was not declared in function "convertValue"
+... 'function' ? new Blob([value]) : Buffer.from(value);
+                                     ^~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:65806:56: warning: the variable "btoa" was not declared in function "dispatchXhrRequest"
+...rs.set('Authorization', 'Basic ' + btoa(username + ':' + password));
+                                      ^~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:71831:158: warning: the variable "File" was not declared in function "isBinary"
+...| withNativeFile && obj instanceof File;
+                                      ^~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:72236:35: warning: the variable "addEventListener" was not declared in anonymous function " 2168#"
+... withEventListeners = typeof addEventListener === "function" && typeof rem...
+                                ^~~~~~~~~~~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:72236:77: warning: the variable "removeEventListener" was not declared in anonymous function " 2168#"
+...er === "function" && typeof removeEventListener === "function";
+                               ^~~~~~~~~~~~~~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:72307:65: warning: the variable "location" was not declared in function "SocketWithoutUpgrade"
+...ts.secure ? opts.secure : typeof location !== "undefined" && "https:" === ...
+                                    ^~~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:73272:16: warning: the variable "TransformStream" was not declared in function "createPacketEncoderStream"
+    return new TransformStream({
+               ^~~~~~~~~~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:73328:26: warning: the variable "TextDecoder" was not declared in function "createPacketDecoderStream"
+      TEXT_DECODER = new TextDecoder();
+                         ^~~~~~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:73451:28: warning: the variable "TextEncoder" was not declared in anonymous function " 2206#"
+        TEXT_ENCODER = new TextEncoder();
+                           ^~~~~~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:74042:33: warning: the variable "WebTransport" was not declared in function "doOpen 1#"
+          this._transport = new WebTransport(this.createUri("https"), this.op...
+                                ^~~~~~~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:74373:16: warning: the variable "attachEvent" was not declared in anonymous function " 2244#"
+    if (typeof attachEvent === "function") {
+               ^~~~~~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:80944:18: warning: the variable "dispatchEvent" was not declared in function "reportError 1#"
+      if (typeof dispatchEvent === "function" && typeof ErrorEvent === "funct...
+                 ^~~~~~~~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:80944:57: warning: the variable "ErrorEvent" was not declared in function "reportError 1#"
+...hEvent === "function" && typeof ErrorEvent === "function") {
+                                   ^~~~~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:99394:35: warning: the variable "FileList" was not declared in function "u 7#"
+    var t = "undefined" != typeof FileList && e instanceof FileList;
+                                  ^~~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:99819:77: warning: the variable "HTMLElement" was not declared in function "K 1#"
+...w ? t.defaultView.HTMLElement : HTMLElement);
+                                   ^~~~~~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:100952:33: warning: the variable "crypto" was not declared in function "ke 1#"
+      if ("undefined" != typeof crypto && crypto.randomUUID) return crypto.ra...
+                                ^~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:107624:91: warning: the variable "value" was not declared in anonymous function " 3880#"
+...e), n.bind(null, true)) : n(false, value);
+                                      ^~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:204510:19: warning: the variable "_getAnimationTimestamp" was not declared in function "handleAndFlushAnimationFrame 1#"
+        var now = _getAnimationTimestamp();
+                  ^~~~~~~~~~~~~~~~~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:204630:11: warning: the variable "_WORKLET" was not declared in function "runOnRuntime"
+      if (_WORKLET) {
+          ^~~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:204635:18: warning: the variable "_scheduleOnRuntime" was not declared in anonymous function " 7207#"
+          return _scheduleOnRuntime(workletRuntime, (0, _$$_REQUIRE(_dependen...
+                 ^~~~~~~~~~~~~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:205489:26: warning: Direct call to eval(), but lexical scope is not supported.
+            workletFun = eval('(' + initData.code + '\n)');
+                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:205798:20: warning: the variable "_makeShareableClone" was not declared in function "cloneRecursive"
+            return _makeShareableClone(value);
+                   ^~~~~~~~~~~~~~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:206279:9: warning: the variable "_scheduleOnJS" was not declared in anonymous function " 7277#"
+        _scheduleOnJS(fun, args.length > 0 ?
+        ^~~~~~~~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:206399:13: warning: the variable "_updateDataSynchronously" was not declared in function "set _value 1#"
+            _updateDataSynchronously(syncDataHolder, (0, _$$_REQUIRE(_depende...
+            ^~~~~~~~~~~~~~~~~~~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:207031:9: warning: the variable "_notifyAboutProgress" was not declared in anonymous function " 7305#"
+        _notifyAboutProgress(tag, sharedValue.value, isSharedTransition);
+        ^~~~~~~~~~~~~~~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:207049:7: warning: the variable "_notifyAboutEnd" was not declared in function "stopObservingProgress"
+      _notifyAboutEnd(tag, removeView);
+      ^~~~~~~~~~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:212357:11: warning: the variable "_updatePropsFabric" was not declared in function "flush 1#"
+          _updatePropsFabric(operations);
+          ^~~~~~~~~~~~~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:212386:11: warning: the variable "_updatePropsPaper" was not declared in function "flush 2#"
+          _updatePropsPaper(operations);
+          ^~~~~~~~~~~~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:221689:18: warning: the variable "message" was not declared in anonymous function " 7911#"
+          return message;
+                 ^~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:221721:5: warning: the variable "jest" was not declared in function "beforeTest"
+    jest.useFakeTimers();
+    ^~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:221858:7: warning: the variable "_dispatchCommandFabric" was not declared in function "dispatchCommandFabric"
+      _dispatchCommandFabric(shadowNodeWrapper, commandName, args);
+      ^~~~~~~~~~~~~~~~~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:221876:7: warning: the variable "_dispatchCommandPaper" was not declared in function "dispatchCommandPaper"
+      _dispatchCommandPaper(viewTag, commandName, args);
+      ^~~~~~~~~~~~~~~~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:221987:22: warning: the variable "_measureFabric" was not declared in function "measureFabric"
+      var measured = _measureFabric(viewTag);
+                     ^~~~~~~~~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:222021:22: warning: the variable "_measurePaper" was not declared in function "measurePaper"
+      var measured = _measurePaper(viewTag);
+                     ^~~~~~~~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:222109:7: warning: the variable "_scrollToPaper" was not declared in function "scrollToPaper"
+      _scrollToPaper(viewTag, x, y, animated);
+      ^~~~~~~~~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:222156:7: warning: the variable "_setGestureState" was not declared in function "setGestureStateNative"
+      _setGestureState(handlerTag, newState);
+      ^~~~~~~~~~~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:226235:45: warning: the variable "structuredClone" was not declared in function "handleLayoutTransition"
+...ormCopy = existingTransform ? structuredClone(existingTransform) : [];
+                                 ^~~~~~~~~~~~~~~
+/Users/sudoraj/Desktop/DhwaniAstrologer/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle:226617:7: warning: the variable "_removeFromPropsRegistry" was not declared in function "removeFromPropsRegistryOnUI"
+      _removeFromPropsRegistry(viewTags);
+      ^~~~~~~~~~~~~~~~~~~~~~~~
+
+> Task :app:generateCodegenSchemaFromJavaScript SKIPPED
+> Task :app:generateCodegenArtifactsFromSchema SKIPPED
+
+> Task :react-native:packages:react-native:ReactAndroid:hermes-engine:configureBuildForHermes
+-- Looking for getrusage - found
+-- Looking for setrlimit
+-- Looking for setrlimit - found
+-- Looking for isatty
+-- Looking for isatty - found
+-- Looking for futimens
+-- Looking for futimens - found
+-- Looking for futimes
+-- Looking for futimes - found
+-- Looking for posix_fallocate
+-- Looking for posix_fallocate - not found
+-- Looking for lseek64
+-- Looking for lseek64 - not found
+-- Looking for mallctl
+-- Looking for mallctl - not found
+-- Looking for mallinfo
+-- Looking for mallinfo - not found
+-- Looking for malloc_zone_statistics
+-- Looking for malloc_zone_statistics - found
+-- Looking for getrlimit
+-- Looking for getrlimit - found
+-- Looking for posix_spawn
+-- Looking for posix_spawn - found
+-- Looking for pread
+-- Looking for pread - found
+-- Looking for realpath
+-- Looking for realpath - found
+-- Looking for sbrk
+-- Looking for sbrk - found
+-- Looking for strerror
+-- Looking for strerror - found
+-- Looking for strerror_r
+-- Looking for strerror_r - found
+-- Looking for strerror_s
+-- Looking for strerror_s - not found
+-- Looking for setenv
+-- Looking for setenv - found
+-- Looking for dlopen
+-- Looking for dlopen - found
+-- Looking for dladdr
+-- Looking for dladdr - found
+-- Looking for __GLIBC__
+-- Looking for __GLIBC__ - not found
+-- Looking for sched_getaffinity
+-- Looking for sched_getaffinity - not found
+-- Looking for CPU_COUNT
+-- Looking for CPU_COUNT - not found
+-- Looking for pthread_getname_np
+-- Looking for pthread_getname_np - found
+-- Looking for pthread_setname_np
+-- Looking for pthread_setname_np - found
+-- Performing Test HAVE_CXX_ATOMICS_WITHOUT_LIB
+-- Performing Test HAVE_CXX_ATOMICS_WITHOUT_LIB - Success
+-- Performing Test HAVE_CXX_ATOMICS64_WITHOUT_LIB
+-- Performing Test HAVE_CXX_ATOMICS64_WITHOUT_LIB - Success
+-- Performing Test LLVM_HAS_ATOMICS
+-- Performing Test LLVM_HAS_ATOMICS - Success
+-- Performing Test SUPPORTS_NO_PIE_FLAG
+-- Performing Test SUPPORTS_NO_PIE_FLAG - Success
+-- Performing Test SUPPORTS_VARIADIC_MACROS_FLAG
+-- Performing Test SUPPORTS_VARIADIC_MACROS_FLAG - Success
+-- Performing Test SUPPORTS_GNU_ZERO_VARIADIC_MACRO_ARGUMENTS_FLAG
+-- Performing Test SUPPORTS_GNU_ZERO_VARIADIC_MACRO_ARGUMENTS_FLAG - Success
+-- Threads enabled.
+-- Doxygen disabled.
+-- Go bindings disabled.
+-- Found ld64 - /Library/Developer/CommandLineTools/usr/bin/ld
+-- Found Python module pygments
+-- Found Python module pygments.lexers.c_cpp
+-- Could NOT find Python module yaml
+-- CMAKE_HOST_SYSTEM_NAME = Darwin
+-- CMAKE_SYSTEM_NAME = Darwin
+-- HERMES_APPLE_TARGET_PLATFORM = 
+-- CMAKE_CROSSCOMPILING = FALSE
+-- Looking for readline
+-- Looking for readline - found
+-- Configuring done
+
+> Task :app:generatePackageList
+> Task :app:preBuild
+> Task :app:preReleaseBuild
+> Task :app:generateReleaseResValues
+> Task :app:processReleaseGoogleServices
+> Task :lottie-react-native:preBuild UP-TO-DATE
+> Task :lottie-react-native:preReleaseBuild UP-TO-DATE
+> Task :lottie-react-native:generateReleaseResValues UP-TO-DATE
+> Task :lottie-react-native:generateReleaseResources UP-TO-DATE
+> Task :lottie-react-native:packageReleaseResources UP-TO-DATE
+> Task :notifee_react-native:preBuild UP-TO-DATE
+> Task :notifee_react-native:preReleaseBuild UP-TO-DATE
+> Task :notifee_react-native:generateReleaseResValues UP-TO-DATE
+> Task :notifee_react-native:generateReleaseResources UP-TO-DATE
+> Task :notifee_react-native:packageReleaseResources UP-TO-DATE
+> Task :react-native-async-storage_async-storage:preBuild UP-TO-DATE
+> Task :react-native-async-storage_async-storage:preReleaseBuild UP-TO-DATE
+> Task :react-native-async-storage_async-storage:generateReleaseResValues UP-TO-DATE
+> Task :react-native-async-storage_async-storage:generateReleaseResources UP-TO-DATE
+> Task :react-native-async-storage_async-storage:packageReleaseResources UP-TO-DATE
+> Task :react-native-blob-util:preBuild UP-TO-DATE
+> Task :react-native-blob-util:preReleaseBuild UP-TO-DATE
+> Task :react-native-blob-util:generateReleaseResValues UP-TO-DATE
+> Task :react-native-blob-util:generateReleaseResources UP-TO-DATE
+> Task :react-native-blob-util:packageReleaseResources UP-TO-DATE
+> Task :react-native-callkeep:preBuild UP-TO-DATE
+> Task :react-native-callkeep:preReleaseBuild UP-TO-DATE
+> Task :react-native-callkeep:generateReleaseResValues UP-TO-DATE
+> Task :react-native-callkeep:generateReleaseResources UP-TO-DATE
+> Task :react-native-callkeep:packageReleaseResources UP-TO-DATE
+> Task :react-native-community_blur:preBuild UP-TO-DATE
+> Task :react-native-community_blur:preReleaseBuild UP-TO-DATE
+> Task :react-native-community_blur:generateReleaseResValues UP-TO-DATE
+> Task :react-native-community_blur:generateReleaseResources UP-TO-DATE
+> Task :react-native-community_blur:packageReleaseResources UP-TO-DATE
+> Task :react-native-community_netinfo:preBuild UP-TO-DATE
+> Task :react-native-community_netinfo:preReleaseBuild UP-TO-DATE
+> Task :react-native-community_netinfo:generateReleaseResValues UP-TO-DATE
+> Task :react-native-community_netinfo:generateReleaseResources UP-TO-DATE
+> Task :react-native-community_netinfo:packageReleaseResources UP-TO-DATE
+> Task :react-native-date-picker:preBuild UP-TO-DATE
+> Task :react-native-date-picker:preReleaseBuild UP-TO-DATE
+> Task :react-native-date-picker:generateReleaseResValues UP-TO-DATE
+> Task :react-native-date-picker:generateReleaseResources UP-TO-DATE
+> Task :react-native-date-picker:packageReleaseResources UP-TO-DATE
+> Task :react-native-fast-image:preBuild UP-TO-DATE
+> Task :react-native-fast-image:preReleaseBuild UP-TO-DATE
+> Task :react-native-fast-image:generateReleaseResValues UP-TO-DATE
+> Task :react-native-fast-image:generateReleaseResources UP-TO-DATE
+> Task :react-native-fast-image:packageReleaseResources UP-TO-DATE
+> Task :react-native-firebase_analytics:preBuild UP-TO-DATE
+> Task :react-native-firebase_analytics:preReleaseBuild UP-TO-DATE
+> Task :react-native-firebase_analytics:generateReleaseResValues UP-TO-DATE
+> Task :react-native-firebase_analytics:generateReleaseResources UP-TO-DATE
+> Task :react-native-firebase_analytics:packageReleaseResources UP-TO-DATE
+> Task :react-native-firebase_app:preBuild UP-TO-DATE
+> Task :react-native-firebase_app:preReleaseBuild UP-TO-DATE
+> Task :react-native-firebase_app:generateReleaseResValues UP-TO-DATE
+> Task :react-native-firebase_app:generateReleaseResources UP-TO-DATE
+> Task :react-native-firebase_app:packageReleaseResources UP-TO-DATE
+> Task :react-native-firebase_messaging:preBuild UP-TO-DATE
+> Task :react-native-firebase_messaging:preReleaseBuild UP-TO-DATE
+> Task :react-native-firebase_messaging:generateReleaseResValues UP-TO-DATE
+> Task :react-native-firebase_messaging:generateReleaseResources UP-TO-DATE
+> Task :react-native-firebase_messaging:packageReleaseResources UP-TO-DATE
+> Task :react-native-gesture-handler:preBuild UP-TO-DATE
+> Task :react-native-gesture-handler:preReleaseBuild UP-TO-DATE
+> Task :react-native-gesture-handler:generateReleaseResValues UP-TO-DATE
+> Task :react-native-gesture-handler:generateReleaseResources UP-TO-DATE
+> Task :react-native-gesture-handler:packageReleaseResources UP-TO-DATE
+> Task :react-native-image-picker:preBuild UP-TO-DATE
+> Task :react-native-image-picker:preReleaseBuild UP-TO-DATE
+> Task :react-native-image-picker:generateReleaseResValues UP-TO-DATE
+> Task :react-native-image-picker:generateReleaseResources UP-TO-DATE
+> Task :react-native-image-picker:packageReleaseResources UP-TO-DATE
+> Task :react-native-incall-manager:preBuild UP-TO-DATE
+> Task :react-native-incall-manager:preReleaseBuild UP-TO-DATE
+> Task :react-native-incall-manager:generateReleaseResValues UP-TO-DATE
+> Task :react-native-incall-manager:generateReleaseResources UP-TO-DATE
+> Task :react-native-incall-manager:packageReleaseResources UP-TO-DATE
+> Task :react-native-keychain:preBuild UP-TO-DATE
+> Task :react-native-keychain:preReleaseBuild UP-TO-DATE
+> Task :react-native-keychain:generateReleaseResValues UP-TO-DATE
+> Task :react-native-keychain:generateReleaseResources UP-TO-DATE
+> Task :react-native-keychain:packageReleaseResources UP-TO-DATE
+> Task :react-native-linear-gradient:preBuild UP-TO-DATE
+> Task :react-native-linear-gradient:preReleaseBuild UP-TO-DATE
+> Task :react-native-linear-gradient:generateReleaseResValues UP-TO-DATE
+> Task :react-native-linear-gradient:generateReleaseResources UP-TO-DATE
+> Task :react-native-linear-gradient:packageReleaseResources UP-TO-DATE
+> Task :react-native-mmkv:preBuild UP-TO-DATE
+> Task :react-native-mmkv:preReleaseBuild UP-TO-DATE
+> Task :react-native-mmkv:generateReleaseResValues UP-TO-DATE
+> Task :react-native-mmkv:generateReleaseResources UP-TO-DATE
+> Task :react-native-mmkv:packageReleaseResources UP-TO-DATE
+> Task :react-native-onesignal:preBuild UP-TO-DATE
+> Task :react-native-onesignal:preReleaseBuild UP-TO-DATE
+> Task :react-native-onesignal:generateReleaseResValues UP-TO-DATE
+> Task :react-native-onesignal:generateReleaseResources UP-TO-DATE
+> Task :react-native-onesignal:packageReleaseResources UP-TO-DATE
+> Task :react-native-razorpay:preBuild UP-TO-DATE
+> Task :react-native-razorpay:preReleaseBuild UP-TO-DATE
+> Task :react-native-razorpay:generateReleaseResValues UP-TO-DATE
+> Task :react-native-razorpay:generateReleaseResources UP-TO-DATE
+> Task :react-native-razorpay:packageReleaseResources UP-TO-DATE
+> Task :react-native-reanimated:assertLatestReactNativeWithNewArchitectureTask SKIPPED
+> Task :react-native-reanimated:assertMinimalReactNativeVersionTask SKIPPED
+> Task :react-native-reanimated:prepareHeadersForPrefab UP-TO-DATE
+> Task :react-native-reanimated:preBuild UP-TO-DATE
+> Task :react-native-reanimated:preReleaseBuild UP-TO-DATE
+> Task :react-native-reanimated:generateReleaseResValues UP-TO-DATE
+> Task :react-native-reanimated:generateReleaseResources UP-TO-DATE
+> Task :react-native-reanimated:packageReleaseResources UP-TO-DATE
+> Task :react-native-safe-area-context:preBuild UP-TO-DATE
+> Task :react-native-safe-area-context:preReleaseBuild UP-TO-DATE
+> Task :react-native-safe-area-context:generateReleaseResValues UP-TO-DATE
+> Task :react-native-safe-area-context:generateReleaseResources UP-TO-DATE
+> Task :react-native-safe-area-context:packageReleaseResources UP-TO-DATE
+> Task :react-native-screens:preBuild UP-TO-DATE
+> Task :react-native-screens:preReleaseBuild UP-TO-DATE
+> Task :react-native-screens:generateReleaseResValues UP-TO-DATE
+> Task :react-native-screens:generateReleaseResources UP-TO-DATE
+
+> Task :react-native:packages:react-native:ReactAndroid:hermes-engine:configureBuildForHermes
+-- Generating done
+-- Build files have been written to: /Users/sudoraj/Desktop/DhwaniAstrologer/node_modules/react-native/ReactAndroid/hermes-engine/build/hermes
+
+> Task :react-native-screens:packageReleaseResources UP-TO-DATE
+> Task :react-native-sound:preBuild UP-TO-DATE
+> Task :react-native-sound:preReleaseBuild UP-TO-DATE
+> Task :react-native-sound:generateReleaseResValues UP-TO-DATE
+> Task :react-native-sound:generateReleaseResources UP-TO-DATE
+> Task :react-native-sound:packageReleaseResources UP-TO-DATE
+> Task :react-native-svg:preBuild UP-TO-DATE
+> Task :react-native-svg:preReleaseBuild UP-TO-DATE
+> Task :react-native-svg:generateReleaseResValues UP-TO-DATE
+> Task :react-native-svg:generateReleaseResources UP-TO-DATE
+> Task :react-native-svg:packageReleaseResources UP-TO-DATE
+> Task :react-native-vector-icons:preBuild UP-TO-DATE
+> Task :react-native-vector-icons:preReleaseBuild UP-TO-DATE
+> Task :react-native-vector-icons:generateReleaseResValues UP-TO-DATE
+> Task :react-native-vector-icons:generateReleaseResources UP-TO-DATE
+> Task :react-native-vector-icons:packageReleaseResources UP-TO-DATE
+> Task :react-native-vector-icons_lucide:copyFonts UP-TO-DATE
+> Task :react-native-vector-icons_lucide:preBuild UP-TO-DATE
+> Task :react-native-vector-icons_lucide:preReleaseBuild UP-TO-DATE
+> Task :react-native-vector-icons_lucide:generateReleaseResValues UP-TO-DATE
+> Task :react-native-vector-icons_lucide:generateReleaseResources UP-TO-DATE
+> Task :react-native-vector-icons_lucide:packageReleaseResources UP-TO-DATE
+> Task :react-native-webrtc:preBuild UP-TO-DATE
+> Task :react-native-webrtc:preReleaseBuild UP-TO-DATE
+> Task :react-native-webrtc:generateReleaseResValues UP-TO-DATE
+> Task :react-native-webrtc:generateReleaseResources UP-TO-DATE
+> Task :react-native-webrtc:packageReleaseResources UP-TO-DATE
+> Task :react-native-webview:preBuild UP-TO-DATE
+> Task :react-native-webview:preReleaseBuild UP-TO-DATE
+> Task :react-native-webview:generateReleaseResValues UP-TO-DATE
+> Task :react-native-webview:generateReleaseResources UP-TO-DATE
+> Task :react-native-webview:packageReleaseResources UP-TO-DATE
+> Task :app:generateReleaseResources
+> Task :app:createReleaseCompatibleScreenManifests
+> Task :app:extractDeepLinksRelease
+> Task :lottie-react-native:extractDeepLinksRelease UP-TO-DATE
+> Task :lottie-react-native:processReleaseManifest UP-TO-DATE
+> Task :notifee_react-native:extractDeepLinksRelease UP-TO-DATE
+> Task :notifee_react-native:processReleaseManifest UP-TO-DATE
+> Task :react-native-async-storage_async-storage:extractDeepLinksRelease UP-TO-DATE
+> Task :react-native-async-storage_async-storage:processReleaseManifest UP-TO-DATE
+> Task :react-native-blob-util:extractDeepLinksRelease UP-TO-DATE
+> Task :react-native-blob-util:processReleaseManifest UP-TO-DATE
+> Task :react-native-callkeep:extractDeepLinksRelease UP-TO-DATE
+> Task :react-native-callkeep:processReleaseManifest UP-TO-DATE
+> Task :react-native-community_blur:extractDeepLinksRelease UP-TO-DATE
+> Task :react-native-community_blur:processReleaseManifest UP-TO-DATE
+> Task :react-native-community_netinfo:extractDeepLinksRelease UP-TO-DATE
+> Task :react-native-community_netinfo:processReleaseManifest UP-TO-DATE
+> Task :react-native-date-picker:extractDeepLinksRelease UP-TO-DATE
+> Task :react-native-date-picker:processReleaseManifest UP-TO-DATE
+> Task :react-native-fast-image:extractDeepLinksRelease UP-TO-DATE
+> Task :react-native-fast-image:processReleaseManifest UP-TO-DATE
+> Task :react-native-firebase_analytics:extractDeepLinksRelease UP-TO-DATE
+> Task :react-native-firebase_analytics:processReleaseManifest UP-TO-DATE
+> Task :react-native-firebase_app:extractDeepLinksRelease UP-TO-DATE
+> Task :react-native-firebase_app:processReleaseManifest UP-TO-DATE
+> Task :react-native-firebase_messaging:extractDeepLinksRelease UP-TO-DATE
+> Task :react-native-firebase_messaging:processReleaseManifest UP-TO-DATE
+> Task :react-native-gesture-handler:extractDeepLinksRelease UP-TO-DATE
+> Task :react-native-gesture-handler:processReleaseManifest UP-TO-DATE
+> Task :react-native-image-picker:extractDeepLinksRelease UP-TO-DATE
+> Task :react-native-image-picker:processReleaseManifest UP-TO-DATE
+> Task :react-native-incall-manager:extractDeepLinksRelease UP-TO-DATE
+> Task :react-native-incall-manager:processReleaseManifest UP-TO-DATE
+> Task :react-native-keychain:extractDeepLinksRelease UP-TO-DATE
+> Task :react-native-keychain:processReleaseManifest UP-TO-DATE
+> Task :react-native-linear-gradient:extractDeepLinksRelease UP-TO-DATE
+> Task :react-native-linear-gradient:processReleaseManifest UP-TO-DATE
+> Task :react-native-mmkv:extractDeepLinksRelease UP-TO-DATE
+> Task :react-native-mmkv:processReleaseManifest UP-TO-DATE
+> Task :react-native-onesignal:extractDeepLinksRelease UP-TO-DATE
+> Task :react-native-onesignal:processReleaseManifest UP-TO-DATE
+> Task :react-native-razorpay:extractDeepLinksRelease UP-TO-DATE
+> Task :react-native-razorpay:processReleaseManifest UP-TO-DATE
+> Task :react-native-reanimated:extractDeepLinksRelease UP-TO-DATE
+> Task :react-native-reanimated:processReleaseManifest UP-TO-DATE
+> Task :react-native-safe-area-context:extractDeepLinksRelease UP-TO-DATE
+> Task :react-native-safe-area-context:processReleaseManifest UP-TO-DATE
+> Task :react-native-screens:extractDeepLinksRelease UP-TO-DATE
+> Task :react-native-screens:processReleaseManifest UP-TO-DATE
+> Task :react-native-sound:extractDeepLinksRelease UP-TO-DATE
+> Task :react-native-sound:processReleaseManifest UP-TO-DATE
+> Task :react-native-svg:extractDeepLinksRelease UP-TO-DATE
+> Task :react-native-svg:processReleaseManifest UP-TO-DATE
+> Task :react-native-vector-icons:extractDeepLinksRelease UP-TO-DATE
+> Task :react-native-vector-icons:processReleaseManifest UP-TO-DATE
+> Task :react-native-vector-icons_lucide:extractDeepLinksRelease UP-TO-DATE
+> Task :react-native-vector-icons_lucide:processReleaseManifest UP-TO-DATE
+> Task :react-native-webrtc:extractDeepLinksRelease UP-TO-DATE
+> Task :react-native-webrtc:processReleaseManifest UP-TO-DATE
+> Task :react-native-webview:extractDeepLinksRelease UP-TO-DATE
+> Task :react-native-webview:processReleaseManifest UP-TO-DATE
+> Task :lottie-react-native:writeReleaseAarMetadata UP-TO-DATE
+> Task :notifee_react-native:writeReleaseAarMetadata UP-TO-DATE
+> Task :react-native-async-storage_async-storage:writeReleaseAarMetadata UP-TO-DATE
+> Task :react-native-blob-util:writeReleaseAarMetadata UP-TO-DATE
+> Task :react-native-callkeep:writeReleaseAarMetadata UP-TO-DATE
+> Task :react-native-community_blur:writeReleaseAarMetadata UP-TO-DATE
+> Task :react-native-community_netinfo:writeReleaseAarMetadata UP-TO-DATE
+> Task :react-native-date-picker:writeReleaseAarMetadata UP-TO-DATE
+> Task :react-native-fast-image:writeReleaseAarMetadata UP-TO-DATE
+> Task :react-native-firebase_analytics:writeReleaseAarMetadata UP-TO-DATE
+> Task :react-native-firebase_app:writeReleaseAarMetadata UP-TO-DATE
+> Task :react-native-firebase_messaging:writeReleaseAarMetadata UP-TO-DATE
+> Task :react-native-gesture-handler:writeReleaseAarMetadata UP-TO-DATE
+> Task :react-native-image-picker:writeReleaseAarMetadata UP-TO-DATE
+> Task :react-native-incall-manager:writeReleaseAarMetadata UP-TO-DATE
+> Task :react-native-keychain:writeReleaseAarMetadata UP-TO-DATE
+> Task :react-native-linear-gradient:writeReleaseAarMetadata UP-TO-DATE
+> Task :react-native-mmkv:writeReleaseAarMetadata UP-TO-DATE
+> Task :react-native-onesignal:writeReleaseAarMetadata UP-TO-DATE
+> Task :react-native-razorpay:writeReleaseAarMetadata UP-TO-DATE
+> Task :react-native-reanimated:writeReleaseAarMetadata UP-TO-DATE
+> Task :react-native-safe-area-context:writeReleaseAarMetadata UP-TO-DATE
+> Task :react-native-screens:writeReleaseAarMetadata UP-TO-DATE
+> Task :react-native-sound:writeReleaseAarMetadata UP-TO-DATE
+> Task :react-native-svg:writeReleaseAarMetadata UP-TO-DATE
+> Task :react-native-vector-icons:writeReleaseAarMetadata UP-TO-DATE
+> Task :react-native-vector-icons_lucide:writeReleaseAarMetadata UP-TO-DATE
+> Task :react-native-webrtc:writeReleaseAarMetadata UP-TO-DATE
+> Task :react-native-webview:writeReleaseAarMetadata UP-TO-DATE
+> Task :app:packageReleaseResources
+> Task :lottie-react-native:compileReleaseLibraryResources UP-TO-DATE
+> Task :lottie-react-native:parseReleaseLocalResources UP-TO-DATE
+> Task :lottie-react-native:generateReleaseRFile UP-TO-DATE
+> Task :notifee_react-native:compileReleaseLibraryResources UP-TO-DATE
+> Task :notifee_react-native:parseReleaseLocalResources UP-TO-DATE
+> Task :notifee_react-native:generateReleaseRFile UP-TO-DATE
+> Task :react-native-async-storage_async-storage:compileReleaseLibraryResources UP-TO-DATE
+> Task :react-native-async-storage_async-storage:parseReleaseLocalResources UP-TO-DATE
+> Task :react-native-async-storage_async-storage:generateReleaseRFile UP-TO-DATE
+> Task :react-native-blob-util:compileReleaseLibraryResources UP-TO-DATE
+> Task :react-native-blob-util:parseReleaseLocalResources UP-TO-DATE
+> Task :app:parseReleaseLocalResources
+> Task :react-native-blob-util:generateReleaseRFile UP-TO-DATE
+> Task :react-native-callkeep:compileReleaseLibraryResources UP-TO-DATE
+> Task :react-native-callkeep:parseReleaseLocalResources UP-TO-DATE
+> Task :react-native-callkeep:generateReleaseRFile UP-TO-DATE
+> Task :react-native-community_blur:compileReleaseLibraryResources UP-TO-DATE
+> Task :react-native-community_blur:parseReleaseLocalResources UP-TO-DATE
+> Task :react-native-community_blur:generateReleaseRFile UP-TO-DATE
+> Task :react-native-community_netinfo:compileReleaseLibraryResources UP-TO-DATE
+> Task :react-native-community_netinfo:parseReleaseLocalResources UP-TO-DATE
+> Task :react-native-community_netinfo:generateReleaseRFile UP-TO-DATE
+> Task :react-native-date-picker:compileReleaseLibraryResources UP-TO-DATE
+> Task :react-native-date-picker:parseReleaseLocalResources UP-TO-DATE
+> Task :react-native-date-picker:generateReleaseRFile UP-TO-DATE
+> Task :react-native-fast-image:compileReleaseLibraryResources UP-TO-DATE
+> Task :react-native-fast-image:parseReleaseLocalResources UP-TO-DATE
+> Task :react-native-fast-image:generateReleaseRFile UP-TO-DATE
+> Task :react-native-firebase_analytics:compileReleaseLibraryResources UP-TO-DATE
+> Task :react-native-firebase_analytics:parseReleaseLocalResources UP-TO-DATE
+> Task :react-native-firebase_analytics:generateReleaseRFile UP-TO-DATE
+> Task :react-native-firebase_app:compileReleaseLibraryResources UP-TO-DATE
+> Task :react-native-firebase_app:parseReleaseLocalResources UP-TO-DATE
+> Task :react-native-firebase_app:generateReleaseRFile UP-TO-DATE
+> Task :react-native-firebase_messaging:compileReleaseLibraryResources UP-TO-DATE
+> Task :react-native-firebase_messaging:parseReleaseLocalResources UP-TO-DATE
+> Task :react-native-firebase_messaging:generateReleaseRFile UP-TO-DATE
+> Task :react-native-gesture-handler:compileReleaseLibraryResources UP-TO-DATE
+> Task :react-native-gesture-handler:parseReleaseLocalResources UP-TO-DATE
+> Task :react-native-gesture-handler:generateReleaseRFile UP-TO-DATE
+> Task :react-native-image-picker:compileReleaseLibraryResources UP-TO-DATE
+> Task :react-native-image-picker:parseReleaseLocalResources UP-TO-DATE
+> Task :react-native-image-picker:generateReleaseRFile UP-TO-DATE
+> Task :react-native-incall-manager:compileReleaseLibraryResources UP-TO-DATE
+> Task :react-native-incall-manager:parseReleaseLocalResources UP-TO-DATE
+> Task :react-native-incall-manager:generateReleaseRFile UP-TO-DATE
+> Task :react-native-keychain:compileReleaseLibraryResources UP-TO-DATE
+> Task :react-native-keychain:parseReleaseLocalResources UP-TO-DATE
+> Task :react-native-keychain:generateReleaseRFile UP-TO-DATE
+> Task :react-native-linear-gradient:compileReleaseLibraryResources UP-TO-DATE
+> Task :react-native-linear-gradient:parseReleaseLocalResources UP-TO-DATE
+> Task :react-native-linear-gradient:generateReleaseRFile UP-TO-DATE
+> Task :react-native-mmkv:compileReleaseLibraryResources UP-TO-DATE
+> Task :react-native-mmkv:parseReleaseLocalResources UP-TO-DATE
+> Task :react-native-mmkv:generateReleaseRFile UP-TO-DATE
+> Task :react-native-onesignal:compileReleaseLibraryResources UP-TO-DATE
+> Task :react-native-onesignal:parseReleaseLocalResources UP-TO-DATE
+> Task :react-native-onesignal:generateReleaseRFile UP-TO-DATE
+> Task :react-native-razorpay:compileReleaseLibraryResources UP-TO-DATE
+> Task :react-native-razorpay:parseReleaseLocalResources UP-TO-DATE
+> Task :react-native-razorpay:generateReleaseRFile UP-TO-DATE
+> Task :react-native-reanimated:compileReleaseLibraryResources UP-TO-DATE
+> Task :react-native-reanimated:parseReleaseLocalResources UP-TO-DATE
+> Task :react-native-reanimated:generateReleaseRFile UP-TO-DATE
+> Task :react-native-safe-area-context:compileReleaseLibraryResources UP-TO-DATE
+> Task :react-native-safe-area-context:parseReleaseLocalResources UP-TO-DATE
+> Task :react-native-safe-area-context:generateReleaseRFile UP-TO-DATE
+> Task :react-native-screens:compileReleaseLibraryResources UP-TO-DATE
+> Task :react-native-screens:parseReleaseLocalResources UP-TO-DATE
+> Task :react-native-screens:generateReleaseRFile UP-TO-DATE
+> Task :react-native-sound:compileReleaseLibraryResources UP-TO-DATE
+> Task :react-native-sound:parseReleaseLocalResources UP-TO-DATE
+> Task :react-native-sound:generateReleaseRFile UP-TO-DATE
+> Task :react-native-svg:compileReleaseLibraryResources UP-TO-DATE
+> Task :react-native-svg:parseReleaseLocalResources UP-TO-DATE
+> Task :react-native-svg:generateReleaseRFile UP-TO-DATE
+> Task :react-native-vector-icons:compileReleaseLibraryResources UP-TO-DATE
+> Task :react-native-vector-icons:parseReleaseLocalResources UP-TO-DATE
+> Task :react-native-vector-icons:generateReleaseRFile UP-TO-DATE
+> Task :react-native-vector-icons_lucide:compileReleaseLibraryResources UP-TO-DATE
+> Task :react-native-vector-icons_lucide:parseReleaseLocalResources UP-TO-DATE
+> Task :react-native-vector-icons_lucide:generateReleaseRFile UP-TO-DATE
+> Task :react-native-webrtc:compileReleaseLibraryResources UP-TO-DATE
+> Task :react-native-webrtc:parseReleaseLocalResources UP-TO-DATE
+> Task :react-native-webrtc:generateReleaseRFile UP-TO-DATE
+> Task :react-native-webview:compileReleaseLibraryResources UP-TO-DATE
+> Task :react-native-webview:parseReleaseLocalResources UP-TO-DATE
+> Task :react-native-webview:generateReleaseRFile UP-TO-DATE
+> Task :app:extractReleaseVersionControlInfo
+> Task :notifee_react-native:generateReleaseBuildConfig UP-TO-DATE
+> Task :notifee_react-native:javaPreCompileRelease UP-TO-DATE
+> Task :react-native-async-storage_async-storage:generateReleaseBuildConfig UP-TO-DATE
+> Task :react-native-async-storage_async-storage:javaPreCompileRelease UP-TO-DATE
+> Task :react-native-community_blur:generateReleaseBuildConfig UP-TO-DATE
+> Task :react-native-community_blur:javaPreCompileRelease UP-TO-DATE
+> Task :react-native-community_netinfo:generateReleaseBuildConfig UP-TO-DATE
+> Task :react-native-community_netinfo:javaPreCompileRelease UP-TO-DATE
+> Task :react-native-firebase_analytics:generateReleaseBuildConfig UP-TO-DATE
+> Task :react-native-firebase_analytics:javaPreCompileRelease UP-TO-DATE
+> Task :react-native-firebase_app:generateReleaseBuildConfig UP-TO-DATE
+> Task :react-native-firebase_app:javaPreCompileRelease UP-TO-DATE
+> Task :react-native-firebase_messaging:generateReleaseBuildConfig UP-TO-DATE
+> Task :react-native-firebase_messaging:javaPreCompileRelease UP-TO-DATE
+> Task :react-native-vector-icons_lucide:generateReleaseBuildConfig UP-TO-DATE
+> Task :react-native-vector-icons_lucide:javaPreCompileRelease UP-TO-DATE
+> Task :lottie-react-native:generateReleaseBuildConfig UP-TO-DATE
+> Task :lottie-react-native:javaPreCompileRelease UP-TO-DATE
+> Task :react-native-blob-util:generateReleaseBuildConfig UP-TO-DATE
+> Task :react-native-blob-util:javaPreCompileRelease UP-TO-DATE
+> Task :react-native-callkeep:generateReleaseBuildConfig UP-TO-DATE
+> Task :react-native-callkeep:javaPreCompileRelease UP-TO-DATE
+> Task :react-native-date-picker:generateReleaseBuildConfig UP-TO-DATE
+> Task :react-native-date-picker:javaPreCompileRelease UP-TO-DATE
+> Task :react-native-fast-image:generateReleaseBuildConfig UP-TO-DATE
+> Task :react-native-fast-image:javaPreCompileRelease UP-TO-DATE
+> Task :react-native-gesture-handler:generateReleaseBuildConfig UP-TO-DATE
+> Task :react-native-reanimated:generateReleaseBuildConfig UP-TO-DATE
+> Task :react-native-reanimated:javaPreCompileRelease UP-TO-DATE
+> Task :react-native-reanimated:packageNdkLibs NO-SOURCE
+> Task :react-native-gesture-handler:javaPreCompileRelease UP-TO-DATE
+> Task :react-native-image-picker:generateReleaseBuildConfig UP-TO-DATE
+> Task :react-native-image-picker:javaPreCompileRelease UP-TO-DATE
+> Task :react-native-incall-manager:generateReleaseBuildConfig UP-TO-DATE
+> Task :react-native-incall-manager:javaPreCompileRelease UP-TO-DATE
+> Task :react-native-keychain:generateReleaseBuildConfig UP-TO-DATE
+> Task :react-native-keychain:javaPreCompileRelease UP-TO-DATE
+> Task :react-native-linear-gradient:generateReleaseBuildConfig UP-TO-DATE
+> Task :react-native-linear-gradient:javaPreCompileRelease UP-TO-DATE
+> Task :react-native-mmkv:generateReleaseBuildConfig UP-TO-DATE
+> Task :react-native-mmkv:javaPreCompileRelease UP-TO-DATE
+> Task :react-native-onesignal:generateReleaseBuildConfig UP-TO-DATE
+> Task :react-native-onesignal:javaPreCompileRelease UP-TO-DATE
+> Task :react-native-razorpay:generateReleaseBuildConfig UP-TO-DATE
+> Task :react-native-razorpay:javaPreCompileRelease UP-TO-DATE
+> Task :react-native-safe-area-context:generateReleaseBuildConfig UP-TO-DATE
+> Task :react-native-safe-area-context:javaPreCompileRelease UP-TO-DATE
+> Task :react-native-screens:generateReleaseBuildConfig UP-TO-DATE
+> Task :react-native-screens:javaPreCompileRelease UP-TO-DATE
+> Task :react-native-svg:generateReleaseBuildConfig UP-TO-DATE
+> Task :react-native-svg:javaPreCompileRelease UP-TO-DATE
+> Task :react-native-vector-icons:generateReleaseBuildConfig UP-TO-DATE
+> Task :react-native-vector-icons:javaPreCompileRelease UP-TO-DATE
+> Task :react-native-webrtc:generateReleaseBuildConfig UP-TO-DATE
+> Task :react-native-webrtc:javaPreCompileRelease UP-TO-DATE
+> Task :react-native-webview:generateReleaseBuildConfig UP-TO-DATE
+> Task :react-native-webview:javaPreCompileRelease UP-TO-DATE
+> Task :react-native-sound:generateReleaseBuildConfig UP-TO-DATE
+> Task :react-native-sound:javaPreCompileRelease UP-TO-DATE
+
+> Task :react-native:packages:react-native:ReactAndroid:hermes-engine:buildHermesC
+[  0%] Building CXX object external/llvh/lib/Demangle/CMakeFiles/LLVHDemangle.dir/MicrosoftDemangle.cpp.o
+[  0%] Building C object external/zip/CMakeFiles/zip.dir/src/zip.c.o
+[  0%] Building C object external/dtoa/CMakeFiles/dtoa.dir/dtoa.c.o
+[  0%] Building CXX object external/llvh/lib/Demangle/CMakeFiles/LLVHDemangle.dir/MicrosoftDemangleNodes.cpp.o
+[  3%] Building CXX object external/llvh/lib/Demangle/CMakeFiles/LLVHDemangle.dir/ItaniumDemangle.cpp.o
+[  3%] Building CXX object external/dtoa/CMakeFiles/dtoa.dir/locks.cpp.o
+[  6%] Building C object external/dtoa/CMakeFiles/dtoa.dir/g_fmt.c.o
+[  6%] Building CXX object public/hermes/Public/CMakeFiles/hermesPublic.dir/rtti.cpp.o
+[ 10%] Linking C static library libzip.a
+[ 10%] Linking CXX static library libdtoa.a
+[ 10%] Linking CXX static library libhermesPublic.a
+[ 10%] Built target hermesPublic
+[ 10%] Built target zip
+[ 10%] Built target dtoa
+[ 10%] Linking CXX static library libLLVHDemangle.a
+[ 10%] Built target LLVHDemangle
+[ 13%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/CommandLine.cpp.o
+[ 13%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/APInt.cpp.o
+[ 13%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/ConvertUTFWrapper.cpp.o
+[ 13%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/circular_raw_ostream.cpp.o
+[ 13%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/APFloat.cpp.o
+[ 13%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/Debug.cpp.o
+[ 13%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/ConvertUTF.cpp.o
+[ 13%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/Errno.cpp.o
+[ 13%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/Error.cpp.o
+[ 13%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/ErrorHandling.cpp.o
+[ 16%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/FileCheck.cpp.o
+[ 16%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/FoldingSet.cpp.o
+[ 16%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/GraphWriter.cpp.o
+[ 16%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/Hashing.cpp.o
+[ 16%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/Host.cpp.o
+[ 16%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/InitLLVM.cpp.o
+[ 16%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/LineIterator.cpp.o
+[ 16%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/Locale.cpp.o
+[ 20%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/ManagedStatic.cpp.o
+[ 20%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/MD5.cpp.o
+[ 20%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/Memory.cpp.o
+
+> Task :app:checkReleaseDuplicateClasses
+> Task :app:buildKotlinToolingMetadata
+> Task :app:generateReleaseBuildConfig
+> Task :app:javaPreCompileRelease
+
+> Task :react-native:packages:react-native:ReactAndroid:hermes-engine:buildHermesC
+[ 20%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/MemoryBuffer.cpp.o
+[ 20%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/Mutex.cpp.o
+[ 20%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/NativeFormatting.cpp.o
+[ 20%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/Path.cpp.o
+[ 23%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/PrettyStackTrace.cpp.o
+[ 23%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/Process.cpp.o
+[ 23%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/Program.cpp.o
+[ 23%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/raw_ostream.cpp.o
+[ 23%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/raw_os_ostream.cpp.o
+[ 23%] Building C object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/regcomp.c.o
+[ 23%] Building C object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/regerror.c.o
+[ 26%] Building C object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/regfree.c.o
+[ 26%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/Regex.cpp.o
+[ 26%] Building C object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/regexec.c.o
+[ 26%] Building C object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/regstrlcpy.c.o
+[ 26%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/SHA1.cpp.o
+[ 26%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/Signals.cpp.o
+
+> Task :app:desugarReleaseFileDependencies
+> Task :app:mergeReleaseStartupProfile UP-TO-DATE
+> Task :app:mergeReleaseShaders
+> Task :app:compileReleaseShaders NO-SOURCE
+> Task :app:copyReactNativeVectorIconFonts
+> Task :app:generateReleaseAssets
+> Task :lottie-react-native:mergeReleaseShaders UP-TO-DATE
+> Task :lottie-react-native:compileReleaseShaders NO-SOURCE
+> Task :lottie-react-native:generateReleaseAssets UP-TO-DATE
+> Task :lottie-react-native:mergeReleaseAssets UP-TO-DATE
+> Task :notifee_react-native:mergeReleaseShaders UP-TO-DATE
+> Task :notifee_react-native:compileReleaseShaders NO-SOURCE
+> Task :notifee_react-native:generateReleaseAssets UP-TO-DATE
+> Task :notifee_react-native:mergeReleaseAssets UP-TO-DATE
+> Task :react-native-async-storage_async-storage:mergeReleaseShaders UP-TO-DATE
+> Task :react-native-async-storage_async-storage:compileReleaseShaders NO-SOURCE
+> Task :react-native-async-storage_async-storage:generateReleaseAssets UP-TO-DATE
+> Task :react-native-async-storage_async-storage:mergeReleaseAssets UP-TO-DATE
+> Task :react-native-blob-util:mergeReleaseShaders UP-TO-DATE
+> Task :react-native-blob-util:compileReleaseShaders NO-SOURCE
+> Task :react-native-blob-util:generateReleaseAssets UP-TO-DATE
+> Task :react-native-blob-util:mergeReleaseAssets UP-TO-DATE
+> Task :react-native-callkeep:mergeReleaseShaders UP-TO-DATE
+> Task :react-native-callkeep:compileReleaseShaders NO-SOURCE
+> Task :react-native-callkeep:generateReleaseAssets UP-TO-DATE
+> Task :react-native-callkeep:mergeReleaseAssets UP-TO-DATE
+> Task :react-native-community_blur:mergeReleaseShaders UP-TO-DATE
+> Task :react-native-community_blur:compileReleaseShaders NO-SOURCE
+> Task :react-native-community_blur:generateReleaseAssets UP-TO-DATE
+> Task :react-native-community_blur:mergeReleaseAssets UP-TO-DATE
+> Task :react-native-community_netinfo:mergeReleaseShaders UP-TO-DATE
+> Task :react-native-community_netinfo:compileReleaseShaders NO-SOURCE
+> Task :react-native-community_netinfo:generateReleaseAssets UP-TO-DATE
+> Task :react-native-community_netinfo:mergeReleaseAssets UP-TO-DATE
+> Task :react-native-date-picker:mergeReleaseShaders UP-TO-DATE
+> Task :react-native-date-picker:compileReleaseShaders NO-SOURCE
+> Task :react-native-date-picker:generateReleaseAssets UP-TO-DATE
+> Task :react-native-date-picker:mergeReleaseAssets UP-TO-DATE
+> Task :react-native-fast-image:mergeReleaseShaders UP-TO-DATE
+> Task :react-native-fast-image:compileReleaseShaders NO-SOURCE
+> Task :react-native-fast-image:generateReleaseAssets UP-TO-DATE
+> Task :react-native-fast-image:mergeReleaseAssets UP-TO-DATE
+> Task :react-native-firebase_analytics:mergeReleaseShaders UP-TO-DATE
+> Task :react-native-firebase_analytics:compileReleaseShaders NO-SOURCE
+> Task :react-native-firebase_analytics:generateReleaseAssets UP-TO-DATE
+> Task :react-native-firebase_analytics:mergeReleaseAssets UP-TO-DATE
+> Task :react-native-firebase_app:mergeReleaseShaders UP-TO-DATE
+> Task :react-native-firebase_app:compileReleaseShaders NO-SOURCE
+> Task :react-native-firebase_app:generateReleaseAssets UP-TO-DATE
+> Task :react-native-firebase_app:mergeReleaseAssets UP-TO-DATE
+> Task :react-native-firebase_messaging:mergeReleaseShaders UP-TO-DATE
+> Task :react-native-firebase_messaging:compileReleaseShaders NO-SOURCE
+> Task :react-native-firebase_messaging:generateReleaseAssets UP-TO-DATE
+> Task :react-native-firebase_messaging:mergeReleaseAssets UP-TO-DATE
+> Task :react-native-gesture-handler:mergeReleaseShaders UP-TO-DATE
+> Task :react-native-gesture-handler:compileReleaseShaders NO-SOURCE
+> Task :react-native-gesture-handler:generateReleaseAssets UP-TO-DATE
+> Task :react-native-gesture-handler:mergeReleaseAssets UP-TO-DATE
+> Task :react-native-image-picker:mergeReleaseShaders UP-TO-DATE
+> Task :react-native-image-picker:compileReleaseShaders NO-SOURCE
+> Task :react-native-image-picker:generateReleaseAssets UP-TO-DATE
+> Task :react-native-image-picker:mergeReleaseAssets UP-TO-DATE
+> Task :react-native-incall-manager:mergeReleaseShaders UP-TO-DATE
+> Task :react-native-incall-manager:compileReleaseShaders NO-SOURCE
+> Task :react-native-incall-manager:generateReleaseAssets UP-TO-DATE
+> Task :react-native-incall-manager:mergeReleaseAssets UP-TO-DATE
+> Task :react-native-keychain:mergeReleaseShaders UP-TO-DATE
+> Task :react-native-keychain:compileReleaseShaders NO-SOURCE
+> Task :react-native-keychain:generateReleaseAssets UP-TO-DATE
+> Task :react-native-keychain:mergeReleaseAssets UP-TO-DATE
+> Task :react-native-linear-gradient:mergeReleaseShaders UP-TO-DATE
+> Task :react-native-linear-gradient:compileReleaseShaders NO-SOURCE
+> Task :react-native-linear-gradient:generateReleaseAssets UP-TO-DATE
+> Task :react-native-linear-gradient:mergeReleaseAssets UP-TO-DATE
+> Task :react-native-mmkv:mergeReleaseShaders UP-TO-DATE
+> Task :react-native-mmkv:compileReleaseShaders NO-SOURCE
+> Task :react-native-mmkv:generateReleaseAssets UP-TO-DATE
+> Task :react-native-mmkv:mergeReleaseAssets UP-TO-DATE
+> Task :react-native-onesignal:mergeReleaseShaders UP-TO-DATE
+> Task :react-native-onesignal:compileReleaseShaders NO-SOURCE
+> Task :react-native-onesignal:generateReleaseAssets UP-TO-DATE
+> Task :react-native-onesignal:mergeReleaseAssets UP-TO-DATE
+> Task :react-native-razorpay:mergeReleaseShaders UP-TO-DATE
+> Task :react-native-razorpay:compileReleaseShaders NO-SOURCE
+> Task :react-native-razorpay:generateReleaseAssets UP-TO-DATE
+> Task :react-native-razorpay:mergeReleaseAssets UP-TO-DATE
+> Task :react-native-reanimated:mergeReleaseShaders UP-TO-DATE
+> Task :react-native-reanimated:compileReleaseShaders NO-SOURCE
+> Task :react-native-reanimated:generateReleaseAssets UP-TO-DATE
+> Task :react-native-reanimated:mergeReleaseAssets UP-TO-DATE
+> Task :react-native-safe-area-context:mergeReleaseShaders UP-TO-DATE
+> Task :react-native-safe-area-context:compileReleaseShaders NO-SOURCE
+> Task :react-native-safe-area-context:generateReleaseAssets UP-TO-DATE
+> Task :react-native-safe-area-context:mergeReleaseAssets UP-TO-DATE
+> Task :react-native-screens:mergeReleaseShaders UP-TO-DATE
+> Task :react-native-screens:compileReleaseShaders NO-SOURCE
+> Task :react-native-screens:generateReleaseAssets UP-TO-DATE
+> Task :react-native-screens:mergeReleaseAssets UP-TO-DATE
+> Task :react-native-sound:mergeReleaseShaders UP-TO-DATE
+> Task :react-native-sound:compileReleaseShaders NO-SOURCE
+> Task :react-native-sound:generateReleaseAssets UP-TO-DATE
+> Task :react-native-sound:mergeReleaseAssets UP-TO-DATE
+> Task :react-native-svg:mergeReleaseShaders UP-TO-DATE
+> Task :react-native-svg:compileReleaseShaders NO-SOURCE
+> Task :react-native-svg:generateReleaseAssets UP-TO-DATE
+> Task :react-native-svg:mergeReleaseAssets UP-TO-DATE
+> Task :react-native-vector-icons:mergeReleaseShaders UP-TO-DATE
+> Task :react-native-vector-icons:compileReleaseShaders NO-SOURCE
+> Task :react-native-vector-icons:generateReleaseAssets UP-TO-DATE
+> Task :react-native-vector-icons:mergeReleaseAssets UP-TO-DATE
+> Task :react-native-vector-icons_lucide:mergeReleaseShaders UP-TO-DATE
+> Task :react-native-vector-icons_lucide:compileReleaseShaders NO-SOURCE
+> Task :react-native-vector-icons_lucide:generateReleaseAssets UP-TO-DATE
+> Task :react-native-vector-icons_lucide:mergeReleaseAssets UP-TO-DATE
+> Task :react-native-webrtc:mergeReleaseShaders UP-TO-DATE
+> Task :react-native-webrtc:compileReleaseShaders NO-SOURCE
+> Task :react-native-webrtc:generateReleaseAssets UP-TO-DATE
+> Task :react-native-webrtc:mergeReleaseAssets UP-TO-DATE
+> Task :react-native-webview:mergeReleaseShaders UP-TO-DATE
+> Task :react-native-webview:compileReleaseShaders NO-SOURCE
+> Task :react-native-webview:generateReleaseAssets UP-TO-DATE
+> Task :react-native-webview:mergeReleaseAssets UP-TO-DATE
+> Task :notifee_react-native:processReleaseJavaRes NO-SOURCE
+> Task :react-native-async-storage_async-storage:processReleaseJavaRes NO-SOURCE
+> Task :react-native-blob-util:processReleaseJavaRes NO-SOURCE
+> Task :react-native-callkeep:processReleaseJavaRes NO-SOURCE
+> Task :react-native-community_blur:processReleaseJavaRes NO-SOURCE
+> Task :react-native-community_netinfo:processReleaseJavaRes NO-SOURCE
+> Task :react-native-date-picker:processReleaseJavaRes NO-SOURCE
+> Task :react-native-firebase_analytics:processReleaseJavaRes NO-SOURCE
+> Task :react-native-firebase_app:processReleaseJavaRes NO-SOURCE
+> Task :react-native-firebase_messaging:processReleaseJavaRes NO-SOURCE
+> Task :react-native-image-picker:processReleaseJavaRes NO-SOURCE
+> Task :react-native-incall-manager:processReleaseJavaRes NO-SOURCE
+> Task :react-native-linear-gradient:processReleaseJavaRes NO-SOURCE
+> Task :react-native-mmkv:processReleaseJavaRes NO-SOURCE
+> Task :react-native-onesignal:processReleaseJavaRes NO-SOURCE
+> Task :react-native-razorpay:processReleaseJavaRes NO-SOURCE
+> Task :react-native-reanimated:processReleaseJavaRes NO-SOURCE
+> Task :react-native-sound:processReleaseJavaRes NO-SOURCE
+> Task :react-native-svg:processReleaseJavaRes NO-SOURCE
+> Task :react-native-vector-icons:processReleaseJavaRes NO-SOURCE
+> Task :react-native-webrtc:processReleaseJavaRes NO-SOURCE
+> Task :app:mergeReleaseJniLibFolders
+> Task :lottie-react-native:mergeReleaseJniLibFolders UP-TO-DATE
+> Task :lottie-react-native:mergeReleaseNativeLibs NO-SOURCE
+> Task :lottie-react-native:copyReleaseJniLibsProjectOnly UP-TO-DATE
+> Task :notifee_react-native:mergeReleaseJniLibFolders UP-TO-DATE
+> Task :notifee_react-native:mergeReleaseNativeLibs NO-SOURCE
+> Task :notifee_react-native:copyReleaseJniLibsProjectOnly UP-TO-DATE
+> Task :react-native-async-storage_async-storage:mergeReleaseJniLibFolders UP-TO-DATE
+> Task :react-native-async-storage_async-storage:mergeReleaseNativeLibs NO-SOURCE
+> Task :react-native-async-storage_async-storage:copyReleaseJniLibsProjectOnly UP-TO-DATE
+> Task :react-native-blob-util:mergeReleaseJniLibFolders UP-TO-DATE
+> Task :react-native-blob-util:mergeReleaseNativeLibs NO-SOURCE
+> Task :react-native-blob-util:copyReleaseJniLibsProjectOnly UP-TO-DATE
+> Task :react-native-callkeep:mergeReleaseJniLibFolders UP-TO-DATE
+> Task :react-native-callkeep:mergeReleaseNativeLibs NO-SOURCE
+> Task :react-native-callkeep:copyReleaseJniLibsProjectOnly UP-TO-DATE
+> Task :react-native-community_blur:mergeReleaseJniLibFolders UP-TO-DATE
+> Task :react-native-community_blur:mergeReleaseNativeLibs NO-SOURCE
+> Task :react-native-community_blur:copyReleaseJniLibsProjectOnly UP-TO-DATE
+> Task :react-native-community_netinfo:mergeReleaseJniLibFolders UP-TO-DATE
+> Task :react-native-community_netinfo:mergeReleaseNativeLibs NO-SOURCE
+> Task :react-native-community_netinfo:copyReleaseJniLibsProjectOnly UP-TO-DATE
+> Task :react-native-date-picker:mergeReleaseJniLibFolders UP-TO-DATE
+> Task :react-native-date-picker:mergeReleaseNativeLibs NO-SOURCE
+> Task :react-native-date-picker:copyReleaseJniLibsProjectOnly UP-TO-DATE
+> Task :react-native-fast-image:mergeReleaseJniLibFolders UP-TO-DATE
+> Task :react-native-fast-image:mergeReleaseNativeLibs NO-SOURCE
+> Task :react-native-fast-image:copyReleaseJniLibsProjectOnly UP-TO-DATE
+> Task :react-native-firebase_analytics:mergeReleaseJniLibFolders UP-TO-DATE
+> Task :react-native-firebase_analytics:mergeReleaseNativeLibs NO-SOURCE
+> Task :react-native-firebase_analytics:copyReleaseJniLibsProjectOnly UP-TO-DATE
+> Task :react-native-firebase_app:mergeReleaseJniLibFolders UP-TO-DATE
+> Task :react-native-firebase_app:mergeReleaseNativeLibs NO-SOURCE
+> Task :react-native-firebase_app:copyReleaseJniLibsProjectOnly UP-TO-DATE
+> Task :react-native-firebase_messaging:mergeReleaseJniLibFolders UP-TO-DATE
+> Task :react-native-firebase_messaging:mergeReleaseNativeLibs NO-SOURCE
+> Task :react-native-firebase_messaging:copyReleaseJniLibsProjectOnly UP-TO-DATE
+> Task :react-native-gesture-handler:mergeReleaseJniLibFolders UP-TO-DATE
+> Task :react-native-gesture-handler:mergeReleaseNativeLibs NO-SOURCE
+> Task :react-native-gesture-handler:copyReleaseJniLibsProjectOnly UP-TO-DATE
+> Task :react-native-image-picker:mergeReleaseJniLibFolders UP-TO-DATE
+> Task :react-native-image-picker:mergeReleaseNativeLibs NO-SOURCE
+> Task :react-native-image-picker:copyReleaseJniLibsProjectOnly UP-TO-DATE
+> Task :react-native-incall-manager:mergeReleaseJniLibFolders UP-TO-DATE
+> Task :react-native-incall-manager:mergeReleaseNativeLibs NO-SOURCE
+> Task :react-native-incall-manager:copyReleaseJniLibsProjectOnly UP-TO-DATE
+> Task :react-native-keychain:mergeReleaseJniLibFolders UP-TO-DATE
+> Task :react-native-keychain:mergeReleaseNativeLibs NO-SOURCE
+> Task :react-native-keychain:copyReleaseJniLibsProjectOnly UP-TO-DATE
+> Task :react-native-linear-gradient:mergeReleaseJniLibFolders UP-TO-DATE
+> Task :react-native-linear-gradient:mergeReleaseNativeLibs NO-SOURCE
+> Task :react-native-linear-gradient:copyReleaseJniLibsProjectOnly UP-TO-DATE
+> Task :react-native-mmkv:mergeReleaseJniLibFolders UP-TO-DATE
+> Task :react-native-onesignal:mergeReleaseJniLibFolders UP-TO-DATE
+> Task :react-native-onesignal:mergeReleaseNativeLibs NO-SOURCE
+> Task :react-native-onesignal:copyReleaseJniLibsProjectOnly UP-TO-DATE
+> Task :react-native-razorpay:mergeReleaseJniLibFolders UP-TO-DATE
+> Task :react-native-razorpay:mergeReleaseNativeLibs NO-SOURCE
+> Task :react-native-razorpay:copyReleaseJniLibsProjectOnly UP-TO-DATE
+> Task :react-native-reanimated:mergeReleaseJniLibFolders UP-TO-DATE
+> Task :react-native-safe-area-context:mergeReleaseJniLibFolders UP-TO-DATE
+> Task :react-native-safe-area-context:mergeReleaseNativeLibs NO-SOURCE
+> Task :react-native-safe-area-context:copyReleaseJniLibsProjectOnly UP-TO-DATE
+> Task :react-native-screens:mergeReleaseJniLibFolders UP-TO-DATE
+> Task :react-native-screens:mergeReleaseNativeLibs NO-SOURCE
+> Task :react-native-screens:copyReleaseJniLibsProjectOnly UP-TO-DATE
+> Task :react-native-sound:mergeReleaseJniLibFolders UP-TO-DATE
+> Task :react-native-sound:mergeReleaseNativeLibs NO-SOURCE
+> Task :react-native-sound:copyReleaseJniLibsProjectOnly UP-TO-DATE
+> Task :react-native-svg:mergeReleaseJniLibFolders UP-TO-DATE
+> Task :react-native-svg:mergeReleaseNativeLibs NO-SOURCE
+> Task :react-native-svg:copyReleaseJniLibsProjectOnly UP-TO-DATE
+> Task :react-native-vector-icons:mergeReleaseJniLibFolders UP-TO-DATE
+> Task :react-native-vector-icons:mergeReleaseNativeLibs NO-SOURCE
+> Task :react-native-vector-icons:copyReleaseJniLibsProjectOnly UP-TO-DATE
+> Task :react-native-vector-icons_lucide:mergeReleaseJniLibFolders UP-TO-DATE
+> Task :react-native-vector-icons_lucide:mergeReleaseNativeLibs NO-SOURCE
+> Task :react-native-vector-icons_lucide:copyReleaseJniLibsProjectOnly UP-TO-DATE
+> Task :react-native-webrtc:mergeReleaseJniLibFolders UP-TO-DATE
+> Task :react-native-webrtc:mergeReleaseNativeLibs NO-SOURCE
+> Task :react-native-webrtc:copyReleaseJniLibsProjectOnly UP-TO-DATE
+> Task :react-native-webview:mergeReleaseJniLibFolders UP-TO-DATE
+> Task :react-native-webview:mergeReleaseNativeLibs NO-SOURCE
+> Task :react-native-webview:copyReleaseJniLibsProjectOnly UP-TO-DATE
+> Task :app:writeReleaseAppMetadata
+> Task :lottie-react-native:prepareReleaseArtProfile UP-TO-DATE
+> Task :notifee_react-native:prepareReleaseArtProfile UP-TO-DATE
+> Task :react-native-async-storage_async-storage:prepareReleaseArtProfile UP-TO-DATE
+> Task :react-native-blob-util:prepareReleaseArtProfile UP-TO-DATE
+> Task :react-native-callkeep:prepareReleaseArtProfile UP-TO-DATE
+> Task :react-native-community_blur:prepareReleaseArtProfile UP-TO-DATE
+> Task :react-native-community_netinfo:prepareReleaseArtProfile UP-TO-DATE
+> Task :react-native-date-picker:prepareReleaseArtProfile UP-TO-DATE
+> Task :react-native-fast-image:prepareReleaseArtProfile UP-TO-DATE
+> Task :react-native-firebase_analytics:prepareReleaseArtProfile UP-TO-DATE
+> Task :react-native-firebase_app:prepareReleaseArtProfile UP-TO-DATE
+> Task :react-native-firebase_messaging:prepareReleaseArtProfile UP-TO-DATE
+> Task :react-native-gesture-handler:prepareReleaseArtProfile UP-TO-DATE
+> Task :react-native-image-picker:prepareReleaseArtProfile UP-TO-DATE
+> Task :react-native-incall-manager:prepareReleaseArtProfile UP-TO-DATE
+> Task :react-native-keychain:prepareReleaseArtProfile UP-TO-DATE
+> Task :react-native-linear-gradient:prepareReleaseArtProfile UP-TO-DATE
+> Task :react-native-mmkv:prepareReleaseArtProfile UP-TO-DATE
+> Task :react-native-onesignal:prepareReleaseArtProfile UP-TO-DATE
+> Task :react-native-razorpay:prepareReleaseArtProfile UP-TO-DATE
+> Task :react-native-reanimated:prepareReleaseArtProfile UP-TO-DATE
+> Task :react-native-safe-area-context:prepareReleaseArtProfile UP-TO-DATE
+> Task :react-native-screens:prepareReleaseArtProfile UP-TO-DATE
+> Task :react-native-sound:prepareReleaseArtProfile UP-TO-DATE
+> Task :react-native-svg:prepareReleaseArtProfile UP-TO-DATE
+> Task :react-native-vector-icons:prepareReleaseArtProfile UP-TO-DATE
+> Task :react-native-vector-icons_lucide:prepareReleaseArtProfile UP-TO-DATE
+> Task :react-native-webrtc:prepareReleaseArtProfile UP-TO-DATE
+> Task :react-native-webview:prepareReleaseArtProfile UP-TO-DATE
+> Task :app:collectReleaseDependencies
+> Task :app:configureReleaseDependencies
+> Task :app:extractProguardFiles
+> Task :lottie-react-native:extractProguardFiles UP-TO-DATE
+> Task :lottie-react-native:prepareLintJarForPublish UP-TO-DATE
+> Task :notifee_react-native:extractProguardFiles UP-TO-DATE
+> Task :notifee_react-native:prepareLintJarForPublish UP-TO-DATE
+> Task :react-native-async-storage_async-storage:extractProguardFiles UP-TO-DATE
+> Task :react-native-async-storage_async-storage:prepareLintJarForPublish UP-TO-DATE
+> Task :react-native-blob-util:extractProguardFiles UP-TO-DATE
+> Task :react-native-blob-util:prepareLintJarForPublish UP-TO-DATE
+> Task :react-native-callkeep:extractProguardFiles UP-TO-DATE
+> Task :react-native-callkeep:prepareLintJarForPublish UP-TO-DATE
+> Task :react-native-community_blur:extractProguardFiles UP-TO-DATE
+> Task :react-native-community_blur:prepareLintJarForPublish UP-TO-DATE
+> Task :react-native-community_netinfo:extractProguardFiles UP-TO-DATE
+> Task :react-native-community_netinfo:prepareLintJarForPublish UP-TO-DATE
+> Task :react-native-date-picker:extractProguardFiles UP-TO-DATE
+> Task :react-native-date-picker:prepareLintJarForPublish UP-TO-DATE
+> Task :react-native-fast-image:extractProguardFiles UP-TO-DATE
+> Task :react-native-fast-image:prepareLintJarForPublish UP-TO-DATE
+> Task :react-native-firebase_analytics:extractProguardFiles UP-TO-DATE
+> Task :react-native-firebase_app:extractProguardFiles UP-TO-DATE
+> Task :react-native-firebase_app:prepareLintJarForPublish UP-TO-DATE
+> Task :react-native-firebase_analytics:prepareLintJarForPublish UP-TO-DATE
+> Task :react-native-firebase_messaging:extractProguardFiles UP-TO-DATE
+> Task :react-native-firebase_messaging:prepareLintJarForPublish UP-TO-DATE
+> Task :react-native-gesture-handler:extractProguardFiles UP-TO-DATE
+> Task :react-native-reanimated:extractProguardFiles UP-TO-DATE
+> Task :react-native-reanimated:prepareLintJarForPublish UP-TO-DATE
+> Task :react-native-gesture-handler:prepareLintJarForPublish UP-TO-DATE
+> Task :react-native-image-picker:extractProguardFiles UP-TO-DATE
+> Task :react-native-image-picker:prepareLintJarForPublish UP-TO-DATE
+> Task :react-native-incall-manager:extractProguardFiles UP-TO-DATE
+> Task :react-native-incall-manager:prepareLintJarForPublish UP-TO-DATE
+> Task :react-native-keychain:extractProguardFiles UP-TO-DATE
+> Task :react-native-keychain:prepareLintJarForPublish UP-TO-DATE
+> Task :react-native-linear-gradient:extractProguardFiles UP-TO-DATE
+> Task :react-native-linear-gradient:prepareLintJarForPublish UP-TO-DATE
+> Task :react-native-mmkv:extractProguardFiles UP-TO-DATE
+> Task :react-native-mmkv:prepareLintJarForPublish UP-TO-DATE
+> Task :react-native-onesignal:extractProguardFiles UP-TO-DATE
+> Task :react-native-onesignal:prepareLintJarForPublish UP-TO-DATE
+> Task :react-native-razorpay:extractProguardFiles UP-TO-DATE
+> Task :react-native-razorpay:prepareLintJarForPublish UP-TO-DATE
+> Task :react-native-safe-area-context:extractProguardFiles UP-TO-DATE
+> Task :react-native-safe-area-context:prepareLintJarForPublish UP-TO-DATE
+> Task :react-native-screens:extractProguardFiles UP-TO-DATE
+> Task :react-native-screens:prepareLintJarForPublish UP-TO-DATE
+> Task :react-native-sound:extractProguardFiles UP-TO-DATE
+> Task :react-native-sound:prepareLintJarForPublish UP-TO-DATE
+> Task :react-native-svg:extractProguardFiles UP-TO-DATE
+> Task :react-native-svg:prepareLintJarForPublish UP-TO-DATE
+> Task :react-native-vector-icons:extractProguardFiles UP-TO-DATE
+> Task :react-native-vector-icons:prepareLintJarForPublish UP-TO-DATE
+> Task :react-native-vector-icons_lucide:extractProguardFiles UP-TO-DATE
+> Task :react-native-vector-icons_lucide:prepareLintJarForPublish UP-TO-DATE
+> Task :react-native-webrtc:extractProguardFiles UP-TO-DATE
+> Task :react-native-webrtc:prepareLintJarForPublish UP-TO-DATE
+> Task :react-native-webview:extractProguardFiles UP-TO-DATE
+> Task :react-native-webview:prepareLintJarForPublish UP-TO-DATE
+> Task :notifee_react-native:stripReleaseDebugSymbols NO-SOURCE
+> Task :notifee_react-native:copyReleaseJniLibsProjectAndLocalJars UP-TO-DATE
+> Task :notifee_react-native:extractDeepLinksForAarRelease UP-TO-DATE
+> Task :notifee_react-native:mergeReleaseJavaResource UP-TO-DATE
+> Task :react-native-async-storage_async-storage:stripReleaseDebugSymbols NO-SOURCE
+> Task :react-native-async-storage_async-storage:copyReleaseJniLibsProjectAndLocalJars UP-TO-DATE
+> Task :react-native-async-storage_async-storage:extractDeepLinksForAarRelease UP-TO-DATE
+> Task :react-native-async-storage_async-storage:mergeReleaseJavaResource UP-TO-DATE
+> Task :react-native-community_blur:stripReleaseDebugSymbols NO-SOURCE
+> Task :react-native-community_blur:copyReleaseJniLibsProjectAndLocalJars UP-TO-DATE
+> Task :react-native-community_blur:extractDeepLinksForAarRelease UP-TO-DATE
+> Task :react-native-community_blur:mergeReleaseJavaResource UP-TO-DATE
+> Task :react-native-community_netinfo:stripReleaseDebugSymbols NO-SOURCE
+> Task :react-native-community_netinfo:copyReleaseJniLibsProjectAndLocalJars UP-TO-DATE
+> Task :react-native-community_netinfo:extractDeepLinksForAarRelease UP-TO-DATE
+> Task :react-native-community_netinfo:mergeReleaseJavaResource UP-TO-DATE
+> Task :react-native-firebase_analytics:stripReleaseDebugSymbols NO-SOURCE
+> Task :react-native-firebase_analytics:copyReleaseJniLibsProjectAndLocalJars UP-TO-DATE
+> Task :react-native-firebase_analytics:extractDeepLinksForAarRelease UP-TO-DATE
+> Task :react-native-firebase_analytics:mergeReleaseJavaResource UP-TO-DATE
+> Task :react-native-firebase_messaging:stripReleaseDebugSymbols NO-SOURCE
+> Task :react-native-firebase_messaging:copyReleaseJniLibsProjectAndLocalJars UP-TO-DATE
+> Task :react-native-firebase_messaging:extractDeepLinksForAarRelease UP-TO-DATE
+> Task :react-native-firebase_messaging:mergeReleaseJavaResource UP-TO-DATE
+> Task :react-native-firebase_app:stripReleaseDebugSymbols NO-SOURCE
+> Task :react-native-firebase_app:copyReleaseJniLibsProjectAndLocalJars UP-TO-DATE
+> Task :react-native-firebase_app:extractDeepLinksForAarRelease UP-TO-DATE
+> Task :react-native-firebase_app:mergeReleaseJavaResource UP-TO-DATE
+> Task :react-native-vector-icons_lucide:stripReleaseDebugSymbols NO-SOURCE
+> Task :react-native-vector-icons_lucide:copyReleaseJniLibsProjectAndLocalJars UP-TO-DATE
+> Task :react-native-vector-icons_lucide:extractDeepLinksForAarRelease UP-TO-DATE
+> Task :lottie-react-native:stripReleaseDebugSymbols NO-SOURCE
+> Task :lottie-react-native:copyReleaseJniLibsProjectAndLocalJars UP-TO-DATE
+> Task :lottie-react-native:extractDeepLinksForAarRelease UP-TO-DATE
+> Task :react-native-blob-util:stripReleaseDebugSymbols NO-SOURCE
+> Task :react-native-blob-util:copyReleaseJniLibsProjectAndLocalJars UP-TO-DATE
+> Task :react-native-blob-util:extractDeepLinksForAarRelease UP-TO-DATE
+> Task :react-native-blob-util:mergeReleaseJavaResource UP-TO-DATE
+> Task :react-native-callkeep:stripReleaseDebugSymbols NO-SOURCE
+> Task :react-native-callkeep:copyReleaseJniLibsProjectAndLocalJars UP-TO-DATE
+> Task :react-native-callkeep:extractDeepLinksForAarRelease UP-TO-DATE
+> Task :react-native-callkeep:mergeReleaseJavaResource UP-TO-DATE
+> Task :react-native-date-picker:stripReleaseDebugSymbols NO-SOURCE
+> Task :react-native-date-picker:copyReleaseJniLibsProjectAndLocalJars UP-TO-DATE
+> Task :react-native-date-picker:extractDeepLinksForAarRelease UP-TO-DATE
+> Task :react-native-date-picker:mergeReleaseJavaResource UP-TO-DATE
+> Task :react-native-fast-image:stripReleaseDebugSymbols NO-SOURCE
+> Task :react-native-fast-image:copyReleaseJniLibsProjectAndLocalJars UP-TO-DATE
+> Task :react-native-fast-image:extractDeepLinksForAarRelease UP-TO-DATE
+> Task :react-native-gesture-handler:stripReleaseDebugSymbols NO-SOURCE
+> Task :react-native-gesture-handler:copyReleaseJniLibsProjectAndLocalJars UP-TO-DATE
+> Task :react-native-gesture-handler:extractDeepLinksForAarRelease UP-TO-DATE
+> Task :react-native-image-picker:stripReleaseDebugSymbols NO-SOURCE
+> Task :react-native-image-picker:copyReleaseJniLibsProjectAndLocalJars UP-TO-DATE
+> Task :react-native-image-picker:extractDeepLinksForAarRelease UP-TO-DATE
+> Task :react-native-image-picker:mergeReleaseJavaResource UP-TO-DATE
+> Task :react-native-incall-manager:stripReleaseDebugSymbols NO-SOURCE
+> Task :react-native-incall-manager:copyReleaseJniLibsProjectAndLocalJars UP-TO-DATE
+> Task :react-native-incall-manager:extractDeepLinksForAarRelease UP-TO-DATE
+> Task :react-native-incall-manager:mergeReleaseJavaResource UP-TO-DATE
+> Task :react-native-keychain:stripReleaseDebugSymbols NO-SOURCE
+> Task :react-native-keychain:copyReleaseJniLibsProjectAndLocalJars UP-TO-DATE
+> Task :react-native-keychain:extractDeepLinksForAarRelease UP-TO-DATE
+> Task :react-native-linear-gradient:stripReleaseDebugSymbols NO-SOURCE
+> Task :react-native-linear-gradient:copyReleaseJniLibsProjectAndLocalJars UP-TO-DATE
+> Task :react-native-linear-gradient:extractDeepLinksForAarRelease UP-TO-DATE
+> Task :react-native-linear-gradient:mergeReleaseJavaResource UP-TO-DATE
+> Task :react-native-mmkv:extractDeepLinksForAarRelease UP-TO-DATE
+> Task :react-native-mmkv:mergeReleaseJavaResource UP-TO-DATE
+> Task :react-native-onesignal:stripReleaseDebugSymbols NO-SOURCE
+> Task :react-native-onesignal:copyReleaseJniLibsProjectAndLocalJars UP-TO-DATE
+> Task :react-native-onesignal:extractDeepLinksForAarRelease UP-TO-DATE
+> Task :react-native-onesignal:mergeReleaseJavaResource UP-TO-DATE
+> Task :react-native-razorpay:stripReleaseDebugSymbols NO-SOURCE
+> Task :react-native-razorpay:copyReleaseJniLibsProjectAndLocalJars UP-TO-DATE
+> Task :react-native-razorpay:extractDeepLinksForAarRelease UP-TO-DATE
+> Task :react-native-razorpay:mergeReleaseJavaResource UP-TO-DATE
+> Task :react-native-reanimated:extractDeepLinksForAarRelease UP-TO-DATE
+> Task :react-native-reanimated:mergeReleaseJavaResource UP-TO-DATE
+> Task :react-native-safe-area-context:stripReleaseDebugSymbols NO-SOURCE
+> Task :react-native-safe-area-context:copyReleaseJniLibsProjectAndLocalJars UP-TO-DATE
+> Task :react-native-safe-area-context:extractDeepLinksForAarRelease UP-TO-DATE
+> Task :react-native-screens:stripReleaseDebugSymbols NO-SOURCE
+> Task :react-native-screens:copyReleaseJniLibsProjectAndLocalJars UP-TO-DATE
+> Task :react-native-screens:extractDeepLinksForAarRelease UP-TO-DATE
+> Task :react-native-svg:stripReleaseDebugSymbols NO-SOURCE
+> Task :react-native-svg:copyReleaseJniLibsProjectAndLocalJars UP-TO-DATE
+> Task :react-native-svg:extractDeepLinksForAarRelease UP-TO-DATE
+> Task :react-native-svg:mergeReleaseJavaResource UP-TO-DATE
+> Task :react-native-vector-icons:stripReleaseDebugSymbols NO-SOURCE
+> Task :react-native-vector-icons:copyReleaseJniLibsProjectAndLocalJars UP-TO-DATE
+> Task :react-native-vector-icons:extractDeepLinksForAarRelease UP-TO-DATE
+> Task :react-native-vector-icons:mergeReleaseJavaResource UP-TO-DATE
+> Task :react-native-webrtc:stripReleaseDebugSymbols NO-SOURCE
+> Task :react-native-webrtc:copyReleaseJniLibsProjectAndLocalJars UP-TO-DATE
+> Task :react-native-webrtc:extractDeepLinksForAarRelease UP-TO-DATE
+> Task :react-native-webrtc:mergeReleaseJavaResource UP-TO-DATE
+> Task :react-native-webview:stripReleaseDebugSymbols NO-SOURCE
+> Task :react-native-webview:copyReleaseJniLibsProjectAndLocalJars UP-TO-DATE
+> Task :react-native-webview:extractDeepLinksForAarRelease UP-TO-DATE
+> Task :react-native-sound:stripReleaseDebugSymbols NO-SOURCE
+> Task :react-native-sound:copyReleaseJniLibsProjectAndLocalJars UP-TO-DATE
+> Task :react-native-sound:extractDeepLinksForAarRelease UP-TO-DATE
+> Task :react-native-sound:mergeReleaseJavaResource UP-TO-DATE
+> Task :lottie-react-native:writeReleaseLintModelMetadata UP-TO-DATE
+> Task :notifee_react-native:writeReleaseLintModelMetadata UP-TO-DATE
+> Task :react-native-async-storage_async-storage:writeReleaseLintModelMetadata UP-TO-DATE
+> Task :react-native-blob-util:writeReleaseLintModelMetadata UP-TO-DATE
+> Task :react-native-callkeep:writeReleaseLintModelMetadata UP-TO-DATE
+> Task :react-native-community_blur:writeReleaseLintModelMetadata UP-TO-DATE
+> Task :react-native-community_netinfo:writeReleaseLintModelMetadata UP-TO-DATE
+> Task :react-native-date-picker:writeReleaseLintModelMetadata UP-TO-DATE
+> Task :react-native-fast-image:writeReleaseLintModelMetadata UP-TO-DATE
+> Task :react-native-firebase_app:writeReleaseLintModelMetadata UP-TO-DATE
+> Task :react-native-firebase_analytics:writeReleaseLintModelMetadata UP-TO-DATE
+> Task :react-native-firebase_messaging:writeReleaseLintModelMetadata UP-TO-DATE
+> Task :react-native-reanimated:writeReleaseLintModelMetadata UP-TO-DATE
+> Task :react-native-gesture-handler:writeReleaseLintModelMetadata UP-TO-DATE
+> Task :react-native-image-picker:writeReleaseLintModelMetadata UP-TO-DATE
+> Task :react-native-incall-manager:writeReleaseLintModelMetadata UP-TO-DATE
+> Task :react-native-keychain:writeReleaseLintModelMetadata UP-TO-DATE
+
+> Task :react-native:packages:react-native:ReactAndroid:hermes-engine:buildHermesC
+[ 26%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/SmallVector.cpp.o
+[ 30%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/SmallPtrSet.cpp.o
+[ 30%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/SourceMgr.cpp.o
+[ 30%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/Statistic.cpp.o
+[ 30%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/StringExtras.cpp.o
+[ 30%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/StringMap.cpp.o
+[ 30%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/StringRef.cpp.o
+[ 30%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/StringSaver.cpp.o
+[ 33%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/TargetParser.cpp.o
+[ 33%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/Threading.cpp.o
+[ 33%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/Timer.cpp.o
+[ 33%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/Triple.cpp.o
+[ 33%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/Twine.cpp.o
+
+> Task :react-native-linear-gradient:writeReleaseLintModelMetadata UP-TO-DATE
+> Task :react-native-mmkv:writeReleaseLintModelMetadata UP-TO-DATE
+> Task :react-native-onesignal:writeReleaseLintModelMetadata UP-TO-DATE
+> Task :react-native-razorpay:writeReleaseLintModelMetadata UP-TO-DATE
+> Task :react-native-safe-area-context:writeReleaseLintModelMetadata UP-TO-DATE
+> Task :react-native-screens:writeReleaseLintModelMetadata UP-TO-DATE
+> Task :react-native-sound:writeReleaseLintModelMetadata UP-TO-DATE
+> Task :react-native-svg:writeReleaseLintModelMetadata UP-TO-DATE
+> Task :react-native-vector-icons:writeReleaseLintModelMetadata UP-TO-DATE
+> Task :react-native-vector-icons_lucide:writeReleaseLintModelMetadata UP-TO-DATE
+> Task :react-native-webrtc:writeReleaseLintModelMetadata UP-TO-DATE
+> Task :react-native-webview:writeReleaseLintModelMetadata UP-TO-DATE
+> Task :app:parseReleaseIntegrityConfig UP-TO-DATE
+> Task :app:validateSigningRelease
+
+> Task :react-native:packages:react-native:ReactAndroid:hermes-engine:buildHermesC
+[ 33%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/Unicode.cpp.o
+[ 33%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/Valgrind.cpp.o
+[ 33%] Building CXX object external/llvh/lib/Support/CMakeFiles/LLVHSupport.dir/Watchdog.cpp.o
+[ 36%] Linking CXX static library libLLVHSupport.a
+[ 36%] Built target LLVHSupport
+[ 36%] Building CXX object lib/Platform/Unicode/CMakeFiles/hermesPlatformUnicode.dir/PlatformUnicodeJava.cpp.o
+[ 36%] Building CXX object lib/CMakeFiles/hermesOptimizer.dir/Optimizer/PassManager/PassManager.cpp.o
+[ 36%] Building CXX object lib/Platform/Unicode/CMakeFiles/hermesPlatformUnicode.dir/PlatformUnicodeLite.cpp.o
+[ 36%] Building CXX object lib/Platform/Unicode/CMakeFiles/hermesPlatformUnicode.dir/PlatformUnicodeCF.cpp.o
+[ 36%] Building CXX object lib/Platform/Unicode/CMakeFiles/hermesPlatformUnicode.dir/CharacterProperties.cpp.o
+[ 36%] Building CXX object lib/FrontEndDefs/CMakeFiles/hermesFrontEndDefs.dir/Builtins.cpp.o
+[ 40%] Building CXX object lib/Platform/Unicode/CMakeFiles/hermesPlatformUnicode.dir/PlatformUnicodeEmscripten.cpp.o
+[ 40%] Building CXX object lib/Platform/Unicode/CMakeFiles/hermesPlatformUnicode.dir/PlatformUnicodeICU.cpp.o
+[ 40%] Linking CXX static library libhermesFrontEndDefs.a
+[ 40%] Built target hermesFrontEndDefs
+[ 40%] Building CXX object lib/CMakeFiles/hermesOptimizer.dir/Optimizer/PassManager/Pipeline.cpp.o
+[ 40%] Building CXX object lib/CMakeFiles/hermesOptimizer.dir/Optimizer/Scalar/CSE.cpp.o
+[ 40%] Building CXX object lib/CMakeFiles/hermesOptimizer.dir/Optimizer/Scalar/SimplifyCFG.cpp.o
+[ 40%] Building CXX object lib/CMakeFiles/hermesOptimizer.dir/Optimizer/Scalar/CodeMotion.cpp.o
+[ 43%] Building CXX object lib/CMakeFiles/hermesOptimizer.dir/Optimizer/Scalar/DCE.cpp.o
+[ 43%] Building CXX object lib/CMakeFiles/hermesOptimizer.dir/Optimizer/Scalar/Mem2Reg.cpp.o
+[ 43%] Linking CXX static library libhermesPlatformUnicode.a
+[ 43%] Built target hermesPlatformUnicode
+[ 43%] Building CXX object lib/CMakeFiles/hermesOptimizer.dir/Optimizer/Scalar/TypeInference.cpp.o
+[ 43%] Building CXX object lib/CMakeFiles/hermesOptimizer.dir/Optimizer/Scalar/StackPromotion.cpp.o
+[ 43%] Building CXX object lib/CMakeFiles/hermesOptimizer.dir/Optimizer/Scalar/SimpleStackPromotion.cpp.o
+[ 43%] Building CXX object lib/CMakeFiles/hermesOptimizer.dir/Optimizer/Scalar/InstSimplify.cpp.o
+[ 43%] Building CXX object lib/CMakeFiles/hermesOptimizer.dir/Optimizer/Scalar/Auditor.cpp.o
+[ 46%] Building CXX object lib/CMakeFiles/hermesOptimizer.dir/Optimizer/Wasm/WasmSimplify.cpp.o
+[ 46%] Building CXX object lib/CMakeFiles/hermesOptimizer.dir/Optimizer/Scalar/ScopeTransformations.cpp.o
+[ 46%] Building CXX object lib/CMakeFiles/hermesOptimizer.dir/Optimizer/Scalar/ResolveStaticRequire.cpp.o
+[ 46%] Building CXX object lib/CMakeFiles/hermesOptimizer.dir/Optimizer/Scalar/SimpleCallGraphProvider.cpp.o
+[ 46%] Building CXX object lib/CMakeFiles/hermesOptimizer.dir/Optimizer/Scalar/FuncSigOpts.cpp.o
+[ 46%] Building CXX object lib/CMakeFiles/hermesOptimizer.dir/Optimizer/Scalar/Utils.cpp.o
+[ 46%] Building CXX object lib/CMakeFiles/hermesOptimizer.dir/Optimizer/Scalar/Inlining.cpp.o
+[ 46%] Building CXX object lib/CMakeFiles/hermesOptimizer.dir/Optimizer/Scalar/HoistStartGenerator.cpp.o
+[ 50%] Building CXX object lib/CMakeFiles/hermesOptimizer.dir/Optimizer/Scalar/InstructionEscapeAnalysis.cpp.o
+[ 53%] Building CXX object lib/Support/CMakeFiles/hermesSupport.dir/Allocator.cpp.o
+[ 53%] Building CXX object lib/CMakeFiles/hermesOptimizer.dir/Optimizer/Scalar/TDZDedup.cpp.o
+[ 53%] Building CXX object lib/CMakeFiles/hermesOptimizer.dir/IR/Analysis.cpp.o
+[ 53%] Building CXX object lib/CMakeFiles/hermesOptimizer.dir/IR/IREval.cpp.o
+[ 53%] Building CXX object lib/Support/CMakeFiles/hermesSupport.dir/Base64.cpp.o
+[ 53%] Building CXX object lib/Regex/CMakeFiles/hermesRegex.dir/RegexParser.cpp.o
+[ 53%] Building CXX object lib/Support/CMakeFiles/hermesSupport.dir/Base64vlq.cpp.o
+[ 53%] Building CXX object lib/Regex/CMakeFiles/hermesRegex.dir/RegexSerialization.cpp.o
+[ 53%] Building CXX object lib/Support/CMakeFiles/hermesSupport.dir/BigIntSupport.cpp.o
+[ 56%] Building CXX object lib/Regex/CMakeFiles/hermesRegex.dir/Executor.cpp.o
+[ 56%] Building CXX object lib/Support/CMakeFiles/hermesSupport.dir/CheckedMalloc.cpp.o
+[ 56%] Building CXX object lib/Support/CMakeFiles/hermesSupport.dir/Conversions.cpp.o
+[ 56%] Building CXX object lib/Support/CMakeFiles/hermesSupport.dir/ErrorHandling.cpp.o
+[ 60%] Building CXX object lib/Support/CMakeFiles/hermesSupport.dir/InternalIdentifierMaker.cpp.o
+[ 60%] Building CXX object lib/Support/CMakeFiles/hermesSupport.dir/JSONEmitter.cpp.o
+[ 60%] Building CXX object lib/Support/CMakeFiles/hermesSupport.dir/OSCompatEmscripten.cpp.o
+[ 60%] Linking CXX static library libhermesOptimizer.a
+[ 60%] Building CXX object lib/Support/CMakeFiles/hermesSupport.dir/OSCompatPosix.cpp.o
+[ 60%] Building CXX object lib/Support/CMakeFiles/hermesSupport.dir/OSCompatWindows.cpp.o
+[ 60%] Building CXX object lib/Support/CMakeFiles/hermesSupport.dir/PageAccessTrackerPosix.cpp.o
+[ 60%] Building CXX object lib/Support/CMakeFiles/hermesSupport.dir/PerfSection.cpp.o
+[ 63%] Building CXX object lib/Support/CMakeFiles/hermesSupport.dir/SemaphorePosix.cpp.o
+[ 63%] Linking CXX static library libhermesRegex.a
+[ 63%] Built target hermesRegex
+[ 63%] Building CXX object lib/Support/CMakeFiles/hermesSupport.dir/SHA1.cpp.o
+[ 63%] Built target hermesOptimizer
+[ 63%] Building CXX object lib/Support/CMakeFiles/hermesSupport.dir/SNPrintfBuf.cpp.o
+[ 63%] Building CXX object lib/Support/CMakeFiles/hermesSupport.dir/SourceErrorManager.cpp.o
+[ 63%] Building CXX object lib/Support/CMakeFiles/hermesSupport.dir/SimpleDiagHandler.cpp.o
+[ 63%] Building CXX object lib/Support/CMakeFiles/hermesSupport.dir/StringTable.cpp.o
+[ 63%] Building CXX object lib/Support/CMakeFiles/hermesSupport.dir/UTF8.cpp.o
+[ 66%] Building CXX object lib/Support/CMakeFiles/hermesSupport.dir/UTF16Stream.cpp.o
+[ 66%] Building CXX object lib/Support/CMakeFiles/hermesSupport.dir/LEB128.cpp.o
+[ 66%] Linking CXX static library libhermesSupport.a
+[ 66%] Built target hermesSupport
+[ 66%] Building CXX object lib/AST/CMakeFiles/hermesAST.dir/ESTree.cpp.o
+[ 66%] Building CXX object lib/AST/CMakeFiles/hermesAST.dir/ASTBuilder.cpp.o
+[ 66%] Building CXX object lib/ADT/CMakeFiles/hermesADT.dir/CompactArray.cpp.o
+[ 66%] Building CXX object lib/FlowParser/CMakeFiles/hermesFlowParser.dir/FlowParser.cpp.o
+[ 66%] Building CXX object lib/Inst/CMakeFiles/hermesInst.dir/InstDecode.cpp.o
+[ 66%] Building CXX object lib/Inst/CMakeFiles/hermesInst.dir/InstDecode2.cpp.o
+[ 66%] Building CXX object lib/AST/CMakeFiles/hermesAST.dir/BlockScopingTransformations.cpp.o
+[ 70%] Building CXX object lib/AST/CMakeFiles/hermesAST.dir/ESTreeJSONDumper.cpp.o
+[ 70%] Linking CXX static library libhermesFlowParser.a
+[ 70%] Built target hermesFlowParser
+[ 70%] Building CXX object lib/AST/CMakeFiles/hermesAST.dir/SemValidate.cpp.o
+[ 70%] Building CXX object lib/AST/CMakeFiles/hermesAST.dir/SemanticValidator.cpp.o
+[ 70%] Linking CXX static library libhermesADT.a
+[ 70%] Built target hermesADT
+[ 70%] Building CXX object lib/AST/CMakeFiles/hermesAST.dir/CommonJS.cpp.o
+[ 70%] Linking CXX static library libhermesInst.a
+[ 70%] Built target hermesInst
+[ 70%] Linking CXX static library libhermesAST.a
+[ 70%] Built target hermesAST
+[ 70%] Building CXX object lib/Parser/CMakeFiles/hermesParser.dir/JSLexer.cpp.o
+[ 70%] Building CXX object lib/AST2JS/CMakeFiles/hermesAST2JS.dir/AST2JS.cpp.o
+[ 70%] Building CXX object lib/Parser/CMakeFiles/hermesParser.dir/JSParserImpl.cpp.o
+[ 70%] Building CXX object lib/Parser/CMakeFiles/hermesParser.dir/JSONParser.cpp.o
+[ 70%] Building CXX object lib/Parser/CMakeFiles/hermesParser.dir/JSParserImpl-flow.cpp.o
+[ 70%] Building CXX object lib/Parser/CMakeFiles/hermesParser.dir/JSParserImpl-jsx.cpp.o
+[ 70%] Building CXX object lib/Parser/CMakeFiles/hermesParser.dir/JSParserImpl-ts.cpp.o
+[ 73%] Building CXX object lib/Parser/CMakeFiles/hermesParser.dir/JSParser.cpp.o
+[ 73%] Building CXX object lib/Parser/CMakeFiles/hermesParser.dir/FlowHelpers.cpp.o
+[ 73%] Building CXX object lib/Parser/CMakeFiles/hermesParser.dir/rust-api.cpp.o
+[ 73%] Linking CXX static library libhermesAST2JS.a
+[ 73%] Built target hermesAST2JS
+[ 76%] Linking CXX static library libhermesParser.a
+[ 76%] Built target hermesParser
+[ 76%] Building CXX object lib/SourceMap/CMakeFiles/hermesSourceMap.dir/c-api.cpp.o
+[ 76%] Building CXX object lib/SourceMap/CMakeFiles/hermesSourceMap.dir/SourceMapTranslator.cpp.o
+[ 76%] Building CXX object lib/SourceMap/CMakeFiles/hermesSourceMap.dir/SourceMapParser.cpp.o
+[ 76%] Building CXX object lib/SourceMap/CMakeFiles/hermesSourceMap.dir/SourceMap.cpp.o
+[ 76%] Building CXX object lib/SourceMap/CMakeFiles/hermesSourceMap.dir/SourceMapGenerator.cpp.o
+[ 76%] Building CXX object lib/CMakeFiles/hermesFrontend.dir/IRGen/ESTreeIRGen.cpp.o
+[ 76%] Building CXX object lib/CMakeFiles/hermesFrontend.dir/IRGen/IRGen.cpp.o
+[ 76%] Building CXX object lib/CMakeFiles/hermesFrontend.dir/IRGen/ESTreeIRGen-expr.cpp.o
+[ 80%] Building CXX object lib/CMakeFiles/hermesFrontend.dir/IRGen/ESTreeIRGen-stmt.cpp.o
+[ 80%] Building CXX object lib/CMakeFiles/hermesFrontend.dir/IRGen/ESTreeIRGen-func.cpp.o
+[ 80%] Building CXX object lib/CMakeFiles/hermesFrontend.dir/IRGen/ESTreeIRGen-except.cpp.o
+[ 80%] Building CXX object lib/CMakeFiles/hermesFrontend.dir/IRGen/IRInstrument.cpp.o
+[ 80%] Linking CXX static library libhermesSourceMap.a
+[ 80%] Built target hermesSourceMap
+[ 80%] Building CXX object lib/CMakeFiles/hermesFrontend.dir/IR/IR.cpp.o
+[ 80%] Building CXX object lib/CMakeFiles/hermesFrontend.dir/IR/CFG.cpp.o
+[ 80%] Building CXX object lib/CMakeFiles/hermesFrontend.dir/IR/IRBuilder.cpp.o
+[ 83%] Building CXX object lib/CMakeFiles/hermesFrontend.dir/IR/IRVerifier.cpp.o
+[ 83%] Building CXX object lib/CMakeFiles/hermesFrontend.dir/IR/Instrs.cpp.o
+[ 83%] Building CXX object lib/CMakeFiles/hermesFrontend.dir/Utils/Dumper.cpp.o
+[ 83%] Building CXX object lib/CMakeFiles/hermesFrontend.dir/Optimizer/Wasm/WasmIntrinsics.cpp.o
+[ 83%] Building CXX object lib/CMakeFiles/hermesFrontend.dir/Optimizer/Wasm/EmitWasmIntrinsics.cpp.o
+[ 83%] Linking CXX static library libhermesFrontend.a
+[ 83%] Built target hermesFrontend
+[ 83%] Building CXX object lib/BCGen/CMakeFiles/hermesBackend.dir/BCOpt.cpp.o
+[ 83%] Building CXX object lib/BCGen/CMakeFiles/hermesBackend.dir/Exceptions.cpp.o
+[ 83%] Building CXX object lib/BCGen/CMakeFiles/hermesBackend.dir/RegAlloc.cpp.o
+[ 83%] Building CXX object lib/BCGen/CMakeFiles/hermesBackend.dir/Lowering.cpp.o
+[ 83%] Linking CXX static library libhermesBackend.a
+[ 83%] Built target hermesBackend
+[ 86%] Building CXX object lib/BCGen/HBC/CMakeFiles/hermesHBCBackend.dir/Bytecode.cpp.o
+[ 86%] Building CXX object lib/BCGen/HBC/CMakeFiles/hermesHBCBackend.dir/ISel.cpp.o
+[ 86%] Building CXX object lib/BCGen/HBC/CMakeFiles/hermesHBCBackend.dir/HBC.cpp.o
+[ 86%] Building CXX object lib/BCGen/HBC/CMakeFiles/hermesHBCBackend.dir/BackendContext.cpp.o
+[ 86%] Building CXX object lib/BCGen/HBC/CMakeFiles/hermesHBCBackend.dir/BytecodeStream.cpp.o
+[ 86%] Building CXX object lib/BCGen/HBC/CMakeFiles/hermesHBCBackend.dir/BytecodeProviderFromSrc.cpp.o
+[ 86%] Building CXX object lib/BCGen/HBC/CMakeFiles/hermesHBCBackend.dir/BytecodeGenerator.cpp.o
+[ 86%] Building CXX object lib/BCGen/HBC/CMakeFiles/hermesHBCBackend.dir/BytecodeDataProvider.cpp.o
+[ 90%] Building CXX object lib/BCGen/HBC/CMakeFiles/hermesHBCBackend.dir/BytecodeDisassembler.cpp.o
+[ 90%] Building CXX object lib/BCGen/HBC/CMakeFiles/hermesHBCBackend.dir/BytecodeFormConverter.cpp.o
+[ 90%] Building CXX object lib/BCGen/HBC/CMakeFiles/hermesHBCBackend.dir/SerializedLiteralGenerator.cpp.o
+[ 90%] Building CXX object lib/BCGen/HBC/CMakeFiles/hermesHBCBackend.dir/ConsecutiveStringStorage.cpp.o
+[ 93%] Building CXX object lib/BCGen/HBC/CMakeFiles/hermesHBCBackend.dir/SimpleBytecodeBuilder.cpp.o
+[ 93%] Building CXX object lib/BCGen/HBC/CMakeFiles/hermesHBCBackend.dir/Passes.cpp.o
+[ 93%] Building CXX object lib/BCGen/HBC/CMakeFiles/hermesHBCBackend.dir/SerializedLiteralParserBase.cpp.o
+[ 93%] Building CXX object lib/BCGen/HBC/CMakeFiles/hermesHBCBackend.dir/DebugInfo.cpp.o
+[ 93%] Building CXX object lib/BCGen/HBC/CMakeFiles/hermesHBCBackend.dir/StringKind.cpp.o
+[ 93%] Building CXX object lib/BCGen/HBC/CMakeFiles/hermesHBCBackend.dir/TraverseLiteralStrings.cpp.o
+[ 93%] Building CXX object lib/BCGen/HBC/CMakeFiles/hermesHBCBackend.dir/UniquingFilenameTable.cpp.o
+[ 93%] Building CXX object lib/BCGen/HBC/CMakeFiles/hermesHBCBackend.dir/UniquingStringLiteralTable.cpp.o
+[ 93%] Building CXX object lib/BCGen/HBC/CMakeFiles/hermesHBCBackend.dir/Passes/FuncCallNOpts.cpp.o
+[ 93%] Building CXX object lib/BCGen/HBC/CMakeFiles/hermesHBCBackend.dir/Passes/InsertProfilePoint.cpp.o
+[ 96%] Building CXX object lib/BCGen/HBC/CMakeFiles/hermesHBCBackend.dir/Passes/LowerBuiltinCalls.cpp.o
+[ 96%] Building CXX object lib/BCGen/HBC/CMakeFiles/hermesHBCBackend.dir/Passes/OptEnvironmentInit.cpp.o
+[ 96%] Linking CXX static library libhermesHBCBackend.a
+[ 96%] Built target hermesHBCBackend
+[100%] Building CXX object lib/CompilerDriver/CMakeFiles/hermesCompilerDriver.dir/CompilerDriver.cpp.o
+[100%] Linking CXX static library libhermesCompilerDriver.a
+[100%] Built target hermesCompilerDriver
+[100%] Building CXX object tools/hermesc/CMakeFiles/hermesc.dir/hermesc.cpp.o
+[100%] Linking CXX executable ../../bin/hermesc
+ld: warning: ignoring duplicate libraries: '../../external/llvh/lib/Support/libLLVHSupport.a', '../../lib/AST/libhermesAST.a', '../../lib/Parser/libhermesParser.a', '../../lib/Support/libhermesSupport.a'
+[100%] Built target hermesc
+
+> Task :react-native:packages:react-native:ReactAndroid:hermes-engine:prepareHeadersForPrefab
+> Task :react-native:packages:react-native:ReactAndroid:hermes-engine:preBuild
+> Task :react-native:packages:react-native:ReactAndroid:hermes-engine:preReleaseBuild
+> Task :react-native:packages:react-native:ReactAndroid:hermes-engine:generateReleaseResValues
+> Task :react-native:packages:react-native:ReactAndroid:hermes-engine:generateReleaseResources
+> Task :react-native:packages:react-native:ReactAndroid:hermes-engine:packageReleaseResources
+> Task :react-native:packages:react-native:ReactAndroid:prepareJSC
+> Task :react-native:packages:react-native:ReactAndroid:hermes-engine:extractDeepLinksRelease
+> Task :react-native:packages:react-native:ReactAndroid:hermes-engine:writeReleaseAarMetadata
+> Task :react-native:packages:react-native:ReactAndroid:hermes-engine:processReleaseManifest
+> Task :react-native:packages:react-native:ReactAndroid:hermes-engine:parseReleaseLocalResources
+
+> Task :react-native:packages:react-native:ReactAndroid:downloadDoubleConversion
+Download https://github.com/google/double-conversion/archive/v1.1.6.tar.gz
+
+> Task :react-native:packages:react-native:ReactAndroid:downloadGtest
+Download https://github.com/google/googletest/archive/refs/tags/release-1.12.1.tar.gz
+
+> Task :react-native:packages:react-native:ReactAndroid:downloadFmt
+Download https://github.com/fmtlib/fmt/archive/6.2.1.tar.gz
+
+> Task :react-native:packages:react-native:ReactAndroid:downloadLibevent
+Download https://github.com/libevent/libevent/releases/download/release-2.1.12-stable/libevent-2.1.12-stable.tar.gz
+
+> Task :react-native:packages:react-native:ReactAndroid:downloadFolly
+Download https://github.com/facebook/folly/archive/v2022.05.16.00.tar.gz
+
+> Task :react-native:packages:react-native:ReactAndroid:hermes-engine:compileReleaseLibraryResources
+
+> Task :react-native:packages:react-native:ReactAndroid:downloadGlog
+Download https://github.com/google/glog/archive/v0.3.5.tar.gz
+
+> Task :react-native:packages:react-native:ReactAndroid:prepareGtest
+> Task :react-native:packages:react-native:ReactAndroid:prepareLibevent
+> Task :react-native:packages:react-native:ReactAndroid:hermes-engine:generateReleaseBuildConfig
+> Task :react-native:packages:react-native:ReactAndroid:hermes-engine:javaPreCompileRelease
+> Task :react-native:packages:react-native:ReactAndroid:hermes-engine:generateReleaseRFile
+> Task :react-native:packages:react-native:ReactAndroid:hermes-engine:mergeReleaseShaders
+
+> Task :react-native:packages:react-native:ReactAndroid:hermes-engine:compileReleaseJavaWithJavac
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: /Users/sudoraj/Desktop/DhwaniAstrologer/node_modules/react-native/sdks/hermes/lib/Platform/Intl/java/com/facebook/hermes/intl/JSObjects.java uses unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+
+> Task :react-native:packages:react-native:ReactAndroid:prepareFmt
+
+> Task :react-native:packages:react-native:ReactAndroid:prepareGlog
+file '/Users/sudoraj/Desktop/DhwaniAstrologer/node_modules/react-native/ReactAndroid/src/main/jni/third-party/glog/config.h' will be copied to '/Users/sudoraj/Desktop/DhwaniAstrologer/node_modules/react-native/ReactAndroid/build/third-party-ndk/glog/config.h', overwriting tar entry '/Users/sudoraj/Desktop/DhwaniAstrologer/node_modules/react-native/ReactAndroid/build/downloads/glog-0.3.5.tar.gz!glog-0.3.5/src/config.h.in', which has already been copied there.
+
+> Task :react-native:packages:react-native:ReactAndroid:hermes-engine:compileReleaseShaders NO-SOURCE
+> Task :react-native:packages:react-native:ReactAndroid:hermes-engine:generateReleaseAssets UP-TO-DATE
+> Task :react-native:packages:react-native:ReactAndroid:hermes-engine:mergeReleaseAssets
+> Task :react-native:packages:react-native:ReactAndroid:hermes-engine:processReleaseJavaRes NO-SOURCE
+> Task :react-native:packages:react-native:ReactAndroid:hermes-engine:bundleLibRuntimeToJarRelease
+> Task :react-native:packages:react-native:ReactAndroid:hermes-engine:bundleLibCompileToJarRelease
+
+> Task :react-native:packages:react-native:ReactAndroid:hermes-engine:configureCMakeMinSizeRel[arm64-v8a]
+C/C++: CMake Deprecation Warning at CMakeLists.txt:42 (cmake_policy):
+C/C++:   The OLD behavior for policy CMP0026 will be removed from a future version
+C/C++:   of CMake.
+C/C++:   The cmake-policies(7) manual explains that the OLD behaviors of all
+C/C++:   policies are deprecated and that a policy should be set to OLD only under
+C/C++:   specific short-term circumstances.  Projects should be ported to the NEW
+C/C++:   behavior and not rely on setting a policy to OLD.
+
+> Task :react-native:packages:react-native:ReactAndroid:hermes-engine:configureCMakeMinSizeRel[x86_64]
+C/C++: CMake Deprecation Warning at CMakeLists.txt:42 (cmake_policy):
+C/C++:   The OLD behavior for policy CMP0026 will be removed from a future version
+C/C++:   of CMake.
+C/C++:   The cmake-policies(7) manual explains that the OLD behaviors of all
+C/C++:   policies are deprecated and that a policy should be set to OLD only under
+C/C++:   specific short-term circumstances.  Projects should be ported to the NEW
+C/C++:   behavior and not rely on setting a policy to OLD.
+
+> Task :react-native:packages:react-native:ReactAndroid:prepareFolly
+> Task :react-native:packages:react-native:ReactAndroid:hermes-engine:generateJsonModelRelease
+> Task :react-native:packages:react-native:ReactAndroid:hermes-engine:prefabReleaseConfigurePackage UP-TO-DATE
+> Task :react-native:packages:react-native:ReactAndroid:hermes-engine:buildCMakeMinSizeRel[arm64-v8a][libhermes]
