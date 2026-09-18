@@ -4,8 +4,6 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  Platform,
-  PermissionsAndroid,
   Animated,
   Image,
 } from 'react-native';
@@ -93,32 +91,8 @@ export const ChatInput: React.FC<ChatInputProps> = ({
     }).start();
   };
 
-  const requestGalleryPermission = async () => {
-    if (Platform.OS !== 'android') return true;
-
-    try {
-      if (Platform.Version >= 33) {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
-        );
-        return granted === PermissionsAndroid.RESULTS.GRANTED;
-      } else {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-        );
-        return granted === PermissionsAndroid.RESULTS.GRANTED;
-      }
-    } catch (err) {
-      console.log('Permission error:', err);
-      return false;
-    }
-  };
-
   // const handlePickImage = useCallback(async () => {
   //   try {
-  //     const hasPermission = await requestGalleryPermission();
-  //     if (!hasPermission) return;
-
   //     const result = await launchImageLibrary({
   //       mediaType: 'photo',
   //       quality: 0.7,
@@ -153,6 +127,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
       const result = await launchImageLibrary({
         mediaType: 'photo',
         quality: 1,
+        selectionLimit: 1,
       });
 
       if (result.didCancel || !result.assets?.length) {
