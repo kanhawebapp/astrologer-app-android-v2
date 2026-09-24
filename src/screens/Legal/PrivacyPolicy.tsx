@@ -27,7 +27,7 @@ export const PrivacyPolicy: React.FC = () => {
       />
       <View style={styles.webViewWrapper}>
         <WebView
-          source={{ uri: 'https://dhwaniastro.com/astrologer/privacy-policy' }}
+          source={{ uri: 'https://staging.dhwaniastro.com/astrologer/privacy-policy' }}
           originWhitelist={['*']}
           scrollEnabled
           nestedScrollEnabled

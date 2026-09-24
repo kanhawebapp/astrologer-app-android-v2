@@ -89,7 +89,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = memo(
       return types;
     };
 
-    const IMAGE_BASE_URL = 'https://dhwaniastro.com';
+    const IMAGE_BASE_URL = 'https://staging.dhwaniastro.com';
     const imageUrl = profile?.avatar
       ? `${IMAGE_BASE_URL}${profile.avatar}`
       : null;

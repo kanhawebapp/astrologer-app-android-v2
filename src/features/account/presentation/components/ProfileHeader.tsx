@@ -29,7 +29,7 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   };
  
 
-  const IMAGE_BASE_URL = 'https://dhwaniastro.com';
+  const IMAGE_BASE_URL = 'https://staging.dhwaniastro.com';
 
   const renderAvatar = () => {
     const imageUrl = profile?.avatar
