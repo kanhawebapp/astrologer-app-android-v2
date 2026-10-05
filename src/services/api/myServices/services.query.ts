@@ -2,10 +2,14 @@ export const GET_ASTROLOGER_ASSIGNED_BOOKED_SERVICES_QUERY = `
   query GetAstrologerAssignedBookedServices(
     $page: Int!
     $limit: Int!
+    $bookingStatus: BookingStatus
+    $paymentStatus: PaymentStatus
   ) {
     getAstrologerAssignedBookedServices(
       page: $page
       limit: $limit
+      bookingStatus: $bookingStatus
+      paymentStatus: $paymentStatus
     ) {
       success
       total
@@ -15,12 +19,6 @@ export const GET_ASTROLOGER_ASSIGNED_BOOKED_SERVICES_QUERY = `
 
       data {
         id
-        name
-        dob
-        tob
-        pob
-        gender
-        concern
         amount
         paymentStatus
         bookingStatus
@@ -29,7 +27,6 @@ export const GET_ASTROLOGER_ASSIGNED_BOOKED_SERVICES_QUERY = `
         service {
           id
           name
-          price
         }
       }
     }

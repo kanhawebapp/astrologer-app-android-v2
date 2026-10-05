@@ -1,11 +1,5 @@
 export interface BookedService {
   id: string;
-  name: string;
-  dob: string;
-  tob: string;
-  pob: string;
-  gender: string;
-  concern: string;
   amount: number;
   paymentStatus: string;
   bookingStatus: string;
@@ -14,13 +8,14 @@ export interface BookedService {
   service: {
     id: string;
     name: string;
-    price: number;
   };
 }
 
 export interface GetBookedServicesVariables {
   page: number;
   limit: number;
+  paymentStatus?: 'SUCCESS' | 'FAILED' | 'PENDING' | string;
+  bookingStatus?: 'ASSIGNED' | 'COMPLETED' | 'CANCELLED' | string;
 }
 
 export interface BookedServicesResponse {

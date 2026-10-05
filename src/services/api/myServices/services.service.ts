@@ -10,35 +10,28 @@ export const bookedServicesApi = {
     variables: GetBookedServicesVariables,
     token?: string,
   ) => {
-    console.log(
-      '=== GET ASSIGNED BOOKED SERVICES REQUEST ===',
-    );
+    // console.log(
+    //   '=== GET ASSIGNED BOOKED SERVICES REQUEST ===',
+    // );
 
-    console.log(
-      'Variables:',
-      JSON.stringify(
-        variables,
-        null,
-        2,
-      ),
-    );
+    // console.log(
+    //   'Variables:',
+    //   JSON.stringify(variables, null, 2),
+    // );
 
-    console.log(
-      'Query:',
-      GET_ASTROLOGER_ASSIGNED_BOOKED_SERVICES_QUERY.trim(),
-    );
+    // console.log(
+    //   'Query:',
+    //   GET_ASTROLOGER_ASSIGNED_BOOKED_SERVICES_QUERY.trim(),
+    // );
 
-    console.log(
-      '===========================================',
-    );
+    // console.log(
+    //   '===========================================',
+    // );
 
-    return graphqlRequest<
-      GetBookedServicesData,
-      GetBookedServicesVariables
-    >({
+    return graphqlRequest<GetBookedServicesData>({
       query:
         GET_ASTROLOGER_ASSIGNED_BOOKED_SERVICES_QUERY,
-      variables,
+      variables: variables as unknown as Record<string, unknown>,
       token,
     });
   },

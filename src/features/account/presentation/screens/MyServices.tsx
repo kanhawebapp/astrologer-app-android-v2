@@ -8,6 +8,45 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { AppText, Header } from '../../../../components';
 import { bookedServicesApi } from '../../../../services/api/myServices/services.service';
+import { formatDate, formatTime } from '../../../../utils/helpers';
+
+const BOOKING_DATE_OPTIONS: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+};
+
+const BOOKING_TIME_OPTIONS: Intl.DateTimeFormatOptions = {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+};
+
+const parseCreatedAt = (createdAt?: string): Date | null => {
+    if (!createdAt) {
+        return null;
+    }
+
+    const timestamp = Number(createdAt);
+    const date = Number.isNaN(timestamp)
+        ? new Date(createdAt)
+        : new Date(timestamp);
+
+    return Number.isNaN(date.getTime()) ? null : date;
+};
+
+const formatCreatedAt = (createdAt?: string): string => {
+    const date = parseCreatedAt(createdAt);
+
+    if (!date) {
+        return 'N/A';
+    }
+
+    const day = formatDate(date, BOOKING_DATE_OPTIONS, 'en-US');
+    const time = formatTime(date, BOOKING_TIME_OPTIONS, 'en-US');
+
+    return `${day}, ${time}`;
+};
 
 const MyServices: React.FC = () => {
     const navigation = useNavigation();
@@ -24,20 +63,22 @@ const MyServices: React.FC = () => {
             const response = await bookedServicesApi.getBookedServices({
                 page: 1,
                 limit: 20,
+                paymentStatus: 'SUCCESS',
+                bookingStatus: 'ASSIGNED',
             });
 
-            console.log(
-                'services response:',
-                response?.getAstrologerAssignedBookedServices,
-            );
+            // console.log(
+            //     'services response:',
+            //     response?.getAstrologerAssignedBookedServices,
+            // );
 
             const services = response?.getAstrologerAssignedBookedServices;
 
             if (services?.success) {
-                console.log('total:', services.total);
-                console.log('current page:', services.currentPage);
-                console.log('total pages:', services.totalPages);
-                console.log('services:', services.data);
+                // console.log('total:', services.total);
+                // console.log('current page:', services.currentPage);
+                // console.log('total pages:', services.totalPages);
+                // console.log('services:', services.data);
 
                 setData(Array.isArray(services.data) ? services.data : []);
             } else {
@@ -87,7 +128,11 @@ const MyServices: React.FC = () => {
                 data.map(service => (
                     <View key={service.id} style={styles.serviceCard}>
                         <AppText style={styles.serviceName}>
-                            {service.name || 'N/A'}
+                            {service.service?.name || 'N/A'}
+                        </AppText>
+
+                        <AppText>
+                            Booked On: {formatCreatedAt(service.createdAt)}
                         </AppText>
 
                         <AppText>
