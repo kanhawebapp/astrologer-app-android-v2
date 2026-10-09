@@ -24,6 +24,7 @@ import {LogoutButton} from '../components/LogoutButton';
 import {astrologerServicesApi} from '../../../../services/api/AvailvalityToggle/toggleAstrologerService.service';
 import ReviewActionCard from './ReviewActionCard';
 import {appVersionApi} from '../../../../services/api/version/version.api';
+import packageJson from '../../../../../package.json';
 
 export const AccountScreen: React.FC = () => {
   const {theme} = useTheme();
@@ -47,7 +48,7 @@ export const AccountScreen: React.FC = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [notificationEnabled, setNotificationEnabled] = useState(true);
   const [availability, setAvailability] = useState<any>('');
-  const [version, setVersion] = useState<any>('');
+  const [, setVersion] = useState<any>('');
 
   const fetchServices = useCallback(async () => {
     try {
@@ -355,7 +356,7 @@ export const AccountScreen: React.FC = () => {
             color: theme.colors.textSecondary,
             marginVertical: 8,
           }}>
-          {`Version: ${version?.latestVersion || '1.0.0'}`}
+          {`Version: ${packageJson.version}`}
         </Text>
         <View style={styles.bottomSpacer} />
       </ScrollView>
