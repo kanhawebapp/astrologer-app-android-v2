@@ -162,13 +162,7 @@ export const UpcomingLiveList: React.FC<UpcomingLiveListProps> = ({
           style={styles.emptyText}>
           No upcoming live sessions
         </AppText>
-        <TouchableOpacity
-          style={[styles.emptyAction, { borderColor: theme.colors.primary }]}
-          onPress={onSchedulePress}>
-          <AppText variant="button" color={theme.colors.primary}>
-            Schedule a Live
-          </AppText>
-        </TouchableOpacity>
+      
       </View>
     );
   }
