@@ -458,7 +458,7 @@ export const StatusToggleCard: React.FC<
           ]}
         />
 
-        {/* {renderToggleRow(
+        {renderToggleRow(
           'Live',
           'LIVE',
           availability?.isLiveActive ??
@@ -478,7 +478,7 @@ export const StatusToggleCard: React.FC<
           ]}
         />
 
-        {renderToggleRow(
+        {/* {renderToggleRow(
           'Promotional Service',
           'PROMOTIONAL',
           availability?.isPromotional ??
