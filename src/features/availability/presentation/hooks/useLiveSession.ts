@@ -141,6 +141,7 @@ export const useLiveSession = () => {
 
   const startLive = useCallback(
     async (title: string): Promise<boolean> => {
+      liveLog('StartLive handler entered', { hasActiveLive: !!activeLive });
       const trimmed = title.trim();
       if (!trimmed) {
         showError('Please enter a title for your live session.');

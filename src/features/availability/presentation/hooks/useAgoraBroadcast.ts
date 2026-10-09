@@ -59,10 +59,13 @@ export const useAgoraBroadcast = () => {
   const [permissionDenied, setPermissionDenied] = useState(false);
   const [isMicMuted, setIsMicMuted] = useState(false);
   const [isCameraOff, setIsCameraOff] = useState(false);
+  // RtcSurfaceView binds via setupLocalVideo only once on mount, so it must not mount before the engine is initialized.
+  const [isLocalVideoReady, setIsLocalVideoReady] = useState(false);
 
   const releaseEngine = useCallback(() => {
     const engine = engineRef.current;
     engineRef.current = null;
+    setIsLocalVideoReady(false);
     if (!engine) {
       return;
     }
@@ -175,15 +178,20 @@ export const useAgoraBroadcast = () => {
         engine.registerEventHandler(handler);
         handlerRef.current = handler;
 
-        engine.setClientRole(ClientRoleType.ClientRoleBroadcaster);
-        engine.enableVideo();
+        const roleResult = engine.setClientRole(
+          ClientRoleType.ClientRoleBroadcaster,
+        );
+        const videoResult = engine.enableVideo();
         engine.enableAudio();
+        liveLog('Video enabled', { roleResult, videoResult });
         const previewResult = engine.startPreview();
         if (previewResult < 0) {
           liveWarn('Camera preview failed to start', { code: previewResult });
         } else {
           liveLog('Camera preview started');
         }
+        setIsLocalVideoReady(true);
+        liveLog('Local video view ready');
 
         liveLog('Agora channel join started', {
           hasChannelName: credentials.channelName.length > 0,
@@ -248,7 +256,11 @@ export const useAgoraBroadcast = () => {
     }
     const next = !isCameraOff;
     const result = engine.enableLocalVideo(!next);
-    liveLog('Camera toggled', { cameraOff: next, result });
+    liveLog('Camera toggled', {
+      cameraOffBefore: isCameraOff,
+      cameraOffAfter: result === 0 ? next : isCameraOff,
+      result,
+    });
     if (result === 0) {
       setIsCameraOff(next);
     }
@@ -268,6 +280,7 @@ export const useAgoraBroadcast = () => {
     permissionDenied,
     isMicMuted,
     isCameraOff,
+    isLocalVideoReady,
     hasEngine: broadcastState !== 'idle' && broadcastState !== 'failed',
     start,
     leave,

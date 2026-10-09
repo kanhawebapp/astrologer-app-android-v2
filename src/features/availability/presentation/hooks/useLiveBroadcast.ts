@@ -107,6 +107,7 @@ export const useLiveBroadcast = (streamId: string) => {
     error: agora.broadcastError ?? connectError,
     permissionDenied: permissionBlocked || agora.permissionDenied,
     hasPreview: agora.hasEngine,
+    isLocalVideoReady: agora.isLocalVideoReady,
     isJoining,
     isEnding,
     isMicMuted: agora.isMicMuted,

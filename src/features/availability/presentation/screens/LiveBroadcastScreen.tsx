@@ -56,6 +56,7 @@ export const LiveBroadcastScreen: React.FC = () => {
     error,
     permissionDenied,
     hasPreview,
+    isLocalVideoReady,
     isJoining,
     isEnding,
     isMicMuted,
@@ -136,7 +137,7 @@ export const LiveBroadcastScreen: React.FC = () => {
       <StatusBar barStyle="light-content" />
 
       <View style={styles.videoArea}>
-        {hasPreview && !isCameraOff ? (
+        {hasPreview && isLocalVideoReady && !isCameraOff ? (
           <RtcSurfaceView canvas={{ uid: 0 }} style={StyleSheet.absoluteFill} />
         ) : (
           <View style={[StyleSheet.absoluteFill, styles.centered]}>
