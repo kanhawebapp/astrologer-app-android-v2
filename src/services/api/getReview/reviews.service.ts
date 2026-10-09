@@ -10,22 +10,22 @@ export const reviewsApi = {
     filter: GetAstrologerReviewsFilter,
     token?: string,
   ) => {
-    console.log('=== GET ASTROLOGER REVIEWS REQUEST ===');
+    // console.log('=== GET ASTROLOGER REVIEWS REQUEST ===');
 
-    console.log(
-      'Variables:',
-      JSON.stringify(
-        {
-          page: filter.page,
-          limit: filter.limit,
-          rating: filter.rating,
-        },
-        null,
-        2,
-      ),
-    );
+    // console.log(
+    //   'Variables:',
+    //   JSON.stringify(
+    //     {
+    //       page: filter.page,
+    //       limit: filter.limit,
+    //       rating: filter.rating,
+    //     },
+    //     null,
+    //     2,
+    //   ),
+    // );
 
-    console.log('=====================================');
+    // console.log('=====================================');
 
     return graphqlRequest<{
       data: any;
