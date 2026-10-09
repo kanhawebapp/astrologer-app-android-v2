@@ -12,6 +12,7 @@ import { useGlobalChatSocket } from './src/hooks/useGlobalChatSocket';
 import { useGlobalCallSocket } from './src/hooks/useGlobalCallSocket';
 import { useNotificationClickRouter } from './src/hooks/useNotificationClickRouter';
 import { useCallKeepIntegration } from './src/hooks/useCallKeepIntegration';
+import { useInAppUpdates } from './src/hooks/useInAppUpdates';
 import { SocketAuthBridge } from './src/components/SocketAuthBridge';
 import { OneSignalSocketBridge } from './src/components/OneSignalSocketBridge';
 
@@ -22,6 +23,7 @@ const AppContent: React.FC = () => {
   useGlobalCallSocket();
   useNotificationClickRouter();
   useCallKeepIntegration();
+  useInAppUpdates();
 
   return (
     <>
