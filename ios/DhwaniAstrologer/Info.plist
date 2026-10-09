@@ -34,8 +34,10 @@
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
+	<key>NSCameraUsageDescription</key>
+	<string>Camera access is required to broadcast live sessions.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Microphone access is required for voice calls.</string>
+	<string>Microphone access is required for voice calls and live sessions.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>voip</string>

@@ -3,227 +3,123 @@ import {
   LiveSession,
   LiveSessionState,
   ScheduleLiveInput,
-  LiveSessionStatus,
 } from '../../features/availability/domain/liveTypes';
-import { getDefaultLiveSessions } from '../../features/availability/data/dummyLiveData';
 import * as liveSessionRepo from '../../features/availability/data/liveSessionRepository';
+import { getErrorMessage } from '../../utils/helpers';
 
 const initialState: LiveSessionState = {
-  liveSessions: getDefaultLiveSessions(),
-  currentLive: null,
+  scheduledLives: [],
+  activeLive: null,
   isLoading: false,
-  isUpdating: false,
-  error: null,
-  isMockData: true,
+  hasLoaded: false,
+  listError: null,
+  isScheduling: false,
+  isStarting: false,
+  isEnding: false,
 };
 
-export const fetchLiveSessionsThunk = createAsyncThunk(
-  'liveSession/fetchAll',
-  async (_, { rejectWithValue }) => {
-    try {
-      const result = await liveSessionRepo.getLiveSessions();
-      return result;
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Failed to fetch live sessions');
-    }
-  },
-);
+export const fetchScheduledLivesThunk = createAsyncThunk<
+  LiveSession[],
+  void,
+  { rejectValue: string }
+>('liveSession/fetchScheduled', async (_, { rejectWithValue }) => {
+  try {
+    return await liveSessionRepo.getMyScheduledLives();
+  } catch (error) {
+    return rejectWithValue(getErrorMessage(error));
+  }
+});
 
-export const fetchCurrentLiveThunk = createAsyncThunk(
-  'liveSession/fetchCurrent',
-  async (_, { rejectWithValue }) => {
-    try {
-      const result = await liveSessionRepo.getCurrentLive();
-      return result;
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Failed to fetch current live');
-    }
-  },
-);
+export const scheduleLiveThunk = createAsyncThunk<
+  LiveSession,
+  ScheduleLiveInput,
+  { rejectValue: string }
+>('liveSession/schedule', async (input, { rejectWithValue }) => {
+  try {
+    return await liveSessionRepo.scheduleLive(input);
+  } catch (error) {
+    return rejectWithValue(getErrorMessage(error));
+  }
+});
 
-export const scheduleLiveThunk = createAsyncThunk(
-  'liveSession/schedule',
-  async (input: ScheduleLiveInput, { rejectWithValue }) => {
-    try {
-      const result = await liveSessionRepo.scheduleNewLive(input);
-      return result;
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Failed to schedule live');
-    }
-  },
-);
+export const startLiveThunk = createAsyncThunk<
+  LiveSession,
+  string,
+  { rejectValue: string }
+>('liveSession/start', async (title, { rejectWithValue }) => {
+  try {
+    return await liveSessionRepo.startLive(title);
+  } catch (error) {
+    return rejectWithValue(getErrorMessage(error));
+  }
+});
 
-export const startLiveThunk = createAsyncThunk(
-  'liveSession/start',
-  async (sessionId: string | undefined, { rejectWithValue }) => {
-    try {
-      const result = await liveSessionRepo.startLive(sessionId);
-      return result;
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Failed to start live');
-    }
-  },
-);
-
-export const endLiveThunk = createAsyncThunk(
-  'liveSession/end',
-  async (sessionId: string, { rejectWithValue }) => {
-    try {
-      const result = await liveSessionRepo.endLive(sessionId);
-      return result;
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Failed to end live');
-    }
-  },
-);
-
-export const cancelLiveThunk = createAsyncThunk(
-  'liveSession/cancel',
-  async (sessionId: string, { rejectWithValue }) => {
-    try {
-      const result = await liveSessionRepo.cancelLive(sessionId);
-      return result;
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Failed to cancel live');
-    }
-  },
-);
+export const endLiveThunk = createAsyncThunk<
+  string,
+  string,
+  { rejectValue: string }
+>('liveSession/end', async (streamId, { rejectWithValue }) => {
+  try {
+    await liveSessionRepo.endLive(streamId);
+    return streamId;
+  } catch (error) {
+    return rejectWithValue(getErrorMessage(error));
+  }
+});
 
 const liveSessionSlice = createSlice({
   name: 'liveSession',
   initialState,
   reducers: {
-    clearError: state => {
-      state.error = null;
-    },
-    setCurrentLive: (state, action) => {
-      state.currentLive = action.payload;
-    },
-    updateLiveStats: (state, action) => {
-      if (state.currentLive) {
-        state.currentLive.stats = {
-          ...state.currentLive.stats,
-          ...action.payload,
-        };
-      }
-    },
-    clearCurrentLive: state => {
-      state.currentLive = null;
+    clearActiveLive: state => {
+      state.activeLive = null;
     },
   },
   extraReducers: builder => {
     builder
-      .addCase(fetchLiveSessionsThunk.pending, state => {
+      .addCase(fetchScheduledLivesThunk.pending, state => {
         state.isLoading = true;
-        state.error = null;
+        state.listError = null;
       })
-      .addCase(fetchLiveSessionsThunk.fulfilled, (state, action) => {
+      .addCase(fetchScheduledLivesThunk.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.liveSessions = action.payload.data as LiveSession[];
-        state.isMockData = action.payload.isMockData;
+        state.hasLoaded = true;
+        state.scheduledLives = action.payload;
       })
-      .addCase(fetchLiveSessionsThunk.rejected, (state, action) => {
+      .addCase(fetchScheduledLivesThunk.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload as string;
-      })
-      .addCase(fetchCurrentLiveThunk.pending, state => {
-        state.isLoading = true;
-      })
-      .addCase(fetchCurrentLiveThunk.fulfilled, (state, action) => {
-        state.isLoading = false;
-        const data = action.payload.data;
-        if (data && typeof data !== 'object' && !Array.isArray(data)) {
-          state.currentLive = data as LiveSession;
-        }
-        state.isMockData = action.payload.isMockData;
-      })
-      .addCase(fetchCurrentLiveThunk.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload as string;
+        state.listError = action.payload ?? 'Failed to load scheduled lives';
       })
       .addCase(scheduleLiveThunk.pending, state => {
-        state.isUpdating = true;
+        state.isScheduling = true;
       })
-      .addCase(scheduleLiveThunk.fulfilled, (state, action) => {
-        state.isUpdating = false;
-        const newSession = action.payload.data as LiveSession;
-        if (newSession) {
-          state.liveSessions = [...state.liveSessions, newSession];
-        }
-        state.isMockData = action.payload.isMockData;
+      .addCase(scheduleLiveThunk.fulfilled, state => {
+        state.isScheduling = false;
       })
-      .addCase(scheduleLiveThunk.rejected, (state, action) => {
-        state.isUpdating = false;
-        state.error = action.payload as string;
+      .addCase(scheduleLiveThunk.rejected, state => {
+        state.isScheduling = false;
       })
       .addCase(startLiveThunk.pending, state => {
-        state.isUpdating = true;
+        state.isStarting = true;
       })
       .addCase(startLiveThunk.fulfilled, (state, action) => {
-        state.isUpdating = false;
-        const newLive = action.payload.data as LiveSession;
-        if (newLive) {
-          state.currentLive = newLive;
-          const index = state.liveSessions.findIndex(s => s.id === newLive.id);
-          if (index >= 0) {
-            state.liveSessions[index] = newLive;
-          } else {
-            state.liveSessions = [newLive, ...state.liveSessions];
-          }
-        }
-        state.isMockData = action.payload.isMockData;
+        state.isStarting = false;
+        state.activeLive = action.payload;
       })
-      .addCase(startLiveThunk.rejected, (state, action) => {
-        state.isUpdating = false;
-        state.error = action.payload as string;
+      .addCase(startLiveThunk.rejected, state => {
+        state.isStarting = false;
       })
       .addCase(endLiveThunk.pending, state => {
-        state.isUpdating = true;
+        state.isEnding = true;
       })
-      .addCase(endLiveThunk.fulfilled, (state, action) => {
-        state.isUpdating = false;
-        const endedLive = action.payload.data as LiveSession;
-        if (endedLive && endedLive.status === LiveSessionStatus.COMPLETED) {
-          const index = state.liveSessions.findIndex(
-            s => s.id === endedLive.id,
-          );
-          if (index >= 0) {
-            state.liveSessions[index] = endedLive;
-          }
-        }
-        state.currentLive = null;
-        state.isMockData = action.payload.isMockData;
+      .addCase(endLiveThunk.fulfilled, state => {
+        state.isEnding = false;
       })
-      .addCase(endLiveThunk.rejected, (state, action) => {
-        state.isUpdating = false;
-        state.error = action.payload as string;
-      })
-      .addCase(cancelLiveThunk.pending, state => {
-        state.isUpdating = true;
-      })
-      .addCase(cancelLiveThunk.fulfilled, (state, action) => {
-        state.isUpdating = false;
-        const cancelled = action.payload.data as LiveSession;
-        if (cancelled) {
-          const index = state.liveSessions.findIndex(
-            s => s.id === cancelled.id,
-          );
-          if (index >= 0) {
-            state.liveSessions[index] = {
-              ...state.liveSessions[index],
-              status: LiveSessionStatus.CANCELLED,
-            };
-          }
-        }
-        state.isMockData = action.payload.isMockData;
-      })
-      .addCase(cancelLiveThunk.rejected, (state, action) => {
-        state.isUpdating = false;
-        state.error = action.payload as string;
+      .addCase(endLiveThunk.rejected, state => {
+        state.isEnding = false;
       });
   },
 });
 
-export const { clearError, setCurrentLive, updateLiveStats, clearCurrentLive } =
-  liveSessionSlice.actions;
+export const { clearActiveLive } = liveSessionSlice.actions;
 export default liveSessionSlice.reducer;

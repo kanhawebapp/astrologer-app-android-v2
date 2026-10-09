@@ -1,54 +1,58 @@
 export enum LiveSessionStatus {
   SCHEDULED = 'SCHEDULED',
   LIVE = 'LIVE',
-  COMPLETED = 'COMPLETED',
-  CANCELLED = 'CANCELLED',
-}
-
-export interface LiveSessionStats {
-  viewers: number;
-  peakViewers: number;
-  likes: number;
-  comments: number;
-  gifts: number;
-  earnings: number;
-  duration: number;
+  ENDED = 'ENDED',
 }
 
 export interface LiveSession {
   id: string;
+  astrologerId?: string;
   title: string;
-  description?: string;
-  scheduledAt: string;
-  startedAt?: string;
-  endedAt?: string;
-  status: LiveSessionStatus;
-  stats: LiveSessionStats;
-  thumbnailUrl?: string;
-  streamKey?: string;
+  channelName: string;
+  status: LiveSessionStatus | string;
+  scheduledAt?: string | null;
   createdAt: string;
-  updatedAt: string;
+}
+
+export interface JoinLiveCredentials {
+  token: string;
+  uid: number;
+  appId: string;
+  channelName: string;
 }
 
 export interface LiveSessionState {
-  liveSessions: LiveSession[];
-  currentLive: LiveSession | null;
+  scheduledLives: LiveSession[];
+  activeLive: LiveSession | null;
   isLoading: boolean;
-  isUpdating: boolean;
-  error: string | null;
-  isMockData: boolean;
+  hasLoaded: boolean;
+  listError: string | null;
+  isScheduling: boolean;
+  isStarting: boolean;
+  isEnding: boolean;
 }
 
 export interface ScheduleLiveInput {
   title: string;
-  description?: string;
   scheduledAt: string;
 }
 
-export interface LiveSessionResponse {
-  liveSession: LiveSession;
+export interface ScheduleLiveResponse {
+  scheduleLive: LiveSession | null;
 }
 
-export interface LiveSessionsResponse {
-  liveSessions: LiveSession[];
+export interface GetMyScheduledLivesResponse {
+  getMyScheduledLives: LiveSession[] | null;
+}
+
+export interface StartLiveResponse {
+  startLive: LiveSession | null;
+}
+
+export interface JoinLiveResponse {
+  joinLive: JoinLiveCredentials | null;
+}
+
+export interface EndLiveResponse {
+  endLive: boolean | null;
 }

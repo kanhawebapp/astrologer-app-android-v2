@@ -1,239 +1,94 @@
 import { graphqlRequest } from '../../../services/graphqlClient';
 import {
-  LiveSession,
   ScheduleLiveInput,
-  LiveSessionResponse,
-  LiveSessionsResponse,
+  ScheduleLiveResponse,
+  GetMyScheduledLivesResponse,
+  StartLiveResponse,
+  JoinLiveResponse,
+  EndLiveResponse,
 } from '../domain/liveTypes';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Config } from '../../../config/env';
-
-const GET_LIVE_SESSIONS_QUERY = `
-  query GetLiveSessions {
-    liveSessions {
-      id
-      title
-      description
-      scheduledAt
-      startedAt
-      endedAt
-      status
-      stats {
-        viewers
-        peakViewers
-        likes
-        comments
-        gifts
-        earnings
-        duration
-      }
-      thumbnailUrl
-      createdAt
-      updatedAt
-    }
-  }
-`;
-
-const GET_CURRENT_LIVE_QUERY = `
-  query GetCurrentLive {
-    currentLive {
-      id
-      title
-      description
-      scheduledAt
-      startedAt
-      status
-      stats {
-        viewers
-        peakViewers
-        likes
-        comments
-        gifts
-        earnings
-        duration
-      }
-      createdAt
-      updatedAt
-    }
-  }
-`;
 
 const SCHEDULE_LIVE_MUTATION = `
-  mutation ScheduleLive($input: ScheduleLiveInput!) {
-    scheduleLive(input: $input) {
+  mutation ScheduleLive($title: String!, $scheduledAt: String!) {
+    scheduleLive(title: $title, scheduledAt: $scheduledAt) {
       id
       title
-      description
-      scheduledAt
+      channelName
       status
-      stats {
-        viewers
-        peakViewers
-        likes
-        comments
-        gifts
-        earnings
-        duration
-      }
+      scheduledAt
       createdAt
-      updatedAt
+    }
+  }
+`;
+
+const GET_MY_SCHEDULED_LIVES_QUERY = `
+  query GetMyScheduledLives {
+    getMyScheduledLives {
+      id
+      title
+      channelName
+      status
+      scheduledAt
+      createdAt
     }
   }
 `;
 
 const START_LIVE_MUTATION = `
-  mutation StartLiveSession($sessionId: ID!) {
-    startLiveSession(sessionId: $sessionId) {
+  mutation StartLive($title: String!) {
+    startLive(title: $title) {
       id
+      astrologerId
       title
-      description
-      scheduledAt
-      startedAt
+      channelName
       status
-      stats {
-        viewers
-        peakViewers
-        likes
-        comments
-        gifts
-        earnings
-        duration
-      }
       createdAt
-      updatedAt
+    }
+  }
+`;
+
+const JOIN_LIVE_QUERY = `
+  query JoinLive($channelName: String!, $role: String!) {
+    joinLive(channelName: $channelName, role: $role) {
+      token
+      uid
+      appId
+      channelName
     }
   }
 `;
 
 const END_LIVE_MUTATION = `
-  mutation EndLiveSession($sessionId: ID!) {
-    endLiveSession(sessionId: $sessionId) {
-      id
-      title
-      description
-      scheduledAt
-      startedAt
-      endedAt
-      status
-      stats {
-        viewers
-        peakViewers
-        likes
-        comments
-        gifts
-        earnings
-        duration
-      }
-      createdAt
-      updatedAt
-    }
+  mutation EndLive($streamId: String!) {
+    endLive(streamId: $streamId)
   }
 `;
 
-const CANCEL_LIVE_MUTATION = `
-  mutation CancelLiveSession($sessionId: ID!) {
-    cancelLiveSession(sessionId: $sessionId) {
-      id
-      title
-      status
-      updatedAt
-    }
-  }
-`;
-
-const getToken = async (): Promise<string | null> => {
-  try {
-    const token = await AsyncStorage.getItem(Config.TOKEN_KEY);
-    console.log('[ASYNCSTORAGE] Read token from Config.TOKEN_KEY:', token ? 'YES' : 'NO');
-    if (token) {
-      console.log(`[ASYNCSTORAGE] Token Preview: ${token.substring(0, 20)}...`);
-    }
-    return token;
-  } catch {
-    console.log('[ASYNCSTORAGE] Read token from Config.TOKEN_KEY: ERROR');
-    return null;
-  }
-};
-
-export const fetchLiveSessions = async (): Promise<LiveSessionsResponse> => {
-  const token = await getToken();
-  if (!token) {
-    throw new Error('No authentication token');
-  }
-  return graphqlRequest<LiveSessionsResponse>({
-    query: GET_LIVE_SESSIONS_QUERY,
-    token,
-  });
-};
-
-export const fetchCurrentLive =
-  async (): Promise<LiveSessionResponse | null> => {
-    const token = await getToken();
-    if (!token) {
-      throw new Error('No authentication token');
-    }
-    try {
-      return await graphqlRequest<LiveSessionResponse>({
-        query: GET_CURRENT_LIVE_QUERY,
-        token,
-      });
-    } catch {
-      return null;
-    }
-  };
-
-export const scheduleLive = async (
-  input: ScheduleLiveInput,
-): Promise<LiveSessionResponse> => {
-  const token = await getToken();
-  if (!token) {
-    throw new Error('No authentication token');
-  }
-  return graphqlRequest<LiveSessionResponse>({
+export const scheduleLive = (input: ScheduleLiveInput) =>
+  graphqlRequest<ScheduleLiveResponse>({
     query: SCHEDULE_LIVE_MUTATION,
-    variables: { input },
-    token,
+    variables: { title: input.title, scheduledAt: input.scheduledAt },
   });
-};
 
-export const startLiveSession = async (
-  sessionId?: string,
-): Promise<LiveSessionResponse> => {
-  const token = await getToken();
-  if (!token) {
-    throw new Error('No authentication token');
-  }
-  return graphqlRequest<LiveSessionResponse>({
+export const getMyScheduledLives = () =>
+  graphqlRequest<GetMyScheduledLivesResponse>({
+    query: GET_MY_SCHEDULED_LIVES_QUERY,
+  });
+
+export const startLive = (title: string) =>
+  graphqlRequest<StartLiveResponse>({
     query: START_LIVE_MUTATION,
-    variables: { sessionId },
-    token,
+    variables: { title },
   });
-};
 
-export const endLiveSession = async (
-  sessionId: string,
-): Promise<LiveSessionResponse> => {
-  const token = await getToken();
-  if (!token) {
-    throw new Error('No authentication token');
-  }
-  return graphqlRequest<LiveSessionResponse>({
+export const joinLive = (channelName: string, role: 'publisher') =>
+  graphqlRequest<JoinLiveResponse>({
+    query: JOIN_LIVE_QUERY,
+    variables: { channelName, role },
+  });
+
+export const endLive = (streamId: string) =>
+  graphqlRequest<EndLiveResponse>({
     query: END_LIVE_MUTATION,
-    variables: { sessionId },
-    token,
+    variables: { streamId },
   });
-};
-
-export const cancelLiveSession = async (
-  sessionId: string,
-): Promise<LiveSessionResponse> => {
-  const token = await getToken();
-  if (!token) {
-    throw new Error('No authentication token');
-  }
-  return graphqlRequest<LiveSessionResponse>({
-    query: CANCEL_LIVE_MUTATION,
-    variables: { sessionId },
-    token,
-  });
-};

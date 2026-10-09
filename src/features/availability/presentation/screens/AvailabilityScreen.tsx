@@ -23,7 +23,6 @@ import { LiveStatusCard } from '../components/LiveStatusCard';
 import { GoLiveCard } from '../components/GoLiveCard';
 import { UpcomingLiveList } from '../components/UpcomingLiveList';
 import { ScheduleLiveModal } from '../components/ScheduleLiveModal';
-import { ScheduleLiveInput } from '../../domain/liveTypes';
 
 export const AvailabilityScreen: React.FC = () => {
   const { theme } = useTheme();
@@ -43,15 +42,18 @@ export const AvailabilityScreen: React.FC = () => {
   } = useAvailability();
 
   const {
-    currentLive,
-    scheduledSessions,
+    scheduledLives,
+    activeLive,
     isLoading: liveLoading,
-    isUpdating: liveUpdating,
-    formattedDuration,
-    goLiveNow,
-    endLive,
-    cancelScheduledLive,
+    hasLoaded: liveHasLoaded,
+    listError: liveListError,
+    isScheduling,
+    isStarting,
+    isEnding,
     scheduleLive,
+    startLive,
+    openBroadcast,
+    confirmEndLive,
     refresh: refreshLive,
   } = useLiveSession();
 
@@ -60,26 +62,6 @@ export const AvailabilityScreen: React.FC = () => {
   const handleRefresh = () => {
     refresh();
     refreshLive();
-  };
-
-  const handleGoLiveNow = () => {
-    goLiveNow();
-  };
-
-  const handleEndLive = (sessionId: string) => {
-    endLive(sessionId);
-  };
-
-  const handleSchedule = (input: ScheduleLiveInput) => {
-    scheduleLive(input);
-  };
-
-  const handleCancelLive = (sessionId: string) => {
-    cancelScheduledLive(sessionId);
-  };
-
-  const handleStartNow = (sessionId: string) => {
-    goLiveNow(sessionId);
   };
 
   return (
@@ -120,27 +102,32 @@ export const AvailabilityScreen: React.FC = () => {
         </View> */}
 
         <View style={[styles.section, styles.liveSection]}>
-          {currentLive ? (
+          {activeLive ? (
             <LiveStatusCard
-              currentLive={currentLive}
-              onEndLive={handleEndLive}
-              formattedDuration={formattedDuration}
-              isLoading={liveUpdating}
+              session={activeLive}
+              isEnding={isEnding}
+              onReturnToLive={openBroadcast}
+              onEndLive={session => confirmEndLive(session)}
             />
           ) : (
             <GoLiveCard
-              onGoLiveNow={handleGoLiveNow}
+              onGoLiveNow={startLive}
               onScheduleLive={() => setShowScheduleModal(true)}
-              isLoading={liveUpdating}
+              isLoading={isStarting}
             />
           )}
         </View>
 
         <View style={styles.section}>
           <UpcomingLiveList
-            sessions={scheduledSessions}
-            onCancel={handleCancelLive}
-            onStartNow={handleStartNow}
+            sessions={scheduledLives}
+            isLoading={liveLoading}
+            hasLoaded={liveHasLoaded}
+            error={liveListError}
+            activeLiveId={activeLive?.id}
+            onRetry={refreshLive}
+            onSchedulePress={() => setShowScheduleModal(true)}
+            onEndLive={session => confirmEndLive(session)}
           />
         </View>
 
@@ -178,15 +165,16 @@ export const AvailabilityScreen: React.FC = () => {
           />
         </View>
 
-        <View style={[styles.section, styles.lastSection]}>
+        {/* <View style={[styles.section, styles.lastSection]}>
           <InfoBanner availability={availability} isMockData={isMockData} />
-        </View>
+        </View> */}
       </ScrollView>
 
       <ScheduleLiveModal
         visible={showScheduleModal}
         onClose={() => setShowScheduleModal(false)}
-        onSchedule={handleSchedule}
+        onSchedule={scheduleLive}
+        isSubmitting={isScheduling}
       />
     </ScreenContainer>
   );

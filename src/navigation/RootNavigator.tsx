@@ -79,6 +79,7 @@ import AstrologerUpdatesScreen from '../features/home/notification/AstrologerUpd
 import MyRemedies from '../features/account/presentation/screens/MyRemedies';
 import MyServices from '../features/account/presentation/screens/MyServices';
 import {ChatRequestCard} from '../components/common/ChatRequestCard';
+import {LiveBroadcastScreen} from '../features/availability/presentation/screens/LiveBroadcastScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -189,6 +190,14 @@ export const RootNavigator: React.FC = () => {
                 component={KundliWebViewScreen}
                 options={{
                   presentation: 'card',
+                }}
+              />
+              <Stack.Screen
+                name="LiveBroadcast"
+                component={LiveBroadcastScreen}
+                options={{
+                  presentation: 'card',
+                  gestureEnabled: false,
                 }}
               />
             </>

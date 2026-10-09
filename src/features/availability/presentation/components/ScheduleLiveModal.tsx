@@ -6,8 +6,10 @@ import {
   TouchableOpacity,
   TextInput,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import DatePicker from 'react-native-date-picker';
 import { AppText } from '../../../../components/common/AppText';
 import { useTheme } from '../../../../hooks/useTheme';
 import { ScheduleLiveInput } from '../../domain/liveTypes';
@@ -15,106 +17,83 @@ import { ScheduleLiveInput } from '../../domain/liveTypes';
 interface ScheduleLiveModalProps {
   visible: boolean;
   onClose: () => void;
-  onSchedule: (input: ScheduleLiveInput) => void;
+  onSchedule: (input: ScheduleLiveInput) => Promise<boolean>;
+  isSubmitting?: boolean;
 }
+
+const formatSelected = (date: Date) =>
+  date.toLocaleString('en-US', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+  });
 
 export const ScheduleLiveModal: React.FC<ScheduleLiveModalProps> = ({
   visible,
   onClose,
   onSchedule,
+  isSubmitting = false,
 }) => {
   const { theme } = useTheme();
   const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [selectedDate, setSelectedDate] = useState<string>('today');
-  const [selectedTime, setSelectedTime] = useState<string>('18:00');
+  const [scheduledAt, setScheduledAt] = useState<Date | null>(null);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
-  const dateOptions = [
-    { value: 'today', label: 'Today' },
-    { value: 'tomorrow', label: 'Tomorrow' },
-    { value: 'thisWeek', label: 'This Week' },
-  ];
-
-  const timeOptions = [
-    '09:00',
-    '10:00',
-    '11:00',
-    '12:00',
-    '14:00',
-    '15:00',
-    '16:00',
-    '17:00',
-    '18:00',
-    '19:00',
-    '20:00',
-    '21:00',
-  ];
-
-  const handleSchedule = () => {
-    if (!title.trim()) return;
-
-    let scheduledAt: Date;
-    const now = new Date();
-
-    switch (selectedDate) {
-      case 'today':
-        scheduledAt = new Date(
-          now.setHours(
-            parseInt(selectedTime.split(':')[0]),
-            parseInt(selectedTime.split(':')[1]),
-            0,
-            0,
-          ),
-        );
-        if (scheduledAt < new Date()) {
-          scheduledAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
-        }
-        break;
-      case 'tomorrow':
-        scheduledAt = new Date(now);
-        scheduledAt.setDate(scheduledAt.getDate() + 1);
-        scheduledAt.setHours(
-          parseInt(selectedTime.split(':')[0]),
-          parseInt(selectedTime.split(':')[1]),
-          0,
-          0,
-        );
-        break;
-      default:
-        scheduledAt = new Date(now);
-        scheduledAt.setHours(
-          parseInt(selectedTime.split(':')[0]),
-          parseInt(selectedTime.split(':')[1]),
-          0,
-          0,
-        );
-    }
-
-    onSchedule({
-      title: title.trim(),
-      description: description.trim() || undefined,
-      scheduledAt: scheduledAt.toISOString(),
-    });
-
+  const resetForm = () => {
     setTitle('');
-    setDescription('');
-    setSelectedDate('today');
-    setSelectedTime('18:00');
+    setScheduledAt(null);
+    setValidationError(null);
+  };
+
+  const handleClose = () => {
+    if (isSubmitting) {
+      return;
+    }
+    resetForm();
     onClose();
   };
 
-  const formatTime = (time: string) => {
-    const [hours, minutes] = time.split(':');
-    const hour = parseInt(hours);
-    const ampm = hour >= 12 ? 'PM' : 'AM';
-    const displayHour = hour % 12 || 12;
-    return `${displayHour}:${minutes} ${ampm}`;
+  const handleSchedule = async () => {
+    if (isSubmitting) {
+      return;
+    }
+    if (!title.trim()) {
+      setValidationError('Please enter a session title.');
+      return;
+    }
+    if (!scheduledAt || isNaN(scheduledAt.getTime())) {
+      setValidationError('Please select a date and time.');
+      return;
+    }
+    if (scheduledAt.getTime() <= Date.now()) {
+      setValidationError('Please select a time in the future.');
+      return;
+    }
+    setValidationError(null);
+
+    const scheduled = await onSchedule({
+      title: title.trim(),
+      scheduledAt: scheduledAt.toISOString(),
+    });
+    if (scheduled) {
+      resetForm();
+      onClose();
+    }
   };
 
-  const isValid = title.trim().length > 0;
+  const isValid = title.trim().length > 0 && scheduledAt !== null;
 
   return (
-    <Modal visible={visible} transparent animationType="slide">
+    <Modal
+      visible={visible}
+      transparent
+      animationType="slide"
+      onRequestClose={handleClose}>
       <View style={[styles.overlay, { backgroundColor: theme.colors.overlay }]}>
         <View
           style={[styles.container, { backgroundColor: theme.colors.surface }]}>
@@ -123,13 +102,14 @@ export const ScheduleLiveModal: React.FC<ScheduleLiveModalProps> = ({
             <AppText variant="h4" color={theme.colors.text}>
               Schedule Live Session
             </AppText>
-            <TouchableOpacity onPress={onClose}>
+            <TouchableOpacity onPress={handleClose} disabled={isSubmitting}>
               <Icon name="close" size={24} color={theme.colors.text} />
             </TouchableOpacity>
           </View>
 
           <ScrollView
             style={styles.content}
+            keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}>
             <View style={styles.inputGroup}>
               <AppText
@@ -152,6 +132,7 @@ export const ScheduleLiveModal: React.FC<ScheduleLiveModalProps> = ({
                 value={title}
                 onChangeText={setTitle}
                 maxLength={100}
+                editable={!isSubmitting}
               />
             </View>
 
@@ -160,101 +141,44 @@ export const ScheduleLiveModal: React.FC<ScheduleLiveModalProps> = ({
                 variant="body2"
                 color={theme.colors.textSecondary}
                 style={styles.label}>
-                Description (Optional)
+                Date & Time *
               </AppText>
-              <TextInput
+              <TouchableOpacity
                 style={[
                   styles.input,
-                  styles.textArea,
+                  styles.dateButton,
                   {
                     backgroundColor: theme.colors.surfaceSecondary,
-                    color: theme.colors.text,
                     borderColor: theme.colors.border,
                   },
                 ]}
-                placeholder="What will you cover in this session?"
-                placeholderTextColor={theme.colors.textTertiary}
-                value={description}
-                onChangeText={setDescription}
-                multiline
-                numberOfLines={3}
-                maxLength={300}
-              />
+                onPress={() => setPickerOpen(true)}
+                disabled={isSubmitting}>
+                <Icon
+                  name="calendar-outline"
+                  size={18}
+                  color={theme.colors.textSecondary}
+                />
+                <AppText
+                  variant="body2"
+                  color={
+                    scheduledAt ? theme.colors.text : theme.colors.textTertiary
+                  }>
+                  {scheduledAt
+                    ? formatSelected(scheduledAt)
+                    : 'Select date and time'}
+                </AppText>
+              </TouchableOpacity>
             </View>
 
-            <View style={styles.inputGroup}>
+            {validationError && (
               <AppText
-                variant="body2"
-                color={theme.colors.textSecondary}
-                style={styles.label}>
-                Select Date
+                variant="caption"
+                color={theme.colors.error}
+                style={styles.errorText}>
+                {validationError}
               </AppText>
-              <View style={styles.optionsRow}>
-                {dateOptions.map(option => (
-                  <TouchableOpacity
-                    key={option.value}
-                    style={[
-                      styles.optionButton,
-                      {
-                        backgroundColor: theme.colors.surfaceSecondary,
-                        borderColor:
-                          selectedDate === option.value
-                            ? theme.colors.primary
-                            : 'transparent',
-                      },
-                    ]}
-                    onPress={() => setSelectedDate(option.value)}>
-                    <AppText
-                      variant="body2"
-                      color={
-                        selectedDate === option.value
-                          ? theme.colors.primary
-                          : theme.colors.textSecondary
-                      }>
-                      {option.label}
-                    </AppText>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
-
-            <View style={styles.inputGroup}>
-              <AppText
-                variant="body2"
-                color={theme.colors.textSecondary}
-                style={styles.label}>
-                Select Time
-              </AppText>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                <View style={styles.timeOptionsRow}>
-                  {timeOptions.map(time => (
-                    <TouchableOpacity
-                      key={time}
-                      style={[
-                        styles.timeButton,
-                        {
-                          backgroundColor: theme.colors.surfaceSecondary,
-                          borderColor:
-                            selectedTime === time
-                              ? theme.colors.primary
-                              : 'transparent',
-                        },
-                      ]}
-                      onPress={() => setSelectedTime(time)}>
-                      <AppText
-                        variant="caption"
-                        color={
-                          selectedTime === time
-                            ? theme.colors.primary
-                            : theme.colors.textSecondary
-                        }>
-                        {formatTime(time)}
-                      </AppText>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </ScrollView>
-            </View>
+            )}
           </ScrollView>
 
           <View
@@ -264,7 +188,8 @@ export const ScheduleLiveModal: React.FC<ScheduleLiveModalProps> = ({
                 styles.cancelButton,
                 { backgroundColor: theme.colors.surfaceSecondary },
               ]}
-              onPress={onClose}>
+              onPress={handleClose}
+              disabled={isSubmitting}>
               <AppText variant="button" color={theme.colors.textSecondary}>
                 Cancel
               </AppText>
@@ -273,21 +198,41 @@ export const ScheduleLiveModal: React.FC<ScheduleLiveModalProps> = ({
               style={[
                 styles.scheduleButton,
                 {
-                  backgroundColor: isValid
-                    ? theme.colors.primary
-                    : theme.colors.textTertiary,
+                  backgroundColor:
+                    isValid && !isSubmitting
+                      ? theme.colors.primary
+                      : theme.colors.textTertiary,
                 },
               ]}
               onPress={handleSchedule}
-              disabled={!isValid}>
-              <Icon name="calendar" size={20} color={theme.colors.white} />
+              disabled={!isValid || isSubmitting}>
+              {isSubmitting ? (
+                <ActivityIndicator color={theme.colors.white} />
+              ) : (
+                <Icon name="calendar" size={20} color={theme.colors.white} />
+              )}
               <AppText variant="button" color={theme.colors.white}>
-                Schedule
+                {isSubmitting ? 'Scheduling...' : 'Schedule'}
               </AppText>
             </TouchableOpacity>
           </View>
         </View>
       </View>
+
+      <DatePicker
+        modal
+        open={pickerOpen}
+        date={scheduledAt ?? new Date()}
+        minimumDate={new Date()}
+        mode="datetime"
+        title="Select date and time"
+        onConfirm={date => {
+          setPickerOpen(false);
+          setScheduledAt(date);
+          setValidationError(null);
+        }}
+        onCancel={() => setPickerOpen(false)}
+      />
     </Modal>
   );
 };
@@ -324,31 +269,13 @@ const styles = StyleSheet.create({
     padding: 14,
     fontSize: 16,
   },
-  textArea: {
-    height: 100,
-    textAlignVertical: 'top',
-  },
-  optionsRow: {
+  dateButton: {
     flexDirection: 'row',
+    alignItems: 'center',
     gap: 10,
   },
-  optionButton: {
-    flex: 1,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    borderWidth: 2,
-    alignItems: 'center',
-  },
-  timeOptionsRow: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  timeButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 10,
-    borderWidth: 2,
+  errorText: {
+    marginBottom: 12,
   },
   footer: {
     flexDirection: 'row',

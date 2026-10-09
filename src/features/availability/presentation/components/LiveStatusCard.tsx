@@ -1,10 +1,9 @@
-import React, { useRef, useEffect } from 'react';
+import React from 'react';
 import {
   View,
   StyleSheet,
   TouchableOpacity,
-  Animated,
-  Easing,
+  ActivityIndicator,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { AppText } from '../../../../components/common/AppText';
@@ -12,147 +11,82 @@ import { useTheme } from '../../../../hooks/useTheme';
 import { LiveSession } from '../../domain/liveTypes';
 
 interface LiveStatusCardProps {
-  currentLive: LiveSession | null;
-  onEndLive: (sessionId: string) => void;
-  formattedDuration: string;
-  isLoading?: boolean;
+  session: LiveSession;
+  isEnding: boolean;
+  onReturnToLive: (session: LiveSession) => void;
+  onEndLive: (session: LiveSession) => void;
 }
 
 export const LiveStatusCard: React.FC<LiveStatusCardProps> = ({
-  currentLive,
+  session,
+  isEnding,
+  onReturnToLive,
   onEndLive,
-  formattedDuration,
-  isLoading = false,
 }) => {
   const { theme } = useTheme();
-  const pulseAnim = useRef(new Animated.Value(1)).current;
-  const glowAnim = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    if (currentLive) {
-      Animated.loop(
-        Animated.sequence([
-          Animated.timing(pulseAnim, {
-            toValue: 1.08,
-            duration: 800,
-            easing: Easing.inOut(Easing.ease),
-            useNativeDriver: true,
-          }),
-          Animated.timing(pulseAnim, {
-            toValue: 1,
-            duration: 800,
-            easing: Easing.inOut(Easing.ease),
-            useNativeDriver: true,
-          }),
-        ]),
-      ).start();
-
-      Animated.timing(glowAnim, {
-        toValue: 1,
-        duration: 500,
-        useNativeDriver: false,
-      }).start();
-    } else {
-      pulseAnim.setValue(1);
-      Animated.timing(glowAnim, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: false,
-      }).start();
-    }
-  }, [currentLive, pulseAnim, glowAnim]);
-
-  if (!currentLive) {
-    return null;
-  }
-
-  const handleEndLive = () => {
-    onEndLive(currentLive.id);
-  };
 
   return (
-    <Animated.View
-      style={[
-        styles.container,
-        {
-          backgroundColor: theme.colors.surface,
-          transform: [{ scale: pulseAnim }],
-        },
-      ]}>
-      <Animated.View
-        style={[
-          styles.glowBackground,
-          {
-            backgroundColor: theme.colors.error + '20',
-            opacity: glowAnim,
-          },
-        ]}
-      />
-
+    <View style={[styles.container, { backgroundColor: theme.colors.surface }]}>
       <View style={styles.header}>
-        <View style={styles.liveIndicator}>
-          <View style={styles.redDot} />
-          <AppText variant="caption" color={theme.colors.error}>
-            LIVE
-          </AppText>
-        </View>
+        <AppText variant="caption" color={theme.colors.textSecondary}>
+          Active session
+        </AppText>
         <View
           style={[
-            styles.durationBadge,
+            styles.statusBadge,
             { backgroundColor: theme.colors.errorLight },
           ]}>
-          <Icon name="time-outline" size={14} color={theme.colors.error} />
           <AppText variant="caption" color={theme.colors.error}>
-            {formattedDuration}
+            {session.status}
           </AppText>
         </View>
       </View>
 
       <AppText variant="h4" color={theme.colors.text} style={styles.title}>
-        {currentLive.title}
+        {session.title}
       </AppText>
 
-      <View style={styles.statsRow}>
-        <View style={styles.statItem}>
-          <Icon name="eye-outline" size={18} color={theme.colors.primary} />
-          <AppText variant="body2" color={theme.colors.textSecondary}>
-            {currentLive.stats.viewers}
-          </AppText>
-          <AppText variant="caption" color={theme.colors.textTertiary}>
-            viewers
-          </AppText>
-        </View>
-        <View style={styles.statItem}>
-          <Icon name="heart-outline" size={18} color={theme.colors.primary} />
-          <AppText variant="body2" color={theme.colors.textSecondary}>
-            {currentLive.stats.likes}
-          </AppText>
-          <AppText variant="caption" color={theme.colors.textTertiary}>
-            likes
-          </AppText>
-        </View>
-        <View style={styles.statItem}>
-          <Icon name="cash-outline" size={18} color={theme.colors.success} />
-          <AppText variant="body2" color={theme.colors.textSecondary}>
-            ₹{currentLive.stats.earnings}
-          </AppText>
-          <AppText variant="caption" color={theme.colors.textTertiary}>
-            earned
-          </AppText>
-        </View>
-      </View>
+      <AppText
+        variant="caption"
+        color={theme.colors.textTertiary}
+        style={styles.hint}>
+        Camera and microphone are off. Return to the broadcast screen to
+        reconnect, or end the session.
+      </AppText>
 
       <TouchableOpacity
-        style={[styles.endButton, { backgroundColor: theme.colors.error }]}
-        onPress={handleEndLive}
-        disabled={isLoading}
+        style={[styles.primaryButton, { backgroundColor: theme.colors.primary }]}
+        onPress={() => onReturnToLive(session)}
+        disabled={isEnding}
         activeOpacity={0.8}>
-        <Icon name="close" size={20} color={theme.colors.white} />
+        <Icon name="videocam" size={20} color={theme.colors.white} />
         <AppText variant="button" color={theme.colors.white}>
-          END LIVE
+          Return to Live
         </AppText>
       </TouchableOpacity>
-    </Animated.View>
+
+      <TouchableOpacity
+        style={[
+          styles.endButton,
+          {
+            backgroundColor: isEnding
+              ? theme.colors.textTertiary
+              : theme.colors.error,
+          },
+        ]}
+        onPress={() => onEndLive(session)}
+        disabled={isEnding}
+        activeOpacity={0.8}>
+        {isEnding ? (
+          <ActivityIndicator color={theme.colors.white} />
+        ) : (
+          <Icon name="close" size={20} color={theme.colors.white} />
+        )}
+        <AppText variant="button" color={theme.colors.white}>
+          {isEnding ? 'ENDING...' : 'END LIVE'}
+        </AppText>
+      </TouchableOpacity>
+    </View>
   );
 };
 
@@ -167,15 +101,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
     shadowRadius: 8,
-    overflow: 'hidden',
-  },
-  glowBackground: {
-    position: 'absolute',
-    top: -50,
-    left: -50,
-    right: -50,
-    bottom: -50,
-    borderRadius: 100,
   },
   header: {
     flexDirection: 'row',
@@ -183,35 +108,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 12,
   },
-  liveIndicator: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  redDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#FF3B30',
-    marginRight: 6,
-  },
-  durationBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  statusBadge: {
     paddingHorizontal: 10,
     paddingVertical: 4,
-    borderRadius: 12,
+    borderRadius: 8,
   },
   title: {
+    marginBottom: 8,
+  },
+  hint: {
     marginBottom: 16,
   },
-  statsRow: {
+  primaryButton: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginBottom: 20,
-  },
-  statItem: {
     alignItems: 'center',
-    gap: 4,
+    justifyContent: 'center',
+    borderRadius: 16,
+    paddingVertical: 14,
+    gap: 8,
+    marginBottom: 12,
   },
   endButton: {
     flexDirection: 'row',

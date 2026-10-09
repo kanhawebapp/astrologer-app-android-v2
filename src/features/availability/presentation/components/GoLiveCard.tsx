@@ -1,11 +1,17 @@
-import React from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  TextInput,
+  ActivityIndicator,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { AppText } from '../../../../components/common/AppText';
 import { useTheme } from '../../../../hooks/useTheme';
 
 interface GoLiveCardProps {
-  onGoLiveNow: () => void;
+  onGoLiveNow: (title: string) => Promise<boolean>;
   onScheduleLive: () => void;
   isLoading?: boolean;
 }
@@ -16,6 +22,18 @@ export const GoLiveCard: React.FC<GoLiveCardProps> = ({
   isLoading = false,
 }) => {
   const { theme } = useTheme();
+  const [title, setTitle] = useState('');
+  const canGoLive = title.trim().length > 0 && !isLoading;
+
+  const handleGoLive = async () => {
+    if (!canGoLive) {
+      return;
+    }
+    const started = await onGoLiveNow(title);
+    if (started) {
+      setTitle('');
+    }
+  };
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.surface }]}>
@@ -40,14 +58,43 @@ export const GoLiveCard: React.FC<GoLiveCardProps> = ({
         Go live instantly or schedule a session for later
       </AppText>
 
+      <TextInput
+        style={[
+          styles.input,
+          {
+            backgroundColor: theme.colors.surfaceSecondary,
+            color: theme.colors.text,
+            borderColor: theme.colors.border,
+          },
+        ]}
+        placeholder="Live session title"
+        placeholderTextColor={theme.colors.textTertiary}
+        value={title}
+        onChangeText={setTitle}
+        maxLength={100}
+        editable={!isLoading}
+        returnKeyType="done"
+      />
+
       <TouchableOpacity
-        style={[styles.goLiveButton, { backgroundColor: theme.colors.error }]}
-        onPress={onGoLiveNow}
-        disabled={isLoading}
+        style={[
+          styles.goLiveButton,
+          {
+            backgroundColor: canGoLive
+              ? theme.colors.error
+              : theme.colors.textTertiary,
+          },
+        ]}
+        onPress={handleGoLive}
+        disabled={!canGoLive}
         activeOpacity={0.8}>
-        <Icon name="radio-button-on" size={24} color={theme.colors.white} />
+        {isLoading ? (
+          <ActivityIndicator color={theme.colors.white} />
+        ) : (
+          <Icon name="radio-button-on" size={24} color={theme.colors.white} />
+        )}
         <AppText variant="button" color={theme.colors.white}>
-          GO LIVE NOW
+          {isLoading ? 'STARTING...' : 'GO LIVE NOW'}
         </AppText>
       </TouchableOpacity>
 
@@ -57,6 +104,7 @@ export const GoLiveCard: React.FC<GoLiveCardProps> = ({
           { backgroundColor: theme.colors.surfaceSecondary },
         ]}
         onPress={onScheduleLive}
+        disabled={isLoading}
         activeOpacity={0.8}>
         <Icon
           name="calendar-outline"
@@ -101,6 +149,15 @@ const styles = StyleSheet.create({
   description: {
     textAlign: 'center',
     marginBottom: 20,
+  },
+  input: {
+    width: '100%',
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: 16,
+    marginBottom: 12,
   },
   goLiveButton: {
     flexDirection: 'row',

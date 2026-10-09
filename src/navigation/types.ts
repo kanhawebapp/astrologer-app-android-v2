@@ -43,6 +43,7 @@ export type RootStackParamList = {
     userName?: string;
   };
   AstrologerUpdatesScreen: undefined;
+  LiveBroadcast: {streamId: string};
 };
 
 export type AuthStackParamList = {
