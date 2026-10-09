@@ -9,6 +9,9 @@ import { parseLiveTimestamp } from '../../data/liveSessionRepository';
 interface LiveSessionItemProps {
   session: LiveSession;
   onEndLive?: (session: LiveSession) => void;
+  canStartLive?: boolean;
+  isStarting?: boolean;
+  onStartLive?: (session: LiveSession) => void;
 }
 
 const formatDateTime = (date: Date) => {
@@ -41,6 +44,9 @@ const formatDateTime = (date: Date) => {
 export const LiveSessionItem: React.FC<LiveSessionItemProps> = ({
   session,
   onEndLive,
+  canStartLive = false,
+  isStarting = false,
+  onStartLive,
 }) => {
   const { theme } = useTheme();
 
@@ -87,6 +93,28 @@ export const LiveSessionItem: React.FC<LiveSessionItemProps> = ({
           {scheduledDate ? formatDateTime(scheduledDate) : 'Time not set'}
         </AppText>
       </View>
+
+      {onStartLive && canStartLive && (
+        <View style={styles.actionsRow}>
+          <TouchableOpacity
+            style={[
+              styles.actionButton,
+              {
+                backgroundColor: isStarting
+                  ? theme.colors.textTertiary
+                  : theme.colors.error,
+              },
+            ]}
+            onPress={() => onStartLive(session)}
+            disabled={isStarting}
+            activeOpacity={0.8}>
+            <Icon name="radio-button-on" size={16} color={theme.colors.white} />
+            <AppText variant="caption" color={theme.colors.white}>
+              {isStarting ? 'Starting...' : 'Start Live'}
+            </AppText>
+          </TouchableOpacity>
+        </View>
+      )}
 
       {onEndLive && session.status === LiveSessionStatus.LIVE && (
         <View style={styles.actionsRow}>

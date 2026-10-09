@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -9,7 +9,9 @@ import {
 import Icon from 'react-native-vector-icons/Ionicons';
 import { AppText } from '../../../../components/common/AppText';
 import { useTheme } from '../../../../hooks/useTheme';
-import { LiveSession } from '../../domain/liveTypes';
+import { LiveSession, LiveSessionStatus } from '../../domain/liveTypes';
+import { parseLiveTimestamp } from '../../data/liveSessionRepository';
+import { liveLog } from '../../data/liveLogger';
 import { LiveSessionItem } from './LiveSessionItem';
 
 interface UpcomingLiveListProps {
@@ -18,9 +20,11 @@ interface UpcomingLiveListProps {
   hasLoaded: boolean;
   error: string | null;
   activeLiveId?: string;
+  isStarting: boolean;
   onRetry: () => void;
   onSchedulePress: () => void;
   onEndLive: (session: LiveSession) => void;
+  onStartLive: (session: LiveSession) => void;
 }
 
 export const UpcomingLiveList: React.FC<UpcomingLiveListProps> = ({
@@ -29,11 +33,46 @@ export const UpcomingLiveList: React.FC<UpcomingLiveListProps> = ({
   hasLoaded,
   error,
   activeLiveId,
+  isStarting,
   onRetry,
   onSchedulePress,
   onEndLive,
+  onStartLive,
 }) => {
   const { theme } = useTheme();
+
+  // Re-read only when the list fetch starts or settles (focus, pull-to-refresh, refetch completion); no timers by design.
+  const [evaluatedAt, setEvaluatedAt] = useState(Date.now);
+  useEffect(() => {
+    setEvaluatedAt(Date.now());
+  }, [sessions, isLoading]);
+
+  const startableIds = useMemo(() => {
+    const now = evaluatedAt;
+    const ids = new Set<string>();
+    sessions.forEach(session => {
+      const scheduledMs = parseLiveTimestamp(session.scheduledAt)?.getTime();
+      const eligible =
+        session.status === LiveSessionStatus.SCHEDULED &&
+        scheduledMs !== undefined &&
+        scheduledMs <= now;
+      liveLog('Start eligibility', {
+        sessionId: session.id,
+        status: session.status,
+        scheduledAtRaw: session.scheduledAt,
+        scheduledAt:
+          scheduledMs !== undefined
+            ? new Date(scheduledMs).toISOString()
+            : null,
+        now: new Date(now).toISOString(),
+        eligible,
+      });
+      if (eligible) {
+        ids.add(session.id);
+      }
+    });
+    return ids;
+  }, [sessions, evaluatedAt]);
 
   if (error && sessions.length === 0) {
     return (
@@ -178,8 +217,12 @@ export const UpcomingLiveList: React.FC<UpcomingLiveListProps> = ({
           <LiveSessionItem
             session={item}
             onEndLive={item.id === activeLiveId ? undefined : onEndLive}
+            canStartLive={!activeLiveId && startableIds.has(item.id)}
+            isStarting={isStarting}
+            onStartLive={onStartLive}
           />
         )}
+        extraData={startableIds}
         scrollEnabled={false}
       />
     </View>

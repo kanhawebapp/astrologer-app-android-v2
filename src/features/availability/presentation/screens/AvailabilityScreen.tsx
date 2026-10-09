@@ -23,6 +23,8 @@ import { LiveStatusCard } from '../components/LiveStatusCard';
 import { GoLiveCard } from '../components/GoLiveCard';
 import { UpcomingLiveList } from '../components/UpcomingLiveList';
 import { ScheduleLiveModal } from '../components/ScheduleLiveModal';
+import { LiveSession } from '../../domain/liveTypes';
+import { liveLog } from '../../data/liveLogger';
 
 export const AvailabilityScreen: React.FC = () => {
   const { theme } = useTheme();
@@ -62,6 +64,14 @@ export const AvailabilityScreen: React.FC = () => {
   const handleRefresh = () => {
     refresh();
     refreshLive();
+  };
+
+  const handleStartScheduledLive = (session: LiveSession) => {
+    liveLog('Scheduled Start Live tapped', {
+      sessionId: session.id,
+      status: session.status,
+    });
+    startLive(session.title);
   };
 
   return (
@@ -125,9 +135,11 @@ export const AvailabilityScreen: React.FC = () => {
             hasLoaded={liveHasLoaded}
             error={liveListError}
             activeLiveId={activeLive?.id}
+            isStarting={isStarting}
             onRetry={refreshLive}
             onSchedulePress={() => setShowScheduleModal(true)}
             onEndLive={session => confirmEndLive(session)}
+            onStartLive={handleStartScheduledLive}
           />
         </View>
 
