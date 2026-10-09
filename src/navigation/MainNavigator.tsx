@@ -86,9 +86,9 @@ const TAB_CONFIGS: TabConfig[] = [
     activeIcon: 'message-text',
   },
   {
-    name: 'Availability',
+    name: 'Live',
     component: AvailabilityScreen,
-    label: 'Availability',
+    label: 'Live',
     icon: 'calendar-check-outline',
     activeIcon: 'calendar-check',
   },

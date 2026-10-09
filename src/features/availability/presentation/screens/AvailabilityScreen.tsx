@@ -85,7 +85,7 @@ export const AvailabilityScreen: React.FC = () => {
   return (
     <ScreenContainer scrollable={false} withPadding={false}>
       <Header
-        title="Availability"
+        title="Live"
         rightComponent={
           <TouchableOpacity
             style={[

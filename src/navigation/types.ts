@@ -55,7 +55,7 @@ export type AuthStackParamList = {
 export type MainTabParamList = {
   Home: undefined;
   Sessions: undefined;
-  Availability: undefined;
+  Live: undefined;
   Wallet: undefined;
   Account: undefined;
   ChatScreen: {chatId: string};
