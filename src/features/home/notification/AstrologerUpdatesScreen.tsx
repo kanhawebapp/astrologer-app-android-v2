@@ -15,6 +15,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { spacing } from '../../../theme';
 import { noticesApi } from '../../../services/api/notice/notices.service';
 import { Header } from '../../../components';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const TABS = [
   { key: 'notification', label: 'Notification' },
@@ -86,6 +87,7 @@ const HINDI_DOS_DONTS = [
 const AstrologerUpdatesScreen = () => {
   const navigation = useNavigation<any>();
   const { theme } = useTheme();
+  const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState('notification');
 
   const [loading, setLoading] = useState(false);
@@ -192,7 +194,13 @@ const AstrologerUpdatesScreen = () => {
     switch (activeTab) {
       case 'notification':
         return (
-          <View style={styles.comingSoonContainer}>
+          <View
+            style={[
+              styles.comingSoonContainer,
+              {
+                paddingBottom: Math.max(insets.bottom, 16),
+              },
+            ]}>
             <View
               style={[
                 styles.iconContainer,
@@ -260,7 +268,14 @@ const AstrologerUpdatesScreen = () => {
         return (
           <ScrollView
             style={styles.scrollView}
-            contentContainerStyle={styles.scrollContent}>
+            contentContainerStyle={[
+              styles.scrollContent,
+              {
+                paddingBottom: Math.max(insets.bottom, 16) + 16,
+              },
+            ]}
+            showsVerticalScrollIndicator={false}
+            alwaysBounceVertical={false}>
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
                 <Ionicons
