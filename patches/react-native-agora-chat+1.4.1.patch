@@ -1,0 +1,12 @@
+diff --git a/node_modules/react-native-agora-chat/android/build.gradle b/node_modules/react-native-agora-chat/android/build.gradle
+index be4db63..df8e41f 100644
+--- a/node_modules/react-native-agora-chat/android/build.gradle
++++ b/node_modules/react-native-agora-chat/android/build.gradle
+@@ -48,6 +48,7 @@ android {
+   }
+ 
+   compileSdkVersion getExtOrIntegerDefault("compileSdkVersion")
++  ndkVersion getExtOrDefault("ndkVersion")
+ 
+   defaultConfig {
+     minSdkVersion getExtOrIntegerDefault("minSdkVersion")

@@ -6,8 +6,13 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Alert,
+  Keyboard,
+  Pressable,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { RtcSurfaceView } from 'react-native-agora';
@@ -20,6 +25,10 @@ import {
 import { LiveSessionStatus } from '../../domain/liveTypes';
 import { useLiveBroadcast } from '../hooks/useLiveBroadcast';
 import { BroadcastState } from '../hooks/useAgoraBroadcast';
+import { useKeyboardInset } from '../hooks/useKeyboardInset';
+import { LiveChatPanel } from '../components/LiveChatPanel';
+
+const LOCAL_VIDEO_CANVAS = { uid: 0 };
 
 const getStatusLabel = (
   state: BroadcastState,
@@ -68,7 +77,15 @@ export const LiveBroadcastScreen: React.FC = () => {
     retry,
     openSettings,
     endLive,
+    chatCredentials,
+    isChatUnavailable,
+    chatSenderName,
+    refreshChatCredentials,
   } = useLiveBroadcast(route.params.streamId);
+  const insets = useSafeAreaInsets();
+  const { isKeyboardVisible, keyboardInset, onRootLayout } = useKeyboardInset(
+    insets.bottom,
+  );
 
   useEffect(
     () =>
@@ -133,12 +150,16 @@ export const LiveBroadcastScreen: React.FC = () => {
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: colors.cosmicDeep }]}
-      edges={['top', 'bottom']}>
+      edges={['top', 'bottom']}
+      onLayout={onRootLayout}>
       <StatusBar barStyle="light-content" />
 
       <View style={styles.videoArea}>
         {hasPreview && isLocalVideoReady && !isCameraOff ? (
-          <RtcSurfaceView canvas={{ uid: 0 }} style={StyleSheet.absoluteFill} />
+          <RtcSurfaceView
+            canvas={LOCAL_VIDEO_CANVAS}
+            style={StyleSheet.absoluteFill}
+          />
         ) : (
           <View style={[StyleSheet.absoluteFill, styles.centered]}>
             {isBusy ? (
@@ -189,36 +210,48 @@ export const LiveBroadcastScreen: React.FC = () => {
           {session.title}
         </AppText>
 
-        {error && (
-          <View style={[styles.errorBox, { backgroundColor: colors.errorLight }]}>
-            <AppText variant="body2" color={colors.error}>
-              {error}
-            </AppText>
-            <View style={styles.errorActions}>
-              {canRetry && (
-                <TouchableOpacity
-                  style={[styles.pillButton, { backgroundColor: colors.surface }]}
-                  onPress={retry}>
-                  <AppText variant="button" color={colors.text}>
-                    Retry
-                  </AppText>
-                </TouchableOpacity>
-              )}
-              {permissionDenied && (
-                <TouchableOpacity
-                  style={[styles.pillButton, { backgroundColor: colors.surface }]}
-                  onPress={openSettings}>
-                  <AppText variant="button" color={colors.text}>
-                    Open Settings
-                  </AppText>
-                </TouchableOpacity>
-              )}
+        <Pressable
+          style={[styles.bottomOverlay, { paddingBottom: keyboardInset }]}
+          onPress={Keyboard.dismiss}
+          accessible={false}>
+          {error && (
+            <View style={[styles.errorBox, { backgroundColor: colors.errorLight }]}>
+              <AppText variant="body2" color={colors.error}>
+                {error}
+              </AppText>
+              <View style={styles.errorActions}>
+                {canRetry && (
+                  <TouchableOpacity
+                    style={[styles.pillButton, { backgroundColor: colors.surface }]}
+                    onPress={retry}>
+                    <AppText variant="button" color={colors.text}>
+                      Retry
+                    </AppText>
+                  </TouchableOpacity>
+                )}
+                {permissionDenied && (
+                  <TouchableOpacity
+                    style={[styles.pillButton, { backgroundColor: colors.surface }]}
+                    onPress={openSettings}>
+                    <AppText variant="button" color={colors.text}>
+                      Open Settings
+                    </AppText>
+                  </TouchableOpacity>
+                )}
+              </View>
             </View>
-          </View>
-        )}
+          )}
+          <LiveChatPanel
+            credentials={chatCredentials}
+            isUnavailable={isChatUnavailable}
+            isPreparing={isJoining}
+            senderName={chatSenderName}
+            refreshCredentials={refreshChatCredentials}
+          />
+        </Pressable>
       </View>
 
-      <View style={styles.controls}>
+      <View style={[styles.controls, isKeyboardVisible && styles.hidden]}>
         <TouchableOpacity
           style={[styles.controlButton, !hasPreview && styles.disabled]}
           onPress={toggleMic}
@@ -334,11 +367,13 @@ const styles = StyleSheet.create({
     textShadowColor: 'rgba(0,0,0,0.6)',
     textShadowRadius: 4,
   },
+  bottomOverlay: {
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
   errorBox: {
-    position: 'absolute',
-    left: 16,
-    right: 16,
-    bottom: 16,
+    marginHorizontal: 16,
+    marginBottom: 8,
     padding: 12,
     borderRadius: 12,
   },
@@ -370,6 +405,9 @@ const styles = StyleSheet.create({
   },
   disabled: {
     opacity: 0.4,
+  },
+  hidden: {
+    display: 'none',
   },
   endButton: {
     flex: 1,

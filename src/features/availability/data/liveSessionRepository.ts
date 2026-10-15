@@ -1,5 +1,6 @@
 import {
   JoinLiveCredentials,
+  LiveChatCredentials,
   LiveSession,
   ScheduleLiveInput,
 } from '../domain/liveTypes';
@@ -26,6 +27,26 @@ export const parseLiveTimestamp = (
   }
   const date = new Date(raw);
   return isNaN(date.getTime()) ? null : date;
+};
+
+export const toLiveChatCredentials = (
+  credentials: JoinLiveCredentials | null | undefined,
+): LiveChatCredentials | null => {
+  if (
+    !credentials ||
+    !isNonEmptyString(credentials.chatUserId) ||
+    !isNonEmptyString(credentials.chatToken) ||
+    !isNonEmptyString(credentials.chatRoomId) ||
+    !isNonEmptyString(credentials.chatAppKey)
+  ) {
+    return null;
+  }
+  return {
+    chatUserId: credentials.chatUserId,
+    chatToken: credentials.chatToken,
+    chatRoomId: credentials.chatRoomId,
+    chatAppKey: credentials.chatAppKey,
+  };
 };
 
 const assertValidSession = (
@@ -124,11 +145,7 @@ export const joinLiveAsPublisher = async (
     const hasUid =
       typeof credentials?.uid === 'number' && Number.isInteger(credentials.uid);
     const channelMatches = credentials?.channelName === channelName;
-    const hasChatCredentials =
-      isNonEmptyString(credentials?.chatUserId) &&
-      isNonEmptyString(credentials?.chatToken) &&
-      isNonEmptyString(credentials?.chatRoomId) &&
-      isNonEmptyString(credentials?.chatAppKey);
+    const hasChatCredentials = toLiveChatCredentials(credentials) !== null;
     liveLog('JoinLive response', {
       hasRtcToken,
       hasAppId,

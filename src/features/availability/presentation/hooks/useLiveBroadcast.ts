@@ -4,7 +4,9 @@ import { RootState } from '../../../../store';
 import {
   joinLiveAsPublisher,
   parseLiveTimestamp,
+  toLiveChatCredentials,
 } from '../../data/liveSessionRepository';
+import { LiveChatCredentials } from '../../domain/liveTypes';
 import { getErrorMessage } from '../../../../utils/helpers';
 import { useAgoraBroadcast } from './useAgoraBroadcast';
 import { useEndLive, useMediaPermissions } from './useLiveSession';
@@ -21,11 +23,28 @@ const formatDuration = (seconds: number): string => {
   return `${mins}:${secs.toString().padStart(2, '0')}`;
 };
 
+const isSameChatRoom = (
+  a: LiveChatCredentials | null,
+  b: LiveChatCredentials | null,
+): boolean =>
+  !!a &&
+  !!b &&
+  a.chatAppKey === b.chatAppKey &&
+  a.chatUserId === b.chatUserId &&
+  a.chatRoomId === b.chatRoomId;
+
 export const useLiveBroadcast = (streamId: string) => {
   const activeLive = useSelector(
     (state: RootState) => state.liveSession.activeLive,
   );
   const session = activeLive?.id === streamId ? activeLive : null;
+  const chatSenderName = useSelector(
+    (state: RootState) =>
+      state.account.profile?.displayName?.trim() ||
+      state.account.profile?.name?.trim() ||
+      state.auth.user?.name?.trim() ||
+      undefined,
+  );
   const agora = useAgoraBroadcast();
   const { start: startBroadcast, leave: leaveBroadcast } = agora;
   const { ensureMediaPermissions, openSettings } = useMediaPermissions();
@@ -35,8 +54,12 @@ export const useLiveBroadcast = (streamId: string) => {
   const [connectError, setConnectError] = useState<string | null>(null);
   const [permissionBlocked, setPermissionBlocked] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const [chatCredentials, setChatCredentials] =
+    useState<LiveChatCredentials | null>(null);
+  const [isChatUnavailable, setIsChatUnavailable] = useState(false);
   const joiningRef = useRef(false);
   const autoStartedRef = useRef(false);
+  const channelName = session?.channelName;
 
   const connect = useCallback(async () => {
     if (!session || joiningRef.current) {
@@ -55,6 +78,10 @@ export const useLiveBroadcast = (streamId: string) => {
         return;
       }
       const credentials = await joinLiveAsPublisher(session.channelName);
+      const nextChat = toLiveChatCredentials(credentials);
+      setIsChatUnavailable(nextChat === null);
+      // Keep the existing chat connection when an RTC retry returns the same room.
+      setChatCredentials(prev => (isSameChatRoom(prev, nextChat) ? prev : nextChat));
       await startBroadcast(credentials);
     } catch (error) {
       setConnectError(getErrorMessage(error));
@@ -94,12 +121,24 @@ export const useLiveBroadcast = (streamId: string) => {
         return;
       }
       confirmEndLive(session, () => {
+        setChatCredentials(null);
         leaveBroadcast();
         onEnded();
       });
     },
     [session, confirmEndLive, leaveBroadcast],
   );
+
+  const refreshChatCredentials = useCallback(async () => {
+    if (!channelName) {
+      throw new Error('Live session is no longer active');
+    }
+    const fresh = toLiveChatCredentials(await joinLiveAsPublisher(channelName));
+    if (!fresh) {
+      throw new Error('Server did not return chat credentials');
+    }
+    return fresh;
+  }, [channelName]);
 
   return {
     session,
@@ -119,5 +158,9 @@ export const useLiveBroadcast = (streamId: string) => {
     retry: connect,
     openSettings,
     endLive,
+    chatCredentials: session ? chatCredentials : null,
+    isChatUnavailable,
+    chatSenderName,
+    refreshChatCredentials,
   };
 };
