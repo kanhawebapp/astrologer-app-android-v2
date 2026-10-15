@@ -148,8 +148,13 @@ export const useLiveSession = () => {
         return false;
       }
       if (startingRef.current || activeLive) {
+        // liveLog('StartLive blocked', {
+        //   alreadyStarting: startingRef.current,
+        //   activeLiveId: activeLive?.id,
+        // });
         return false;
       }
+      // liveLog('StartLive request allowed');
       startingRef.current = true;
       try {
         if (!(await ensureMediaPermissions())) {

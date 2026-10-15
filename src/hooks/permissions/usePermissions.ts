@@ -134,6 +134,25 @@ export const usePermissions = (): PermissionActions => {
   };
 
   const requestPermissions = async (): Promise<PermissionState> => {
+    if (Platform.OS === 'android') {
+      // Concurrent PermissionsAndroid.request calls can drop one result and never resolve.
+      try {
+        const result = await PermissionsAndroid.requestMultiple([
+          PermissionsAndroid.PERMISSIONS.CAMERA,
+          PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+        ]);
+        const toStatus = (value?: string): PermissionStatus =>
+          value === PermissionsAndroid.RESULTS.GRANTED ? 'granted' : 'denied';
+        return {
+          camera: toStatus(result[PermissionsAndroid.PERMISSIONS.CAMERA]),
+          microphone: toStatus(
+            result[PermissionsAndroid.PERMISSIONS.RECORD_AUDIO],
+          ),
+        };
+      } catch {
+        return { camera: 'denied', microphone: 'denied' };
+      }
+    }
     const [camera, microphone] = await Promise.all([
       requestCameraPermission(),
       requestMicrophonePermission(),
