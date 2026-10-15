@@ -5,6 +5,7 @@ import {
   GetMyScheduledLivesResponse,
   StartLiveResponse,
   JoinLiveResponse,
+  JoinLiveRole,
   EndLiveResponse,
 } from '../domain/liveTypes';
 
@@ -50,10 +51,15 @@ const START_LIVE_MUTATION = `
 const JOIN_LIVE_QUERY = `
   query JoinLive($channelName: String!, $role: String!) {
     joinLive(channelName: $channelName, role: $role) {
-      token
-      uid
       appId
       channelName
+      uid
+      rtcToken
+      chatUserId
+      chatToken
+      chatRoomId
+      chatAppKey
+      __typename
     }
   }
 `;
@@ -81,7 +87,7 @@ export const startLive = (title: string) =>
     variables: { title },
   });
 
-export const joinLive = (channelName: string, role: 'publisher') =>
+export const joinLive = (channelName: string, role: JoinLiveRole) =>
   graphqlRequest<JoinLiveResponse>({
     query: JOIN_LIVE_QUERY,
     variables: { channelName, role },

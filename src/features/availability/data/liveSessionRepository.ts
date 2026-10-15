@@ -119,20 +119,34 @@ export const joinLiveAsPublisher = async (
       'publisher',
     );
     const credentials = response.joinLive;
-    const hasToken = isNonEmptyString(credentials?.token);
+    const hasRtcToken = isNonEmptyString(credentials?.rtcToken);
     const hasAppId = isNonEmptyString(credentials?.appId);
     const hasUid =
       typeof credentials?.uid === 'number' && Number.isInteger(credentials.uid);
     const channelMatches = credentials?.channelName === channelName;
+    const hasChatCredentials =
+      isNonEmptyString(credentials?.chatUserId) &&
+      isNonEmptyString(credentials?.chatToken) &&
+      isNonEmptyString(credentials?.chatRoomId) &&
+      isNonEmptyString(credentials?.chatAppKey);
     liveLog('JoinLive response', {
-      hasToken,
+      hasRtcToken,
       hasAppId,
       hasUid,
       hasChannelName: isNonEmptyString(credentials?.channelName),
       channelMatches,
+      hasChatCredentials,
     });
-    if (!credentials || !hasToken || !hasAppId || !hasUid) {
+    if (!credentials || !hasRtcToken || !hasAppId || !hasUid) {
       throw new Error('Join live: server returned incomplete Agora credentials');
+    }
+    if (!hasChatCredentials) {
+      liveWarn('JoinLive response: incomplete chat credentials', {
+        hasChatUserId: isNonEmptyString(credentials.chatUserId),
+        hasChatToken: isNonEmptyString(credentials.chatToken),
+        hasChatRoomId: isNonEmptyString(credentials.chatRoomId),
+        hasChatAppKey: isNonEmptyString(credentials.chatAppKey),
+      });
     }
     if (!channelMatches) {
       throw new Error(

@@ -14,11 +14,17 @@ export interface LiveSession {
   createdAt: string;
 }
 
+export type JoinLiveRole = 'publisher' | 'audience';
+
 export interface JoinLiveCredentials {
-  token: string;
-  uid: number;
   appId: string;
   channelName: string;
+  uid: number;
+  rtcToken: string;
+  chatUserId: string;
+  chatToken: string;
+  chatRoomId: string;
+  chatAppKey: string;
 }
 
 export interface LiveSessionState {

@@ -198,7 +198,7 @@ export const useAgoraBroadcast = () => {
           role: 'broadcaster',
         });
         const joinResult = engine.joinChannel(
-          credentials.token,
+          credentials.rtcToken,
           credentials.channelName,
           credentials.uid,
           {
