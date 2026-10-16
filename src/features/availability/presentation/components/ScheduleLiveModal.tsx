@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useRef} from 'react';
 import {
   View,
   StyleSheet,
@@ -19,6 +19,12 @@ interface ScheduleLiveModalProps {
   onClose: () => void;
   onSchedule: (input: ScheduleLiveInput) => Promise<boolean>;
   isSubmitting?: boolean;
+  initialData?: {
+    title: string;
+    scheduledAt?: Date | null;
+    scheduledEndAt?: Date | null;
+  };
+  isEdit?: boolean;
 }
 
 type PickerTarget = 'start' | 'end';
@@ -41,13 +47,36 @@ export const ScheduleLiveModal: React.FC<ScheduleLiveModalProps> = ({
   onClose,
   onSchedule,
   isSubmitting = false,
+  initialData,
+  isEdit = false,
 }) => {
   const {theme} = useTheme();
-  const [title, setTitle] = useState('');
-  const [scheduledAt, setScheduledAt] = useState<Date | null>(null);
-  const [scheduledEndAt, setScheduledEndAt] = useState<Date | null>(null);
+  const [title, setTitle] = useState(initialData?.title ?? '');
+  const [scheduledAt, setScheduledAt] = useState<Date | null>(
+    initialData?.scheduledAt ?? null,
+  );
+  const [scheduledEndAt, setScheduledEndAt] = useState<Date | null>(
+    initialData?.scheduledEndAt ?? null,
+  );
   const [pickerTarget, setPickerTarget] = useState<PickerTarget | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
+  const initialDataRef = useRef(initialData);
+  initialDataRef.current = initialData;
+
+  // Prepopulate the form when the modal opens for an existing session.
+  // Only on open, so user edits are not wiped by later re-renders.
+  React.useEffect(() => {
+    if (!visible) {
+      return;
+    }
+    const data = initialDataRef.current;
+    if (data) {
+      setTitle(data.title);
+      setScheduledAt(data.scheduledAt ?? null);
+      setScheduledEndAt(data.scheduledEndAt ?? null);
+      setValidationError(null);
+    }
+  }, [visible]);
 
   const resetForm = () => {
     setTitle('');
@@ -109,7 +138,7 @@ export const ScheduleLiveModal: React.FC<ScheduleLiveModalProps> = ({
       setValidationError('Please select an end date and time.');
       return;
     }
-    if (scheduledAt.getTime() <= Date.now()) {
+    if (!isEdit && scheduledAt.getTime() <= Date.now()) {
       setValidationError('Please select a start time in the future.');
       return;
     }
@@ -161,7 +190,7 @@ export const ScheduleLiveModal: React.FC<ScheduleLiveModalProps> = ({
           <View
             style={[styles.header, {borderBottomColor: theme.colors.border}]}>
             <AppText variant="h4" color={theme.colors.text}>
-              Schedule Live Session
+              {isEdit ? 'Edit Live Session' : 'Schedule Live Session'}
             </AppText>
             <TouchableOpacity onPress={handleClose} disabled={isSubmitting}>
               <Icon name="close" size={24} color={theme.colors.text} />
@@ -309,7 +338,13 @@ export const ScheduleLiveModal: React.FC<ScheduleLiveModalProps> = ({
                 <Icon name="calendar" size={20} color={theme.colors.white} />
               )}
               <AppText variant="button" color={theme.colors.white}>
-                {isSubmitting ? 'Scheduling...' : 'Schedule'}
+                {isSubmitting
+                  ? isEdit
+                    ? 'Updating...'
+                    : 'Scheduling...'
+                  : isEdit
+                  ? 'Update'
+                  : 'Schedule'}
               </AppText>
             </TouchableOpacity>
           </View>

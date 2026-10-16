@@ -57,6 +57,8 @@ export interface LiveSessionState {
   isScheduling: boolean;
   isStarting: boolean;
   isEnding: boolean;
+  updatingLiveId: string | null;
+  deletingLiveId: string | null;
 }
 
 export interface ScheduleLiveInput {
@@ -85,4 +87,12 @@ export interface JoinLiveResponse {
 
 export interface EndLiveResponse {
   endLive: boolean | null;
+}
+
+export interface UpdateScheduledLiveResponse {
+  updateScheduledLive: LiveSession | null;
+}
+
+export interface DeleteScheduledLiveResponse {
+  deleteScheduledLive: boolean | null;
 }

@@ -7,6 +7,8 @@ import {
   JoinLiveResponse,
   JoinLiveRole,
   EndLiveResponse,
+  UpdateScheduledLiveResponse,
+  DeleteScheduledLiveResponse,
 } from '../domain/liveTypes';
 
 const SCHEDULE_LIVE_MUTATION = `
@@ -46,6 +48,36 @@ const GET_MY_SCHEDULED_LIVES_QUERY = `
       createdAt
       __typename
     }
+  }
+`;
+
+const UPDATE_SCHEDULED_LIVE_MUTATION = `
+  mutation UpdateScheduledLive(
+    $id: ID!
+    $title: String!
+    $scheduledAt: String!
+    $scheduledEndAt: String!
+  ) {
+    updateScheduledLive(
+      id: $id
+      title: $title
+      scheduledAt: $scheduledAt
+      scheduledEndAt: $scheduledEndAt
+    ) {
+      id
+      title
+      channelName
+      status
+      scheduledAt
+      scheduledEndAt
+      __typename
+    }
+  }
+`;
+
+const DELETE_SCHEDULED_LIVE_MUTATION = `
+  mutation DeleteScheduledLive($id: ID!) {
+    deleteScheduledLive(id: $id)
   }
 `;
 
@@ -115,4 +147,21 @@ export const endLive = (streamId: string) =>
   graphqlRequest<EndLiveResponse>({
     query: END_LIVE_MUTATION,
     variables: {streamId},
+  });
+
+export const updateScheduledLive = (id: string, input: ScheduleLiveInput) =>
+  graphqlRequest<UpdateScheduledLiveResponse>({
+    query: UPDATE_SCHEDULED_LIVE_MUTATION,
+    variables: {
+      id,
+      title: input.title,
+      scheduledAt: input.scheduledAt,
+      scheduledEndAt: input.scheduledEndAt,
+    },
+  });
+
+export const deleteScheduledLive = (id: string) =>
+  graphqlRequest<DeleteScheduledLiveResponse>({
+    query: DELETE_SCHEDULED_LIVE_MUTATION,
+    variables: {id},
   });

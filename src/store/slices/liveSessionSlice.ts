@@ -16,6 +16,8 @@ const initialState: LiveSessionState = {
   isScheduling: false,
   isStarting: false,
   isEnding: false,
+  updatingLiveId: null,
+  deletingLiveId: null,
 };
 
 export const fetchScheduledLivesThunk = createAsyncThunk<
@@ -62,6 +64,37 @@ export const endLiveThunk = createAsyncThunk<
   try {
     await liveSessionRepo.endLive(streamId);
     return streamId;
+  } catch (error) {
+    return rejectWithValue(getErrorMessage(error));
+  }
+});
+
+export const updateScheduledLiveThunk = createAsyncThunk<
+  LiveSession | null,
+  {id: string; title: string; scheduledAt: string; scheduledEndAt: string},
+  {rejectValue: string}
+>(
+  'liveSession/updateScheduled',
+  async ({id, title, scheduledAt, scheduledEndAt}, {rejectWithValue}) => {
+    try {
+      return await liveSessionRepo.updateScheduledLive(id, {
+        title,
+        scheduledAt,
+        scheduledEndAt,
+      });
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error));
+    }
+  },
+);
+
+export const deleteScheduledLiveThunk = createAsyncThunk<
+  boolean,
+  string,
+  {rejectValue: string}
+>('liveSession/deleteScheduled', async (id, {rejectWithValue}) => {
+  try {
+    return await liveSessionRepo.deleteScheduledLive(id);
   } catch (error) {
     return rejectWithValue(getErrorMessage(error));
   }
@@ -128,6 +161,24 @@ const liveSessionSlice = createSlice({
       })
       .addCase(endLiveThunk.rejected, state => {
         state.isEnding = false;
+      })
+      .addCase(updateScheduledLiveThunk.pending, (state, action) => {
+        state.updatingLiveId = action.meta.arg.id;
+      })
+      .addCase(updateScheduledLiveThunk.fulfilled, state => {
+        state.updatingLiveId = null;
+      })
+      .addCase(updateScheduledLiveThunk.rejected, state => {
+        state.updatingLiveId = null;
+      })
+      .addCase(deleteScheduledLiveThunk.pending, (state, action) => {
+        state.deletingLiveId = action.meta.arg;
+      })
+      .addCase(deleteScheduledLiveThunk.fulfilled, state => {
+        state.deletingLiveId = null;
+      })
+      .addCase(deleteScheduledLiveThunk.rejected, state => {
+        state.deletingLiveId = null;
       });
   },
 });

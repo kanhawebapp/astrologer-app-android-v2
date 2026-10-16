@@ -219,3 +219,39 @@ export const endLive = async (streamId: string): Promise<void> => {
     throw error;
   }
 };
+
+export const updateScheduledLive = async (
+  id: string,
+  input: ScheduleLiveInput,
+): Promise<LiveSession | null> => {
+  // liveLog('UpdateScheduledLive request', {sessionId: id});
+  if (!isNonEmptyString(id)) {
+    throw new Error('Update scheduled live: missing session id');
+  }
+  try {
+    const response = await liveSessionService.updateScheduledLive(id, input);
+    // liveLog('UpdateScheduledLive response', {
+    //   sessionId: response.updateScheduledLive?.id,
+    //   status: response.updateScheduledLive?.status,
+    // });
+    return response.updateScheduledLive ?? null;
+  } catch (error) {
+    liveWarn('UpdateScheduledLive error', describeError(error));
+    throw error;
+  }
+};
+
+export const deleteScheduledLive = async (id: string): Promise<boolean> => {
+  // liveLog('DeleteScheduledLive request', {sessionId: id});
+  if (!isNonEmptyString(id)) {
+    throw new Error('Delete scheduled live: missing session id');
+  }
+  try {
+    const response = await liveSessionService.deleteScheduledLive(id);
+    // liveLog('DeleteScheduledLive response', {sessionId: id, result: response.deleteScheduledLive});
+    return response.deleteScheduledLive === true;
+  } catch (error) {
+    liveWarn('DeleteScheduledLive error', describeError(error));
+    throw error;
+  }
+};
