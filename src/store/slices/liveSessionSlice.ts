@@ -1,11 +1,11 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import {
   LiveSession,
   LiveSessionState,
   ScheduleLiveInput,
 } from '../../features/availability/domain/liveTypes';
 import * as liveSessionRepo from '../../features/availability/data/liveSessionRepository';
-import { getErrorMessage } from '../../utils/helpers';
+import {getErrorMessage} from '../../utils/helpers';
 
 const initialState: LiveSessionState = {
   scheduledLives: [],
@@ -21,8 +21,8 @@ const initialState: LiveSessionState = {
 export const fetchScheduledLivesThunk = createAsyncThunk<
   LiveSession[],
   void,
-  { rejectValue: string }
->('liveSession/fetchScheduled', async (_, { rejectWithValue }) => {
+  {rejectValue: string}
+>('liveSession/fetchScheduled', async (_, {rejectWithValue}) => {
   try {
     return await liveSessionRepo.getMyScheduledLives();
   } catch (error) {
@@ -33,8 +33,8 @@ export const fetchScheduledLivesThunk = createAsyncThunk<
 export const scheduleLiveThunk = createAsyncThunk<
   LiveSession,
   ScheduleLiveInput,
-  { rejectValue: string }
->('liveSession/schedule', async (input, { rejectWithValue }) => {
+  {rejectValue: string}
+>('liveSession/schedule', async (input, {rejectWithValue}) => {
   try {
     return await liveSessionRepo.scheduleLive(input);
   } catch (error) {
@@ -45,8 +45,8 @@ export const scheduleLiveThunk = createAsyncThunk<
 export const startLiveThunk = createAsyncThunk<
   LiveSession,
   string,
-  { rejectValue: string }
->('liveSession/start', async (title, { rejectWithValue }) => {
+  {rejectValue: string}
+>('liveSession/start', async (title, {rejectWithValue}) => {
   try {
     return await liveSessionRepo.startLive(title);
   } catch (error) {
@@ -57,8 +57,8 @@ export const startLiveThunk = createAsyncThunk<
 export const endLiveThunk = createAsyncThunk<
   string,
   string,
-  { rejectValue: string }
->('liveSession/end', async (streamId, { rejectWithValue }) => {
+  {rejectValue: string}
+>('liveSession/end', async (streamId, {rejectWithValue}) => {
   try {
     await liveSessionRepo.endLive(streamId);
     return streamId;
@@ -93,8 +93,19 @@ const liveSessionSlice = createSlice({
       .addCase(scheduleLiveThunk.pending, state => {
         state.isScheduling = true;
       })
-      .addCase(scheduleLiveThunk.fulfilled, state => {
+      .addCase(scheduleLiveThunk.fulfilled, (state, action) => {
         state.isScheduling = false;
+        const session = action.payload;
+        const exists = state.scheduledLives.some(
+          item => item.id === session.id,
+        );
+        if (!exists) {
+          state.scheduledLives = [session, ...state.scheduledLives];
+        } else {
+          state.scheduledLives = state.scheduledLives.map(item =>
+            item.id === session.id ? session : item,
+          );
+        }
       })
       .addCase(scheduleLiveThunk.rejected, state => {
         state.isScheduling = false;
@@ -121,5 +132,5 @@ const liveSessionSlice = createSlice({
   },
 });
 
-export const { clearActiveLive } = liveSessionSlice.actions;
+export const {clearActiveLive} = liveSessionSlice.actions;
 export default liveSessionSlice.reducer;

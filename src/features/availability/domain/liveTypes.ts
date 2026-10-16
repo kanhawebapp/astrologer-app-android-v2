@@ -10,7 +10,11 @@ export interface LiveSession {
   title: string;
   channelName: string;
   status: LiveSessionStatus | string;
+  /** Epoch milliseconds as a numeric string from the API (not ISO). */
   scheduledAt?: string | null;
+  /** Epoch milliseconds as a numeric string from the API (not ISO). */
+  scheduledEndAt?: string | null;
+  /** Epoch milliseconds as a numeric string from the API (not ISO). */
   createdAt: string;
 }
 
@@ -57,7 +61,10 @@ export interface LiveSessionState {
 
 export interface ScheduleLiveInput {
   title: string;
+  /** ISO 8601 UTC date-time string (with Z suffix). */
   scheduledAt: string;
+  /** ISO 8601 UTC date-time string (with Z suffix). */
+  scheduledEndAt: string;
 }
 
 export interface ScheduleLiveResponse {

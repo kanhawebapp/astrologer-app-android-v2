@@ -5,26 +5,42 @@ import {
   ScheduleLiveInput,
 } from '../domain/liveTypes';
 import * as liveSessionService from './liveSessionService';
-import { describeError, liveLog, liveWarn } from './liveLogger';
+import {describeError, liveLog, liveWarn} from './liveLogger';
 
 const isNonEmptyString = (value: unknown): value is string =>
   typeof value === 'string' && value.trim().length > 0;
 
-// Backend timestamps may arrive as epoch strings (seconds or milliseconds) or ISO 8601.
+/**
+ * Parses live-session timestamps from the API.
+ * ScheduleLive / list responses return scheduledAt, scheduledEndAt, and createdAt
+ * as numeric millisecond strings (e.g. "1792149540000") — not ISO date strings.
+ * Do not treat those response fields as ISO; use Number(value) + new Date(ms).
+ */
 export const parseLiveTimestamp = (
   value: string | number | null | undefined,
 ): Date | null => {
   if (value === null || value === undefined || value === '') {
     return null;
   }
-  const raw = typeof value === 'number' ? String(value) : value.trim();
+  if (typeof value === 'number') {
+    if (!Number.isFinite(value)) {
+      return null;
+    }
+    const date = new Date(value);
+    return isNaN(date.getTime()) ? null : date;
+  }
+  const raw = value.trim();
   if (/^\d+$/.test(raw)) {
-    const num = Number(raw);
-    // Epoch values with 10 or fewer digits are seconds; longer values are milliseconds.
-    const ms = raw.length <= 10 ? num * 1000 : num;
+    const timestamp = Number(raw);
+    if (!Number.isFinite(timestamp)) {
+      return null;
+    }
+    // 10 or fewer digits → seconds; longer values → milliseconds (API contract).
+    const ms = raw.length <= 10 ? timestamp * 1000 : timestamp;
     const date = new Date(ms);
     return isNaN(date.getTime()) ? null : date;
   }
+  // Fallback for any legacy ISO values; primary response path is numeric ms above.
   const date = new Date(raw);
   return isNaN(date.getTime()) ? null : date;
 };
@@ -91,14 +107,22 @@ export const scheduleLive = async (
   liveLog('ScheduleLive request', {
     hasTitle: isNonEmptyString(input.title),
     scheduledAt: input.scheduledAt,
+    scheduledEndAt: input.scheduledEndAt,
   });
   try {
     const response = await liveSessionService.scheduleLive(input);
     const session = assertValidSession(response.scheduleLive, 'Schedule live');
     liveLog('ScheduleLive response', {
       sessionId: session.id,
+      astrologerId: session.astrologerId,
+      channelName: session.channelName,
       status: session.status,
       scheduledAt: session.scheduledAt,
+      scheduledEndAt: session.scheduledEndAt,
+      scheduledAtParsed: parseLiveTimestamp(session.scheduledAt)?.toISOString(),
+      scheduledEndAtParsed: parseLiveTimestamp(
+        session.scheduledEndAt,
+      )?.toISOString(),
     });
     return session;
   } catch (error) {
@@ -108,7 +132,7 @@ export const scheduleLive = async (
 };
 
 export const startLive = async (title: string): Promise<LiveSession> => {
-  liveLog('StartLive request', { hasTitle: isNonEmptyString(title) });
+  liveLog('StartLive request', {hasTitle: isNonEmptyString(title)});
   try {
     const response = await liveSessionService.startLive(title);
     const session = assertValidSession(response.startLive, 'Start live');
@@ -155,7 +179,9 @@ export const joinLiveAsPublisher = async (
       hasChatCredentials,
     });
     if (!credentials || !hasRtcToken || !hasAppId || !hasUid) {
-      throw new Error('Join live: server returned incomplete Agora credentials');
+      throw new Error(
+        'Join live: server returned incomplete Agora credentials',
+      );
     }
     if (!hasChatCredentials) {
       liveWarn('JoinLive response: incomplete chat credentials', {
@@ -178,13 +204,13 @@ export const joinLiveAsPublisher = async (
 };
 
 export const endLive = async (streamId: string): Promise<void> => {
-  liveLog('EndLive request', { streamId });
+  liveLog('EndLive request', {streamId});
   try {
     if (!isNonEmptyString(streamId)) {
       throw new Error('End live: missing stream id');
     }
     const response = await liveSessionService.endLive(streamId);
-    liveLog('EndLive response', { streamId, result: response.endLive });
+    liveLog('EndLive response', {streamId, result: response.endLive});
     if (response.endLive !== true) {
       throw new Error('End live: server did not confirm the session ended');
     }

@@ -1,4 +1,4 @@
-import { graphqlRequest } from '../../../services/graphqlClient';
+import {graphqlRequest} from '../../../services/graphqlClient';
 import {
   ScheduleLiveInput,
   ScheduleLiveResponse,
@@ -10,14 +10,25 @@ import {
 } from '../domain/liveTypes';
 
 const SCHEDULE_LIVE_MUTATION = `
-  mutation ScheduleLive($title: String!, $scheduledAt: String!) {
-    scheduleLive(title: $title, scheduledAt: $scheduledAt) {
+  mutation ScheduleLive(
+    $title: String!
+    $scheduledAt: String!
+    $scheduledEndAt: String!
+  ) {
+    scheduleLive(
+      title: $title
+      scheduledAt: $scheduledAt
+      scheduledEndAt: $scheduledEndAt
+    ) {
       id
+      astrologerId
       title
       channelName
       status
       scheduledAt
+      scheduledEndAt
       createdAt
+      __typename
     }
   }
 `;
@@ -26,11 +37,14 @@ const GET_MY_SCHEDULED_LIVES_QUERY = `
   query GetMyScheduledLives {
     getMyScheduledLives {
       id
+      astrologerId
       title
       channelName
       status
       scheduledAt
+      scheduledEndAt
       createdAt
+      __typename
     }
   }
 `;
@@ -73,7 +87,11 @@ const END_LIVE_MUTATION = `
 export const scheduleLive = (input: ScheduleLiveInput) =>
   graphqlRequest<ScheduleLiveResponse>({
     query: SCHEDULE_LIVE_MUTATION,
-    variables: { title: input.title, scheduledAt: input.scheduledAt },
+    variables: {
+      title: input.title,
+      scheduledAt: input.scheduledAt,
+      scheduledEndAt: input.scheduledEndAt,
+    },
   });
 
 export const getMyScheduledLives = () =>
@@ -84,17 +102,17 @@ export const getMyScheduledLives = () =>
 export const startLive = (title: string) =>
   graphqlRequest<StartLiveResponse>({
     query: START_LIVE_MUTATION,
-    variables: { title },
+    variables: {title},
   });
 
 export const joinLive = (channelName: string, role: JoinLiveRole) =>
   graphqlRequest<JoinLiveResponse>({
     query: JOIN_LIVE_QUERY,
-    variables: { channelName, role },
+    variables: {channelName, role},
   });
 
 export const endLive = (streamId: string) =>
   graphqlRequest<EndLiveResponse>({
     query: END_LIVE_MUTATION,
-    variables: { streamId },
+    variables: {streamId},
   });

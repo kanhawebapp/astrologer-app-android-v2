@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   View,
   StyleSheet,
@@ -10,9 +10,9 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import DatePicker from 'react-native-date-picker';
-import { AppText } from '../../../../components/common/AppText';
-import { useTheme } from '../../../../hooks/useTheme';
-import { ScheduleLiveInput } from '../../domain/liveTypes';
+import {AppText} from '../../../../components/common/AppText';
+import {useTheme} from '../../../../hooks/useTheme';
+import {ScheduleLiveInput} from '../../domain/liveTypes';
 
 interface ScheduleLiveModalProps {
   visible: boolean;
@@ -20,6 +20,10 @@ interface ScheduleLiveModalProps {
   onSchedule: (input: ScheduleLiveInput) => Promise<boolean>;
   isSubmitting?: boolean;
 }
+
+type PickerTarget = 'start' | 'end';
+
+const DEFAULT_DURATION_MS = 3 * 60 * 60 * 1000;
 
 const formatSelected = (date: Date) =>
   date.toLocaleString('en-US', {
@@ -38,15 +42,18 @@ export const ScheduleLiveModal: React.FC<ScheduleLiveModalProps> = ({
   onSchedule,
   isSubmitting = false,
 }) => {
-  const { theme } = useTheme();
+  const {theme} = useTheme();
   const [title, setTitle] = useState('');
   const [scheduledAt, setScheduledAt] = useState<Date | null>(null);
-  const [pickerOpen, setPickerOpen] = useState(false);
+  const [scheduledEndAt, setScheduledEndAt] = useState<Date | null>(null);
+  const [pickerTarget, setPickerTarget] = useState<PickerTarget | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
 
   const resetForm = () => {
     setTitle('');
     setScheduledAt(null);
+    setScheduledEndAt(null);
+    setPickerTarget(null);
     setValidationError(null);
   };
 
@@ -58,6 +65,34 @@ export const ScheduleLiveModal: React.FC<ScheduleLiveModalProps> = ({
     onClose();
   };
 
+  const openPicker = (target: PickerTarget) => {
+    if (isSubmitting) {
+      return;
+    }
+    setPickerTarget(target);
+  };
+
+  const handlePickerConfirm = (date: Date) => {
+    const target = pickerTarget;
+    setPickerTarget(null);
+    setValidationError(null);
+
+    if (target === 'start') {
+      setScheduledAt(date);
+      setScheduledEndAt(prev => {
+        if (!prev || prev.getTime() <= date.getTime()) {
+          return new Date(date.getTime() + DEFAULT_DURATION_MS);
+        }
+        return prev;
+      });
+      return;
+    }
+
+    if (target === 'end') {
+      setScheduledEndAt(date);
+    }
+  };
+
   const handleSchedule = async () => {
     if (isSubmitting) {
       return;
@@ -67,18 +102,28 @@ export const ScheduleLiveModal: React.FC<ScheduleLiveModalProps> = ({
       return;
     }
     if (!scheduledAt || isNaN(scheduledAt.getTime())) {
-      setValidationError('Please select a date and time.');
+      setValidationError('Please select a start date and time.');
+      return;
+    }
+    if (!scheduledEndAt || isNaN(scheduledEndAt.getTime())) {
+      setValidationError('Please select an end date and time.');
       return;
     }
     if (scheduledAt.getTime() <= Date.now()) {
-      setValidationError('Please select a time in the future.');
+      setValidationError('Please select a start time in the future.');
+      return;
+    }
+    if (scheduledEndAt.getTime() <= scheduledAt.getTime()) {
+      setValidationError('End time must be later than the start time.');
       return;
     }
     setValidationError(null);
 
+    // Date#toISOString() converts the local Date to UTC with a Z suffix.
     const scheduled = await onSchedule({
       title: title.trim(),
       scheduledAt: scheduledAt.toISOString(),
+      scheduledEndAt: scheduledEndAt.toISOString(),
     });
     if (scheduled) {
       resetForm();
@@ -86,7 +131,23 @@ export const ScheduleLiveModal: React.FC<ScheduleLiveModalProps> = ({
     }
   };
 
-  const isValid = title.trim().length > 0 && scheduledAt !== null;
+  const isValid =
+    title.trim().length > 0 && scheduledAt !== null && scheduledEndAt !== null;
+
+  const pickerDate =
+    pickerTarget === 'end'
+      ? scheduledEndAt ??
+        (scheduledAt
+          ? new Date(scheduledAt.getTime() + DEFAULT_DURATION_MS)
+          : new Date())
+      : scheduledAt ?? new Date();
+
+  const pickerMinimumDate =
+    pickerTarget === 'end'
+      ? scheduledAt
+        ? new Date(scheduledAt.getTime() + 60 * 1000)
+        : new Date()
+      : new Date();
 
   return (
     <Modal
@@ -94,11 +155,11 @@ export const ScheduleLiveModal: React.FC<ScheduleLiveModalProps> = ({
       transparent
       animationType="slide"
       onRequestClose={handleClose}>
-      <View style={[styles.overlay, { backgroundColor: theme.colors.overlay }]}>
+      <View style={[styles.overlay, {backgroundColor: theme.colors.overlay}]}>
         <View
-          style={[styles.container, { backgroundColor: theme.colors.surface }]}>
+          style={[styles.container, {backgroundColor: theme.colors.surface}]}>
           <View
-            style={[styles.header, { borderBottomColor: theme.colors.border }]}>
+            style={[styles.header, {borderBottomColor: theme.colors.border}]}>
             <AppText variant="h4" color={theme.colors.text}>
               Schedule Live Session
             </AppText>
@@ -141,7 +202,7 @@ export const ScheduleLiveModal: React.FC<ScheduleLiveModalProps> = ({
                 variant="body2"
                 color={theme.colors.textSecondary}
                 style={styles.label}>
-                Date & Time *
+                Start Date & Time *
               </AppText>
               <TouchableOpacity
                 style={[
@@ -152,7 +213,7 @@ export const ScheduleLiveModal: React.FC<ScheduleLiveModalProps> = ({
                     borderColor: theme.colors.border,
                   },
                 ]}
-                onPress={() => setPickerOpen(true)}
+                onPress={() => openPicker('start')}
                 disabled={isSubmitting}>
                 <Icon
                   name="calendar-outline"
@@ -166,7 +227,44 @@ export const ScheduleLiveModal: React.FC<ScheduleLiveModalProps> = ({
                   }>
                   {scheduledAt
                     ? formatSelected(scheduledAt)
-                    : 'Select date and time'}
+                    : 'Select start date and time'}
+                </AppText>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.inputGroup}>
+              <AppText
+                variant="body2"
+                color={theme.colors.textSecondary}
+                style={styles.label}>
+                End Date & Time *
+              </AppText>
+              <TouchableOpacity
+                style={[
+                  styles.input,
+                  styles.dateButton,
+                  {
+                    backgroundColor: theme.colors.surfaceSecondary,
+                    borderColor: theme.colors.border,
+                  },
+                ]}
+                onPress={() => openPicker('end')}
+                disabled={isSubmitting}>
+                <Icon
+                  name="time-outline"
+                  size={18}
+                  color={theme.colors.textSecondary}
+                />
+                <AppText
+                  variant="body2"
+                  color={
+                    scheduledEndAt
+                      ? theme.colors.text
+                      : theme.colors.textTertiary
+                  }>
+                  {scheduledEndAt
+                    ? formatSelected(scheduledEndAt)
+                    : 'Select end date and time'}
                 </AppText>
               </TouchableOpacity>
             </View>
@@ -181,12 +279,11 @@ export const ScheduleLiveModal: React.FC<ScheduleLiveModalProps> = ({
             )}
           </ScrollView>
 
-          <View
-            style={[styles.footer, { borderTopColor: theme.colors.border }]}>
+          <View style={[styles.footer, {borderTopColor: theme.colors.border}]}>
             <TouchableOpacity
               style={[
                 styles.cancelButton,
-                { backgroundColor: theme.colors.surfaceSecondary },
+                {backgroundColor: theme.colors.surfaceSecondary},
               ]}
               onPress={handleClose}
               disabled={isSubmitting}>
@@ -221,17 +318,17 @@ export const ScheduleLiveModal: React.FC<ScheduleLiveModalProps> = ({
 
       <DatePicker
         modal
-        open={pickerOpen}
-        date={scheduledAt ?? new Date()}
-        minimumDate={new Date()}
+        open={pickerTarget !== null}
+        date={pickerDate}
+        minimumDate={pickerMinimumDate}
         mode="datetime"
-        title="Select date and time"
-        onConfirm={date => {
-          setPickerOpen(false);
-          setScheduledAt(date);
-          setValidationError(null);
-        }}
-        onCancel={() => setPickerOpen(false)}
+        title={
+          pickerTarget === 'end'
+            ? 'Select end date and time'
+            : 'Select start date and time'
+        }
+        onConfirm={handlePickerConfirm}
+        onCancel={() => setPickerTarget(null)}
       />
     </Modal>
   );
