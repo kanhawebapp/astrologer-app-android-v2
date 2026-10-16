@@ -1,15 +1,15 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../../../store';
+import {useCallback, useEffect, useRef, useState} from 'react';
+import {useSelector} from 'react-redux';
+import {RootState} from '../../../../store';
 import {
   joinLiveAsPublisher,
   parseLiveTimestamp,
   toLiveChatCredentials,
 } from '../../data/liveSessionRepository';
-import { LiveChatCredentials } from '../../domain/liveTypes';
-import { getErrorMessage } from '../../../../utils/helpers';
-import { useAgoraBroadcast } from './useAgoraBroadcast';
-import { useEndLive, useMediaPermissions } from './useLiveSession';
+import {LiveChatCredentials} from '../../domain/liveTypes';
+import {getErrorMessage} from '../../../../utils/helpers';
+import {useAgoraBroadcast} from './useAgoraBroadcast';
+import {useEndLive, useMediaPermissions} from './useLiveSession';
 
 const formatDuration = (seconds: number): string => {
   const hrs = Math.floor(seconds / 3600);
@@ -46,9 +46,9 @@ export const useLiveBroadcast = (streamId: string) => {
       undefined,
   );
   const agora = useAgoraBroadcast();
-  const { start: startBroadcast, leave: leaveBroadcast } = agora;
-  const { ensureMediaPermissions, openSettings } = useMediaPermissions();
-  const { confirmEndLive, isEnding } = useEndLive();
+  const {start: startBroadcast, leave: leaveBroadcast} = agora;
+  const {ensureMediaPermissions, openSettings} = useMediaPermissions();
+  const {confirmEndLive, isEnding} = useEndLive();
 
   const [isJoining, setIsJoining] = useState(false);
   const [connectError, setConnectError] = useState<string | null>(null);
@@ -81,7 +81,9 @@ export const useLiveBroadcast = (streamId: string) => {
       const nextChat = toLiveChatCredentials(credentials);
       setIsChatUnavailable(nextChat === null);
       // Keep the existing chat connection when an RTC retry returns the same room.
-      setChatCredentials(prev => (isSameChatRoom(prev, nextChat) ? prev : nextChat));
+      setChatCredentials(prev =>
+        isSameChatRoom(prev, nextChat) ? prev : nextChat,
+      );
       await startBroadcast(credentials);
     } catch (error) {
       setConnectError(getErrorMessage(error));
@@ -151,6 +153,8 @@ export const useLiveBroadcast = (streamId: string) => {
     isEnding,
     isMicMuted: agora.isMicMuted,
     isCameraOff: agora.isCameraOff,
+    /** Unique remote RTC UIDs in the channel (excludes local broadcaster). */
+    rtcViewerCount: agora.viewerCount,
     formattedDuration: formatDuration(elapsedSeconds),
     toggleMic: agora.toggleMic,
     toggleCamera: agora.toggleCamera,

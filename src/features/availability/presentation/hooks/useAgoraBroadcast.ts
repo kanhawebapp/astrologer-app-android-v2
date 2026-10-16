@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import {
   createAgoraRtcEngine,
   ChannelProfileType,
@@ -12,13 +12,16 @@ import {
   LocalVideoStreamReason,
   LocalVideoStreamState,
 } from 'react-native-agora';
-import { JoinLiveCredentials } from '../../domain/liveTypes';
-import { getErrorMessage } from '../../../../utils/helpers';
+import {JoinLiveCredentials} from '../../domain/liveTypes';
 import {
-  describeError,
-  liveLog,
-  liveWarn,
-} from '../../data/liveLogger';
+  addAudiencePresence,
+  AudiencePresenceTracker,
+  createAudiencePresenceTracker,
+  removeAudiencePresence,
+  resetAudiencePresence,
+} from '../../domain/audiencePresenceTracker';
+import {getErrorMessage} from '../../../../utils/helpers';
+import {describeError, liveLog, liveWarn} from '../../data/liveLogger';
 
 export type BroadcastState =
   | 'idle'
@@ -54,6 +57,10 @@ export const useAgoraBroadcast = () => {
   const engineRef = useRef<IRtcEngine | null>(null);
   const handlerRef = useRef<IRtcEngineEventHandler | null>(null);
   const isStartingRef = useRef(false);
+  const localUidRef = useRef<number | null>(null);
+  const remoteAudienceRef = useRef<AudiencePresenceTracker<number>>(
+    createAudiencePresenceTracker<number>(),
+  );
   const [broadcastState, setBroadcastState] = useState<BroadcastState>('idle');
   const [broadcastError, setBroadcastError] = useState<string | null>(null);
   const [permissionDenied, setPermissionDenied] = useState(false);
@@ -61,10 +68,18 @@ export const useAgoraBroadcast = () => {
   const [isCameraOff, setIsCameraOff] = useState(false);
   // RtcSurfaceView binds via setupLocalVideo only once on mount, so it must not mount before the engine is initialized.
   const [isLocalVideoReady, setIsLocalVideoReady] = useState(false);
+  const [viewerCount, setViewerCount] = useState(0);
+
+  const resetRemoteAudience = useCallback(() => {
+    remoteAudienceRef.current = resetAudiencePresence<number>();
+    setViewerCount(0);
+  }, []);
 
   const releaseEngine = useCallback(() => {
     const engine = engineRef.current;
     engineRef.current = null;
+    localUidRef.current = null;
+    resetRemoteAudience();
     setIsLocalVideoReady(false);
     if (!engine) {
       return;
@@ -81,7 +96,7 @@ export const useAgoraBroadcast = () => {
       liveWarn('Agora engine release failed', describeError(error));
     }
     handlerRef.current = null;
-  }, []);
+  }, [resetRemoteAudience]);
 
   const start = useCallback(
     async (credentials: JoinLiveCredentials) => {
@@ -96,6 +111,8 @@ export const useAgoraBroadcast = () => {
       setBroadcastState('connecting');
       setIsMicMuted(false);
       setIsCameraOff(false);
+      localUidRef.current = credentials.uid;
+      resetRemoteAudience();
 
       try {
         liveLog('Agora initialization started');
@@ -114,20 +131,66 @@ export const useAgoraBroadcast = () => {
 
         const handler: IRtcEngineEventHandler = {
           onJoinChannelSuccess: (_connection, elapsed) => {
-            liveLog('Agora channel join succeeded', { elapsedMs: elapsed });
+            liveLog('Agora channel join succeeded', {elapsedMs: elapsed});
             setBroadcastState('live');
           },
           onRejoinChannelSuccess: (_connection, elapsed) => {
-            liveLog('Agora channel rejoin succeeded', { elapsedMs: elapsed });
+            liveLog('Agora channel rejoin succeeded', {elapsedMs: elapsed});
           },
           onLeaveChannel: () => {
             liveLog('Agora channel left');
+            resetRemoteAudience();
+          },
+          onUserJoined: (_connection, remoteUid) => {
+            try {
+              const next = addAudiencePresence(
+                remoteAudienceRef.current,
+                remoteUid,
+                localUidRef.current,
+              );
+              if (next === remoteAudienceRef.current) {
+                return;
+              }
+              remoteAudienceRef.current = next;
+              setViewerCount(next.count);
+              liveLog('Remote user joined channel', {
+                remoteUid,
+                viewerCount: next.count,
+              });
+            } catch (error) {
+              liveWarn(
+                'Failed to track remote user join',
+                describeError(error),
+              );
+            }
+          },
+          onUserOffline: (_connection, remoteUid) => {
+            try {
+              const next = removeAudiencePresence(
+                remoteAudienceRef.current,
+                remoteUid,
+              );
+              if (next === remoteAudienceRef.current) {
+                return;
+              }
+              remoteAudienceRef.current = next;
+              setViewerCount(next.count);
+              liveLog('Remote user left channel', {
+                remoteUid,
+                viewerCount: next.count,
+              });
+            } catch (error) {
+              liveWarn(
+                'Failed to track remote user leave',
+                describeError(error),
+              );
+            }
           },
           onError: (err, msg) => {
-            liveWarn('Agora error', { code: err, message: msg });
+            liveWarn('Agora error', {code: err, message: msg});
           },
           onConnectionStateChanged: (_connection, state, reason) => {
-            liveLog('Agora connection state changed', { state, reason });
+            liveLog('Agora connection state changed', {state, reason});
             if (state === ConnectionStateType.ConnectionStateConnected) {
               setBroadcastState('live');
               setBroadcastError(null);
@@ -147,7 +210,7 @@ export const useAgoraBroadcast = () => {
             }
           },
           onLocalVideoStateChanged: (source, state, reason) => {
-            liveLog('Camera state changed', { source, state, reason });
+            liveLog('Camera state changed', {source, state, reason});
             if (state === LocalVideoStreamState.LocalVideoStreamStateFailed) {
               const noPermission =
                 reason ===
@@ -161,7 +224,7 @@ export const useAgoraBroadcast = () => {
             }
           },
           onLocalAudioStateChanged: (_connection, state, reason) => {
-            liveLog('Microphone state changed', { state, reason });
+            liveLog('Microphone state changed', {state, reason});
             if (state === LocalAudioStreamState.LocalAudioStreamStateFailed) {
               const noPermission =
                 reason ===
@@ -183,10 +246,10 @@ export const useAgoraBroadcast = () => {
         );
         const videoResult = engine.enableVideo();
         engine.enableAudio();
-        liveLog('Video enabled', { roleResult, videoResult });
+        liveLog('Video enabled', {roleResult, videoResult});
         const previewResult = engine.startPreview();
         if (previewResult < 0) {
-          liveWarn('Camera preview failed to start', { code: previewResult });
+          liveWarn('Camera preview failed to start', {code: previewResult});
         } else {
           liveLog('Camera preview started');
         }
@@ -224,7 +287,7 @@ export const useAgoraBroadcast = () => {
         isStartingRef.current = false;
       }
     },
-    [releaseEngine],
+    [releaseEngine, resetRemoteAudience],
   );
 
   const leave = useCallback(() => {
@@ -243,7 +306,7 @@ export const useAgoraBroadcast = () => {
     }
     const next = !isMicMuted;
     const result = engine.muteLocalAudioStream(next);
-    liveLog('Microphone toggled', { muted: next, result });
+    liveLog('Microphone toggled', {muted: next, result});
     if (result === 0) {
       setIsMicMuted(next);
     }
@@ -268,7 +331,7 @@ export const useAgoraBroadcast = () => {
 
   const switchCamera = useCallback(() => {
     const result = engineRef.current?.switchCamera();
-    liveLog('Camera switched', { result });
+    liveLog('Camera switched', {result});
   }, []);
 
   // Release media on unmount; the server-side session is intentionally left running.
@@ -281,6 +344,8 @@ export const useAgoraBroadcast = () => {
     isMicMuted,
     isCameraOff,
     isLocalVideoReady,
+    /** Unique remote RTC UIDs currently in the channel (excludes local broadcaster). */
+    viewerCount,
     hasEngine: broadcastState !== 'idle' && broadcastState !== 'failed',
     start,
     leave,

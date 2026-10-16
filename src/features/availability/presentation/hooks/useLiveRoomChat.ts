@@ -9,9 +9,18 @@ import {
   ChatMessageEventListener,
   ChatMessageType,
   ChatOptions,
+  ChatRoomEventListener,
   ChatTextMessageBody,
 } from 'react-native-agora-chat';
 import {LiveChatCredentials, LiveChatMessage} from '../../domain/liveTypes';
+import {
+  addAudiencePresence,
+  AudiencePresenceTracker,
+  createAudiencePresenceTracker,
+  removeAudiencePresence,
+  replaceAudiencePresence,
+  resetAudiencePresence,
+} from '../../domain/audiencePresenceTracker';
 import {liveLog, liveWarn} from '../../data/liveLogger';
 
 export type LiveChatStatus =
@@ -134,8 +143,17 @@ export const useLiveRoomChat = ({
   const [error, setError] = useState<string | null>(null);
   const [messages, setMessages] = useState<LiveChatMessage[]>([]);
   const [attempt, setAttempt] = useState(0);
+  /**
+   * Chat-room members excluding the local broadcaster. Used as a reliable
+   * viewer signal when Agora LIVE_BROADCASTING does not emit onUserJoined
+   * for ClientRoleAudience (see DhwaniAstro useLiveAudienceRtc).
+   */
+  const [chatAudienceCount, setChatAudienceCount] = useState(0);
   const joinedRoomRef = useRef<string | null>(null);
   const messagesRoomRef = useRef<string | null>(null);
+  const chatAudienceRef = useRef<AudiencePresenceTracker<string>>(
+    createAudiencePresenceTracker<string>(),
+  );
   const messagesRef = useRef(messages);
   messagesRef.current = messages;
   const senderNameRef = useRef(senderName);
@@ -143,9 +161,15 @@ export const useLiveRoomChat = ({
   const refreshRef = useRef(refreshCredentials);
   refreshRef.current = refreshCredentials;
 
+  const resetChatAudience = useCallback(() => {
+    chatAudienceRef.current = resetAudiencePresence<string>();
+    setChatAudienceCount(0);
+  }, []);
+
   useEffect(() => {
     if (!enabled) {
       joinedRoomRef.current = null;
+      resetChatAudience();
       setStatus('idle');
       setError(null);
       return;
@@ -153,6 +177,7 @@ export const useLiveRoomChat = ({
     if (messagesRoomRef.current !== chatRoomId) {
       messagesRoomRef.current = chatRoomId;
       setMessages([]);
+      resetChatAudience();
     }
 
     const client = ChatClient.getInstance();
@@ -167,6 +192,7 @@ export const useLiveRoomChat = ({
         return;
       }
       joinedRoomRef.current = null;
+      resetChatAudience();
       setStatus('failed');
       setError(message);
     };
@@ -197,6 +223,34 @@ export const useLiveRoomChat = ({
       }
     };
 
+    const syncChatAudience = (next: AudiencePresenceTracker<string>) => {
+      if (next === chatAudienceRef.current) {
+        return;
+      }
+      chatAudienceRef.current = next;
+      setChatAudienceCount(next.count);
+    };
+
+    const loadRoomMembers = async () => {
+      try {
+        const page = await client.roomManager.fetchChatRoomMembers(chatRoomId);
+        if (!active) {
+          return;
+        }
+        const memberIds = (page?.list ?? []).filter(
+          (id): id is string => typeof id === 'string' && id.length > 0,
+        );
+        const next = replaceAudiencePresence(memberIds, chatUserId);
+        syncChatAudience(next);
+        liveLog('Live chat audience snapshot', {count: next.count});
+      } catch (membersError) {
+        liveWarn(
+          'Live chat audience snapshot unavailable',
+          describeChatError(membersError),
+        );
+      }
+    };
+
     const messageListener: ChatMessageEventListener = {
       onMessagesReceived: received => {
         if (!active) {
@@ -216,6 +270,48 @@ export const useLiveRoomChat = ({
       },
     };
 
+    const roomListener: ChatRoomEventListener = {
+      onMemberJoined: ({roomId, participant}) => {
+        if (!active || roomId !== chatRoomId || !participant) {
+          return;
+        }
+        const next = addAudiencePresence(
+          chatAudienceRef.current,
+          participant,
+          chatUserId,
+        );
+        syncChatAudience(next);
+        liveLog('Live chat member joined', {
+          participant,
+          audienceCount: next.count,
+        });
+      },
+      onMemberExited: ({roomId, participant}) => {
+        if (!active || roomId !== chatRoomId || !participant) {
+          return;
+        }
+        const next = removeAudiencePresence(
+          chatAudienceRef.current,
+          participant,
+        );
+        syncChatAudience(next);
+        liveLog('Live chat member left', {
+          participant,
+          audienceCount: next.count,
+        });
+      },
+      onMemberRemoved: ({roomId, participant}) => {
+        if (!active || roomId !== chatRoomId || !participant) {
+          return;
+        }
+        const next = removeAudiencePresence(
+          chatAudienceRef.current,
+          participant,
+        );
+        syncChatAudience(next);
+      },
+    };
+
     const connectionListener: ChatConnectEventListener = {
       onConnected: () => {
         if (!active || joinedRoomRef.current !== chatRoomId) {
@@ -228,6 +324,7 @@ export const useLiveRoomChat = ({
           wasDisconnected = false;
           // Room messages sent while offline are not redelivered, so backfill the gap.
           loadHistory();
+          loadRoomMembers();
         }
       },
       onDisconnected: () => {
@@ -325,6 +422,7 @@ export const useLiveRoomChat = ({
 
     client.chatManager.addMessageListener(messageListener);
     client.addConnectionListener(connectionListener);
+    client.roomManager.addRoomListener(roomListener);
     liveLog('Live chat connection started', {isRetry});
 
     enqueue(setup)
@@ -336,6 +434,7 @@ export const useLiveRoomChat = ({
         setStatus('connected');
         liveLog('Live chat room joined');
         loadHistory();
+        loadRoomMembers();
       })
       .catch(setupError => {
         liveWarn('Live chat connection failed', describeChatError(setupError));
@@ -345,11 +444,21 @@ export const useLiveRoomChat = ({
     return () => {
       active = false;
       joinedRoomRef.current = null;
+      resetChatAudience();
       client.chatManager.removeMessageListener(messageListener);
       client.removeConnectionListener(connectionListener);
+      client.roomManager.removeRoomListener(roomListener);
       enqueue(teardown);
     };
-  }, [enabled, chatAppKey, chatUserId, chatToken, chatRoomId, attempt]);
+  }, [
+    enabled,
+    chatAppKey,
+    chatUserId,
+    chatToken,
+    chatRoomId,
+    attempt,
+    resetChatAudience,
+  ]);
 
   const sendMessage = useCallback(
     async (text: string): Promise<boolean> => {
@@ -430,6 +539,8 @@ export const useLiveRoomChat = ({
     status,
     error,
     messages,
+    /** Chat-room members excluding the local broadcaster. */
+    chatAudienceCount,
     sendMessage,
     retryMessage,
     reconnect,

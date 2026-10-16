@@ -1,4 +1,4 @@
-import React, {memo, useCallback, useMemo, useState} from 'react';
+import React, {memo, useCallback, useEffect, useMemo, useState} from 'react';
 import {
   View,
   StyleSheet,
@@ -80,6 +80,8 @@ interface LiveChatPanelProps {
   isPreparing: boolean;
   senderName?: string;
   refreshCredentials: () => Promise<LiveChatCredentials>;
+  /** Chat-room audience count excluding the broadcaster (for viewer badge). */
+  onAudienceCountChange?: (count: number) => void;
 }
 
 export const LiveChatPanel = memo(
@@ -89,6 +91,7 @@ export const LiveChatPanel = memo(
     isPreparing,
     senderName,
     refreshCredentials,
+    onAudienceCountChange,
   }: LiveChatPanelProps) => {
     const {theme} = useTheme();
     const colors = theme.colors;
@@ -96,8 +99,25 @@ export const LiveChatPanel = memo(
     const [draft, setDraft] = useState('');
     const [isSending, setIsSending] = useState(false);
 
-    const {status, error, messages, sendMessage, retryMessage, reconnect} =
-      useLiveRoomChat({credentials, senderName, refreshCredentials});
+    const {
+      status,
+      error,
+      messages,
+      chatAudienceCount,
+      sendMessage,
+      retryMessage,
+      reconnect,
+    } = useLiveRoomChat({credentials, senderName, refreshCredentials});
+
+    useEffect(() => {
+      onAudienceCountChange?.(chatAudienceCount);
+    }, [chatAudienceCount, onAudienceCountChange]);
+
+    useEffect(() => {
+      return () => {
+        onAudienceCountChange?.(0);
+      };
+    }, [onAudienceCountChange]);
 
     // Inverted list keeps the newest message pinned to the bottom without manual scrolling.
     const reversedMessages = useMemo(() => [...messages].reverse(), [messages]);
