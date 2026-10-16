@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -9,24 +9,24 @@ import {
   Keyboard,
   Pressable,
 } from 'react-native';
-import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
-import {RouteProp, useNavigation, useRoute} from '@react-navigation/native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import {RtcSurfaceView} from 'react-native-agora';
-import {AppText} from '../../../../components/common/AppText';
-import {useTheme} from '../../../../hooks/useTheme';
+import { RtcSurfaceView } from 'react-native-agora';
+import { AppText } from '../../../../components/common/AppText';
+import { useTheme } from '../../../../hooks/useTheme';
 import {
   RootNavigationProp,
   RootStackParamList,
 } from '../../../../navigation/types';
-import {LiveSessionStatus} from '../../domain/liveTypes';
-import {useLiveBroadcast} from '../hooks/useLiveBroadcast';
-import {BroadcastState} from '../hooks/useAgoraBroadcast';
-import {useKeyboardInset} from '../hooks/useKeyboardInset';
-import {LiveChatPanel} from '../components/LiveChatPanel';
-import {ViewerCountBadge} from '../components/ViewerCountBadge';
+import { LiveSessionStatus } from '../../domain/liveTypes';
+import { useLiveBroadcast } from '../hooks/useLiveBroadcast';
+import { BroadcastState } from '../hooks/useAgoraBroadcast';
+import { useKeyboardInset } from '../hooks/useKeyboardInset';
+import { LiveChatPanel } from '../components/LiveChatPanel';
+import { ViewerCountBadge } from '../components/ViewerCountBadge';
 
-const LOCAL_VIDEO_CANVAS = {uid: 0};
+const LOCAL_VIDEO_CANVAS = { uid: 0 };
 
 const getStatusLabel = (
   state: BroadcastState,
@@ -51,7 +51,7 @@ const getStatusLabel = (
 };
 
 export const LiveBroadcastScreen: React.FC = () => {
-  const {theme} = useTheme();
+  const { theme } = useTheme();
   const colors = theme.colors;
   const navigation = useNavigation<RootNavigationProp>();
   const route = useRoute<RouteProp<RootStackParamList, 'LiveBroadcast'>>();
@@ -89,7 +89,7 @@ export const LiveBroadcastScreen: React.FC = () => {
   // ClientRoleAudience joins do not fire onUserJoined on the host in LIVE_BROADCASTING.
   const viewerCount = Math.max(rtcViewerCount, chatAudienceCount);
   const insets = useSafeAreaInsets();
-  const {isKeyboardVisible, keyboardInset, onRootLayout} = useKeyboardInset(
+  const { isKeyboardVisible, keyboardInset, onRootLayout } = useKeyboardInset(
     insets.bottom,
   );
 
@@ -104,7 +104,7 @@ export const LiveBroadcastScreen: React.FC = () => {
           'Leave broadcast?',
           'Your camera and microphone will stop, but the live session will stay open. You can return to it or end it from the Live tab.',
           [
-            {text: 'Stay', style: 'cancel'},
+            { text: 'Stay', style: 'cancel' },
             {
               text: 'Leave',
               style: 'destructive',
@@ -132,7 +132,7 @@ export const LiveBroadcastScreen: React.FC = () => {
         style={[
           styles.container,
           styles.centered,
-          {backgroundColor: colors.cosmicDeep},
+          { backgroundColor: colors.cosmicDeep },
         ]}
         edges={['top', 'bottom']}>
         <StatusBar barStyle="light-content" />
@@ -140,7 +140,7 @@ export const LiveBroadcastScreen: React.FC = () => {
           This live session is no longer active.
         </AppText>
         <TouchableOpacity
-          style={[styles.pillButton, {backgroundColor: colors.surface}]}
+          style={[styles.pillButton, { backgroundColor: colors.surface }]}
           onPress={() => navigation.goBack()}>
           <AppText variant="button" color={colors.text}>
             Go Back
@@ -159,7 +159,7 @@ export const LiveBroadcastScreen: React.FC = () => {
 
   return (
     <SafeAreaView
-      style={[styles.container, {backgroundColor: colors.cosmicDeep}]}
+      style={[styles.container, { backgroundColor: colors.cosmicDeep }]}
       edges={['top', 'bottom']}
       onLayout={onRootLayout}>
       <StatusBar barStyle="light-content" />
@@ -185,22 +185,22 @@ export const LiveBroadcastScreen: React.FC = () => {
         )}
 
         <View style={styles.topBar}>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={styles.iconButton}
             onPress={() => navigation.goBack()}
             accessibilityLabel="Back">
             <Icon name="chevron-back" size={24} color={colors.white} />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <View style={styles.statusCluster}>
             <View
               style={[
                 styles.statusPill,
                 isOnAir
-                  ? {backgroundColor: colors.error}
+                  ? { backgroundColor: colors.error }
                   : styles.statusPillIdle,
               ]}>
               {isOnAir && (
-                <View style={[styles.dot, {backgroundColor: colors.white}]} />
+                <View style={[styles.dot, { backgroundColor: colors.white }]} />
               )}
               <AppText variant="caption" color={colors.white}>
                 {statusLabel}
@@ -215,7 +215,7 @@ export const LiveBroadcastScreen: React.FC = () => {
               </View>
             ) : null}
           </View>
-          <View style={styles.iconButton} />
+          {/* <View style={styles.iconButton} /> */}
         </View>
 
         <AppText
@@ -227,12 +227,12 @@ export const LiveBroadcastScreen: React.FC = () => {
         </AppText>
 
         <Pressable
-          style={[styles.bottomOverlay, {paddingBottom: keyboardInset}]}
+          style={[styles.bottomOverlay, { paddingBottom: keyboardInset }]}
           onPress={Keyboard.dismiss}
           accessible={false}>
           {error && (
             <View
-              style={[styles.errorBox, {backgroundColor: colors.errorLight}]}>
+              style={[styles.errorBox, { backgroundColor: colors.errorLight }]}>
               <AppText variant="body2" color={colors.error}>
                 {error}
               </AppText>
@@ -241,7 +241,7 @@ export const LiveBroadcastScreen: React.FC = () => {
                   <TouchableOpacity
                     style={[
                       styles.pillButton,
-                      {backgroundColor: colors.surface},
+                      { backgroundColor: colors.surface },
                     ]}
                     onPress={retry}>
                     <AppText variant="button" color={colors.text}>
@@ -253,7 +253,7 @@ export const LiveBroadcastScreen: React.FC = () => {
                   <TouchableOpacity
                     style={[
                       styles.pillButton,
-                      {backgroundColor: colors.surface},
+                      { backgroundColor: colors.surface },
                     ]}
                     onPress={openSettings}>
                     <AppText variant="button" color={colors.text}>
@@ -315,7 +315,7 @@ export const LiveBroadcastScreen: React.FC = () => {
         <TouchableOpacity
           style={[
             styles.endButton,
-            {backgroundColor: isEnding ? colors.textTertiary : colors.error},
+            { backgroundColor: isEnding ? colors.textTertiary : colors.error },
           ]}
           onPress={handleEndLive}
           disabled={isEnding}
