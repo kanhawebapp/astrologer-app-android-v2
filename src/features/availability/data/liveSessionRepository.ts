@@ -79,7 +79,7 @@ const assertValidSession = (
 };
 
 export const getMyScheduledLives = async (): Promise<LiveSession[]> => {
-  liveLog('GetMyScheduledLives request');
+  // liveLog('GetMyScheduledLives request');
   try {
     const response = await liveSessionService.getMyScheduledLives();
     const list = response.getMyScheduledLives;
@@ -90,10 +90,10 @@ export const getMyScheduledLives = async (): Promise<LiveSession[]> => {
       return [];
     }
     const valid = list.filter(item => item && isNonEmptyString(item.id));
-    liveLog('GetMyScheduledLives response', {
-      count: list.length,
-      validCount: valid.length,
-    });
+    // liveLog('GetMyScheduledLives response', {
+    //   count: list.length,
+    //   validCount: valid.length,
+    // });
     return valid;
   } catch (error) {
     liveWarn('GetMyScheduledLives error', describeError(error));
@@ -104,26 +104,26 @@ export const getMyScheduledLives = async (): Promise<LiveSession[]> => {
 export const scheduleLive = async (
   input: ScheduleLiveInput,
 ): Promise<LiveSession> => {
-  liveLog('ScheduleLive request', {
-    hasTitle: isNonEmptyString(input.title),
-    scheduledAt: input.scheduledAt,
-    scheduledEndAt: input.scheduledEndAt,
-  });
+  // liveLog('ScheduleLive request', {
+  //   hasTitle: isNonEmptyString(input.title),
+  //   scheduledAt: input.scheduledAt,
+  //   scheduledEndAt: input.scheduledEndAt,
+  // });
   try {
     const response = await liveSessionService.scheduleLive(input);
     const session = assertValidSession(response.scheduleLive, 'Schedule live');
-    liveLog('ScheduleLive response', {
-      sessionId: session.id,
-      astrologerId: session.astrologerId,
-      channelName: session.channelName,
-      status: session.status,
-      scheduledAt: session.scheduledAt,
-      scheduledEndAt: session.scheduledEndAt,
-      scheduledAtParsed: parseLiveTimestamp(session.scheduledAt)?.toISOString(),
-      scheduledEndAtParsed: parseLiveTimestamp(
-        session.scheduledEndAt,
-      )?.toISOString(),
-    });
+    // liveLog('ScheduleLive response', {
+    //   sessionId: session.id,
+    //   astrologerId: session.astrologerId,
+    //   channelName: session.channelName,
+    //   status: session.status,
+    //   scheduledAt: session.scheduledAt,
+    //   scheduledEndAt: session.scheduledEndAt,
+    //   scheduledAtParsed: parseLiveTimestamp(session.scheduledAt)?.toISOString(),
+    //   scheduledEndAtParsed: parseLiveTimestamp(
+    //     session.scheduledEndAt,
+    //   )?.toISOString(),
+    // });
     return session;
   } catch (error) {
     liveWarn('ScheduleLive error', describeError(error));
@@ -132,15 +132,15 @@ export const scheduleLive = async (
 };
 
 export const startLive = async (title: string): Promise<LiveSession> => {
-  liveLog('StartLive request', {hasTitle: isNonEmptyString(title)});
+  // liveLog('StartLive request', {hasTitle: isNonEmptyString(title)});
   try {
     const response = await liveSessionService.startLive(title);
     const session = assertValidSession(response.startLive, 'Start live');
-    liveLog('StartLive response', {
-      sessionId: session.id,
-      status: session.status,
-      hasChannelName: true,
-    });
+    // liveLog('StartLive response', {
+    //   sessionId: session.id,
+    //   status: session.status,
+    //   hasChannelName: true,
+    // });
     return session;
   } catch (error) {
     liveWarn('StartLive error', describeError(error));
@@ -170,14 +170,14 @@ export const joinLiveAsPublisher = async (
       typeof credentials?.uid === 'number' && Number.isInteger(credentials.uid);
     const channelMatches = credentials?.channelName === channelName;
     const hasChatCredentials = toLiveChatCredentials(credentials) !== null;
-    liveLog('JoinLive response', {
-      hasRtcToken,
-      hasAppId,
-      hasUid,
-      hasChannelName: isNonEmptyString(credentials?.channelName),
-      channelMatches,
-      hasChatCredentials,
-    });
+    // liveLog('JoinLive response', {
+    //   hasRtcToken,
+    //   hasAppId,
+    //   hasUid,
+    //   hasChannelName: isNonEmptyString(credentials?.channelName),
+    //   channelMatches,
+    //   hasChatCredentials,
+    // });
     if (!credentials || !hasRtcToken || !hasAppId || !hasUid) {
       throw new Error(
         'Join live: server returned incomplete Agora credentials',
@@ -204,13 +204,13 @@ export const joinLiveAsPublisher = async (
 };
 
 export const endLive = async (streamId: string): Promise<void> => {
-  liveLog('EndLive request', {streamId});
+  // liveLog('EndLive request', {streamId});
   try {
     if (!isNonEmptyString(streamId)) {
       throw new Error('End live: missing stream id');
     }
     const response = await liveSessionService.endLive(streamId);
-    liveLog('EndLive response', {streamId, result: response.endLive});
+    // liveLog('EndLive response', {streamId, result: response.endLive});
     if (response.endLive !== true) {
       throw new Error('End live: server did not confirm the session ended');
     }
