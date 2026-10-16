@@ -140,6 +140,7 @@ export const AvailabilityScreen: React.FC = () => {
             onSchedulePress={() => setShowScheduleModal(true)}
             onEndLive={session => confirmEndLive(session)}
             onStartLive={handleStartScheduledLive}
+            onRefresh={refreshLive}
           />
         </View>
 
@@ -169,13 +170,13 @@ export const AvailabilityScreen: React.FC = () => {
           />
         </View> */}
 
-        <View style={styles.section}>
+        {/* <View style={styles.section}>
           <WorkingHoursCard
             availability={availability}
             onUpdateWorkingHours={updateWorkingHours}
             isLoading={isUpdating}
           />
-        </View>
+        </View> */}
 
         {/* <View style={[styles.section, styles.lastSection]}>
           <InfoBanner availability={availability} isMockData={isMockData} />

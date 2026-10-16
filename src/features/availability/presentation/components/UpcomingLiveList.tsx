@@ -1,33 +1,18 @@
-import React, {useEffect, useMemo, useRef, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {
   View,
   StyleSheet,
   FlatList,
   ActivityIndicator,
   TouchableOpacity,
-  Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {AppText} from '../../../../components/common/AppText';
 import {useTheme} from '../../../../hooks/useTheme';
-import {useDispatch, useSelector} from 'react-redux';
-import {useToast} from '../../../../hooks/useToast';
-import {getErrorMessage} from '../../../../utils/helpers';
-import {RootState, AppDispatch} from '../../../../store';
-import {
-  updateScheduledLiveThunk,
-  deleteScheduledLiveThunk,
-  fetchScheduledLivesThunk,
-} from '../../../../store/slices/liveSessionSlice';
-import {
-  LiveSession,
-  LiveSessionStatus,
-  ScheduleLiveInput,
-} from '../../domain/liveTypes';
+import {LiveSession, LiveSessionStatus} from '../../domain/liveTypes';
 import {parseLiveTimestamp} from '../../data/liveSessionRepository';
 import {liveLog} from '../../data/liveLogger';
 import {LiveSessionItem} from './LiveSessionItem';
-import {ScheduleLiveModal} from './ScheduleLiveModal';
 
 interface UpcomingLiveListProps {
   sessions: LiveSession[];
@@ -40,19 +25,8 @@ interface UpcomingLiveListProps {
   onSchedulePress: () => void;
   onEndLive: (session: LiveSession) => void;
   onStartLive: (session: LiveSession) => void;
+  onRefresh: () => void;
 }
-
-const parseEditDate = (value: string | null | undefined): Date | null => {
-  if (value === null || value === undefined || value === '') {
-    return null;
-  }
-  if (/^\d+$/.test(value.trim())) {
-    const date = new Date(Number(value.trim()));
-    return isNaN(date.getTime()) ? null : date;
-  }
-  const date = new Date(value);
-  return isNaN(date.getTime()) ? null : date;
-};
 
 export const UpcomingLiveList: React.FC<UpcomingLiveListProps> = ({
   sessions,
@@ -65,20 +39,9 @@ export const UpcomingLiveList: React.FC<UpcomingLiveListProps> = ({
   onSchedulePress: _onSchedulePress,
   onEndLive,
   onStartLive,
+  onRefresh,
 }) => {
   const {theme} = useTheme();
-  const dispatch = useDispatch<AppDispatch>();
-  const {showSuccess, showError} = useToast();
-
-  const updatingLiveId = useSelector(
-    (state: RootState) => state.liveSession.updatingLiveId,
-  );
-  const deletingLiveId = useSelector(
-    (state: RootState) => state.liveSession.deletingLiveId,
-  );
-
-  const updateRef = useRef(false);
-  const deleteRef = useRef(false);
 
   // Re-read only when the list fetch starts or settles (focus, pull-to-refresh, refetch completion); no timers by design.
   const [evaluatedAt, setEvaluatedAt] = useState(Date.now);
@@ -112,90 +75,6 @@ export const UpcomingLiveList: React.FC<UpcomingLiveListProps> = ({
     });
     return ids;
   }, [sessions, evaluatedAt]);
-
-  const [editingSession, setEditingSession] = useState<LiveSession | null>(
-    null,
-  );
-
-  const isItemBusy = (id: string) =>
-    updatingLiveId === id || deletingLiveId === id;
-
-  const handleEditPress = (session: LiveSession) => {
-    setEditingSession(session);
-  };
-
-  const handleEditClose = () => {
-    setEditingSession(null);
-  };
-
-  const handleUpdate = async (input: ScheduleLiveInput): Promise<boolean> => {
-    if (!editingSession || updateRef.current) {
-      return false;
-    }
-    updateRef.current = true;
-    try {
-      await dispatch(
-        updateScheduledLiveThunk({
-          id: editingSession.id,
-          title: input.title.trim(),
-          scheduledAt: input.scheduledAt,
-          scheduledEndAt: input.scheduledEndAt,
-        }),
-      ).unwrap();
-      dispatch(fetchScheduledLivesThunk());
-      return true;
-    } catch (err) {
-      showError(getErrorMessage(err), 'Could not update session');
-      return false;
-    } finally {
-      updateRef.current = false;
-    }
-  };
-
-  const handleDeletePress = (session: LiveSession) => {
-    Alert.alert(
-      'Delete Live Session',
-      `Are you sure you want to delete "${session.title}"?`,
-      [
-        {text: 'Cancel', style: 'cancel'},
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            if (deleteRef.current || !session.id) {
-              return;
-            }
-            deleteRef.current = true;
-            try {
-              const deleted = await dispatch(
-                deleteScheduledLiveThunk(session.id),
-              ).unwrap();
-              if (deleted === true) {
-                dispatch(fetchScheduledLivesThunk());
-                showSuccess('Live session deleted');
-              } else {
-                showError(
-                  'Could not delete the session. Please try again.',
-                  'Delete failed',
-                );
-              }
-            } catch (err) {
-              showError(getErrorMessage(err), 'Could not delete session');
-            } finally {
-              deleteRef.current = false;
-            }
-          },
-        },
-      ],
-    );
-  };
-
-  const startDate = editingSession
-    ? parseEditDate(editingSession.scheduledAt ?? null)
-    : null;
-  const endDate = editingSession
-    ? parseEditDate(editingSession.scheduledEndAt ?? null)
-    : null;
 
   if (error && sessions.length === 0) {
     return (
@@ -330,71 +209,18 @@ export const UpcomingLiveList: React.FC<UpcomingLiveListProps> = ({
         data={sessions}
         keyExtractor={item => item.id}
         renderItem={({item}) => (
-          <View style={styles.itemWrapper}>
-            <LiveSessionItem
-              session={item}
-              onEndLive={item.id === activeLiveId ? undefined : onEndLive}
-              canStartLive={!activeLiveId && startableIds.has(item.id)}
-              isStarting={isStarting}
-              onStartLive={onStartLive}
-            />
-            {item.status === LiveSessionStatus.SCHEDULED && (
-              <View style={styles.actionsRow}>
-                <TouchableOpacity
-                  style={[
-                    styles.actionButton,
-                    {backgroundColor: theme.colors.primary},
-                  ]}
-                  onPress={() => handleEditPress(item)}
-                  disabled={isItemBusy(item.id)}
-                  activeOpacity={0.8}>
-                  <Icon
-                    name="create-outline"
-                    size={16}
-                    color={theme.colors.white}
-                  />
-                  <AppText variant="caption" color={theme.colors.white}>
-                    Edit
-                  </AppText>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.actionButton,
-                    {backgroundColor: theme.colors.error},
-                  ]}
-                  onPress={() => handleDeletePress(item)}
-                  disabled={isItemBusy(item.id)}
-                  activeOpacity={0.8}>
-                  <Icon
-                    name="trash-outline"
-                    size={16}
-                    color={theme.colors.white}
-                  />
-                  <AppText variant="caption" color={theme.colors.white}>
-                    Delete
-                  </AppText>
-                </TouchableOpacity>
-              </View>
-            )}
-          </View>
+          <LiveSessionItem
+            session={item}
+            onEndLive={item.id === activeLiveId ? undefined : onEndLive}
+            canStartLive={!activeLiveId && startableIds.has(item.id)}
+            isStarting={isStarting}
+            onStartLive={onStartLive}
+            onRefresh={onRefresh}
+          />
         )}
-        extraData={[startableIds, updatingLiveId, deletingLiveId]}
+        extraData={[startableIds]}
         scrollEnabled={false}
       />
-      {editingSession && (
-        <ScheduleLiveModal
-          visible
-          onClose={handleEditClose}
-          onSchedule={handleUpdate}
-          isSubmitting={updatingLiveId === editingSession.id}
-          initialData={{
-            title: editingSession.title,
-            scheduledAt: startDate,
-            scheduledEndAt: endDate,
-          }}
-          isEdit
-        />
-      )}
     </View>
   );
 };
@@ -463,23 +289,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     minWidth: 120,
     alignItems: 'center',
-  },
-  itemWrapper: {
-    marginBottom: 12,
-  },
-  actionsRow: {
-    flexDirection: 'row',
-    marginTop: 12,
-    gap: 10,
-  },
-  actionButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 10,
-    gap: 6,
   },
 });
 
