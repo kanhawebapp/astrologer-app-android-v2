@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, FlatList, ActivityIndicator, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Header } from '../../../../components';
 import { AppText } from '../../../../components/common/AppText';
@@ -20,6 +20,32 @@ const SessionMessagesScreen: React.FC = () => {
   const [messages, setMessages] = useState<SessionMessage[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
+
+  const extractImageUrl = (imageString: string | null): string | null => {
+    if (!imageString) {
+      return null;
+    }
+
+    // Check if it's markdown format: [url](url) or just [url]
+    const markdownMatch = imageString.match(/\[([^\]]+)\]\([^)]+\)/);
+    if (markdownMatch) {
+      return markdownMatch[1];
+    }
+
+    // Check if it's just wrapped in brackets
+    const bracketMatch = imageString.match(/^\[([^\]]+)\]$/);
+    if (bracketMatch) {
+      return bracketMatch[1];
+    }
+
+    // Otherwise return as is (normal URL)
+    return imageString;
+  };
+
+  const handleImageError = (messageId: string) => {
+    setImageErrors(prev => ({ ...prev, [messageId]: true }));
+  };
 
 
   const formatMessageTime = (time?: string): string => {
@@ -72,6 +98,8 @@ const SessionMessagesScreen: React.FC = () => {
 
   const renderMessage = ({ item }: { item: SessionMessage }) => {
     const isAstrologer = item.sender?.toLowerCase() === 'astrologer';
+    const imageUrl = extractImageUrl(item.image);
+    const hasImageError = imageErrors[item.id];
     console.log("item>>>", item)
     return (
       <View
@@ -97,25 +125,34 @@ const SessionMessagesScreen: React.FC = () => {
             {item.sender}
           </AppText>
 
-          {item.image ? (
-            <View style={styles.imagePlaceholder}>
-              <Icon name="image" size={24} color={theme.colors.textTertiary} />
-              <AppText
-                variant="caption"
-                color={
-                  isAstrologer ? theme.colors.white : theme.colors.textSecondary
-                }
-                style={styles.imageLabel}>
-                Image
-              </AppText>
-            </View>
+          {imageUrl ? (
+            hasImageError ? (
+              <View style={styles.imagePlaceholder}>
+                <Icon name="broken-image" size={24} color={theme.colors.textTertiary} />
+                <AppText
+                  variant="caption"
+                  color={
+                    isAstrologer ? theme.colors.white : theme.colors.textSecondary
+                  }
+                  style={styles.imageLabel}>
+                  Image
+                </AppText>
+              </View>
+            ) : (
+              <Image
+                source={{ uri: imageUrl }}
+                style={styles.image}
+                resizeMode="cover"
+                onError={() => handleImageError(item.id)}
+              />
+            )
           ) : null}
 
           {item.message ? (
             <AppText
               variant="body2"
               color={isAstrologer ? theme.colors.white : theme.colors.text}
-              style={item.image ? styles.messageWithImage : undefined}>
+              style={imageUrl ? styles.messageWithImage : undefined}>
               {item.message}
             </AppText>
           ) : null}
@@ -249,14 +286,22 @@ const styles = StyleSheet.create({
   },
   imagePlaceholder: {
     padding: 20,
-    borderRadius: 8,
+    borderRadius: 10,
     backgroundColor: 'rgba(0,0,0,0.1)',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
+    width: 220,
+    height: 180,
   },
   imageLabel: {
     fontSize: 12,
+  },
+  image: {
+    width: 220,
+    height: 180,
+    borderRadius: 10,
+    marginBottom: 4,
   },
 });
 
