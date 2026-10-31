@@ -37,6 +37,15 @@ interface MessageRowProps {
 const MessageRow = memo(({item, onRetry}: MessageRowProps) => {
   const {theme} = useTheme();
   const colors = theme.colors;
+
+   const senderName = item.isOwn
+      ? 'You'
+      : (() => {
+          const name = item.senderId?.split('_')[0] || item.senderName || '';
+
+          return name.charAt(0).toUpperCase() + name.slice(1);
+        })();
+
   return (
     <View style={styles.messageRow}>
       <View style={styles.messageHeader}>
@@ -45,7 +54,7 @@ const MessageRow = memo(({item, onRetry}: MessageRowProps) => {
           color={item.isOwn ? colors.accentGold : colors.white}
           numberOfLines={1}
           style={styles.senderName}>
-          {item.isOwn ? 'You' : item.senderName || item.senderId}
+          {senderName}
         </AppText>
         <AppText variant="caption" color={MUTED_TEXT}>
           {formatMessageTime(item.timestamp)}
