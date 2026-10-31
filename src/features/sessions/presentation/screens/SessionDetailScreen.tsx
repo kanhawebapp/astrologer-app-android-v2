@@ -102,6 +102,7 @@ const SessionDetailScreen: React.FC = () => {
 
   const statusColor = getStatusColor();
   const typeLabel = session.type === SessionType.CHAT ? 'Chat' : 'Call';
+  const isCancelled = session?.status?.toUpperCase() === 'CANCELLED';
 
   return (
     <ScreenContainer scrollable={false} withPadding={false}>
@@ -265,24 +266,26 @@ const SessionDetailScreen: React.FC = () => {
         </View>
 
         <View style={styles.actionContainer}>
-          <TouchableOpacity
-            style={[
-              styles.primaryAction,
-              {
-                borderColor: theme.colors.secondary,
-              },
-            ]}
-            onPress={() => {
-              setShowRemedyModal(true);
-            }}>
-            <Icon name="spa" size={20} color={theme.colors.primary} />
+          {!isCancelled && (
+            <TouchableOpacity
+              style={[
+                styles.primaryAction,
+                {
+                  borderColor: theme.colors.secondary,
+                },
+              ]}
+              onPress={() => {
+                setShowRemedyModal(true);
+              }}>
+              <Icon name="spa" size={20} color={theme.colors.primary} />
 
-            <AppText style={[styles.actionText, { color: theme.colors.primary }]}>
-              Send Remedy
-            </AppText>
-          </TouchableOpacity>
+              <AppText style={[styles.actionText, { color: theme.colors.primary }]}>
+                Send Remedy
+              </AppText>
+            </TouchableOpacity>
+          )}
 
-          {session.type === SessionType.CHAT && (
+          {session.type === SessionType.CHAT && !isCancelled && (
             <>
               {/* Kundli */}
               <TouchableOpacity
