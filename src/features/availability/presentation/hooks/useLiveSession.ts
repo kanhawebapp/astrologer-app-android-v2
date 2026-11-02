@@ -19,6 +19,7 @@ import {
 import {getErrorMessage} from '../../../../utils/helpers';
 import {RootNavigationProp} from '../../../../navigation/types';
 import {liveLog} from '../../data/liveLogger';
+import {useStartLiveToggleServices} from '../../../../services/api/startLiveToggleServices/useStartLiveToggleServices';
 
 export const useMediaPermissions = () => {
   const {checkPermissions, requestPermissions, openSettings} = usePermissions();
@@ -48,6 +49,8 @@ export const useMediaPermissions = () => {
 export const useEndLive = () => {
   const dispatch = useDispatch<AppDispatch>();
   const {showSuccess, showError} = useToast();
+  const {toggleLiveService, isLoading: isTogglingLiveOff} =
+    useStartLiveToggleServices();
   const activeLiveId = useSelector(
     (state: RootState) => state.liveSession.activeLive?.id,
   );
@@ -63,6 +66,16 @@ export const useEndLive = () => {
       }
       endingRef.current = true;
       try {
+        // 1–3. Call StartLiveToggleServices(status: false) and wait.
+        // Only proceed when success === true and message is exact.
+        const toggleResult = await toggleLiveService(false);
+        if (!toggleResult.ok) {
+          // showError(toggleResult.message);
+          return;
+        }
+
+        // 4. API confirmed LIVE disabled — stop Agora, clean up, navigate.
+        // showSuccess(toggleResult.response.message);
         await dispatch(endLiveThunk(session.id)).unwrap();
         onEnded?.();
         if (activeLiveId === session.id) {
@@ -77,7 +90,7 @@ export const useEndLive = () => {
         endingRef.current = false;
       }
     },
-    [activeLiveId, dispatch, showError, showSuccess],
+    [activeLiveId, dispatch, showError, showSuccess, toggleLiveService],
   );
 
   const confirmEndLive = useCallback(
@@ -103,7 +116,7 @@ export const useEndLive = () => {
     [endSession],
   );
 
-  return {confirmEndLive, isEnding};
+  return {confirmEndLive, isEnding: isEnding || isTogglingLiveOff};
 };
 
 export const useLiveSession = () => {
@@ -112,6 +125,8 @@ export const useLiveSession = () => {
   const {showSuccess, showError} = useToast();
   const {ensureMediaPermissions, openSettings} = useMediaPermissions();
   const {confirmEndLive, isEnding} = useEndLive();
+  const {toggleLiveService, isLoading: isTogglingLiveOn} =
+    useStartLiveToggleServices();
   const {
     scheduledLives,
     activeLive,
@@ -163,6 +178,17 @@ export const useLiveSession = () => {
           showPermissionDeniedAlert(openSettings);
           return false;
         }
+
+        // 1–3. Call StartLiveToggleServices(status: true) and wait.
+        // Only proceed when success === true and message is exact.
+        const toggleResult = await toggleLiveService(true);
+        if (!toggleResult.ok) {
+          // showError(toggleResult.message);
+          return false;
+        }
+
+        // 4. API confirmed LIVE enabled — start Agora session and navigate.
+        // showSuccess(toggleResult.response.message);
         const session = await dispatch(startLiveThunk(trimmed)).unwrap();
         refresh();
         openBroadcast(session);
@@ -182,6 +208,8 @@ export const useLiveSession = () => {
       openBroadcast,
       refresh,
       showError,
+      showSuccess,
+      toggleLiveService,
     ],
   );
 
@@ -246,7 +274,7 @@ export const useLiveSession = () => {
     hasLoaded,
     listError,
     isScheduling,
-    isStarting,
+    isStarting: isStarting || isTogglingLiveOn,
     isEnding,
     scheduleLive,
     startLive,
