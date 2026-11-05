@@ -29,6 +29,11 @@
     <!-- ================= FOREGROUND SERVICE ================= -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+    
+    <uses-permission
+    android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION"
+    tools:node="remove" />
+    
 
     <!-- ================= OPTIONAL ================= -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
