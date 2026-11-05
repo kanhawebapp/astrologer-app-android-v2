@@ -2,6 +2,8 @@ import { getAuthToken } from '../../socket/socketManager';
 import { UPLOAD_FILE_MUTATION } from './upload.query';
 import { UploadFileData } from './upload.types';
 
+
+
 export const uploadApi = {
     uploadFile: async (
         file: {
