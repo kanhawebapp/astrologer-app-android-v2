@@ -7,8 +7,13 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { useSelector } from 'react-redux';
 import { AppText } from '../../../../components/common/AppText';
 import { useTheme } from '../../../../hooks/useTheme';
+import { useToast } from '../../../../hooks/useToast';
+import { RootState } from '../../../../store';
+import { astrologerServicesApi } from '../../../../services/api/AvailvalityToggle/toggleAstrologerService.service';
+import { getErrorMessage } from '../../../../utils/helpers';
 
 interface GoLiveCardProps {
   onGoLiveNow: (title: string) => Promise<boolean>;
@@ -22,13 +27,46 @@ export const GoLiveCard: React.FC<GoLiveCardProps> = ({
   isLoading = false,
 }) => {
   const { theme } = useTheme();
+  const { showWarning, showError } = useToast();
   const [title, setTitle] = useState('');
-  const canGoLive = title.trim().length > 0 && !isLoading;
+  const [isValidatingLive, setIsValidatingLive] = useState(false);
+  const astrologerId = useSelector(
+    (state: RootState) =>
+      state.account.profile?.id || state.auth.user?.id || null,
+  );
+  const isBusy = isLoading || isValidatingLive;
+  const canGoLive = title.trim().length > 0 && !isBusy;
 
   const handleGoLive = async () => {
     if (!canGoLive) {
       return;
     }
+
+    if (!astrologerId) {
+      showError('Unable to identify astrologer. Please sign in again.');
+      return;
+    }
+
+    setIsValidatingLive(true);
+    try {
+      // Always read the latest LIVE service status before starting Go Live.
+      const response = await astrologerServicesApi.getAstrologerServices({
+        astrologerId: String(astrologerId),
+      });
+      const isLiveActive =
+        response?.getAstrologerById?.isLiveActive === true;
+
+      if (!isLiveActive) {
+        showWarning('Please turn ON Live stream first.');
+        return;
+      }
+    } catch (error) {
+      showError(getErrorMessage(error));
+      return;
+    } finally {
+      setIsValidatingLive(false);
+    }
+
     const started = await onGoLiveNow(title);
     if (started) {
       setTitle('');
@@ -72,7 +110,7 @@ export const GoLiveCard: React.FC<GoLiveCardProps> = ({
         value={title}
         onChangeText={setTitle}
         maxLength={100}
-        editable={!isLoading}
+        editable={!isBusy}
         returnKeyType="done"
       />
 
@@ -88,13 +126,13 @@ export const GoLiveCard: React.FC<GoLiveCardProps> = ({
         onPress={handleGoLive}
         disabled={!canGoLive}
         activeOpacity={0.8}>
-        {isLoading ? (
+        {isBusy ? (
           <ActivityIndicator color={theme.colors.white} />
         ) : (
           <Icon name="radio-button-on" size={24} color={theme.colors.white} />
         )}
         <AppText variant="button" color={theme.colors.white}>
-          {isLoading ? 'STARTING...' : 'GO LIVE NOW'}
+          {isBusy ? 'STARTING...' : 'GO LIVE NOW'}
         </AppText>
       </TouchableOpacity>
 
@@ -104,7 +142,7 @@ export const GoLiveCard: React.FC<GoLiveCardProps> = ({
           { backgroundColor: theme.colors.surfaceSecondary },
         ]}
         onPress={onScheduleLive}
-        disabled={isLoading}
+        disabled={isBusy}
         activeOpacity={0.8}>
         <Icon
           name="calendar-outline"

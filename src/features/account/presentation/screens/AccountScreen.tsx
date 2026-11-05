@@ -1,4 +1,4 @@
-import React, {useState, useCallback, useEffect} from 'react';
+import React, {useState, useCallback, useEffect, useRef} from 'react';
 import {
   View,
   ScrollView,
@@ -14,6 +14,7 @@ import {Header} from '../../../../components/layout/Header';
 import {AppText} from '../../../../components/common/AppText';
 import {useTheme} from '../../../../hooks/useTheme';
 import {useAuth} from '../../../../hooks/useAuth';
+import {useToast} from '../../../../hooks/useToast';
 import {useAccount} from '../hooks/useAccount';
 import {ProfileHeader} from '../components/ProfileHeader';
 import {StatusToggleCard} from '../components/StatusToggleCard';
@@ -22,14 +23,27 @@ import {InfoCard} from '../components/InfoCard';
 import {SettingList} from '../components/SettingList';
 import {LogoutButton} from '../components/LogoutButton';
 import {astrologerServicesApi} from '../../../../services/api/AvailvalityToggle/toggleAstrologerService.service';
+import {AstrologerServiceType} from '../../../../services/api/AvailvalityToggle/toggleAstrologerService.types';
+import {getErrorMessage} from '../../../../utils/helpers';
 import ReviewActionCard from './ReviewActionCard';
 import {appVersionApi} from '../../../../services/api/version/version.api';
 import packageJson from '../../../../../package.json';
+
+const SERVICE_STATUS_FIELD: Record<
+  AstrologerServiceType,
+  'isChatActive' | 'isCallActive' | 'isLiveActive' | 'isPromotional'
+> = {
+  CHAT: 'isChatActive',
+  CALL: 'isCallActive',
+  LIVE: 'isLiveActive',
+  PROMOTIONAL: 'isPromotional',
+};
 
 export const AccountScreen: React.FC = () => {
   const {theme} = useTheme();
   const navigation = useNavigation<any>();
   const {logout} = useAuth();
+  const {showSuccess, showError} = useToast();
 
   const {
     dashboard,
@@ -48,6 +62,8 @@ export const AccountScreen: React.FC = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [notificationEnabled, setNotificationEnabled] = useState(true);
   const [availability, setAvailability] = useState<any>('');
+  const [isTogglingService, setIsTogglingService] = useState(false);
+  const toggleInFlightRef = useRef(false);
   const [, setVersion] = useState<any>('');
 
   const fetchServices = useCallback(async () => {
@@ -141,27 +157,58 @@ export const AccountScreen: React.FC = () => {
   }, [availability]);
 
   const togglePromotionalService = async (
-    serviceType: 'CHAT' | 'CALL' | 'LIVE' | 'PROMOTIONAL',
+    serviceType: AstrologerServiceType,
     status: boolean,
   ) => {
+    if (toggleInFlightRef.current || isTogglingService) {
+      return;
+    }
+
+    const astrologerId = profile?.id;
+    if (!astrologerId) {
+      showError('Unable to identify astrologer. Please sign in again.');
+      return;
+    }
+
+    const statusField = SERVICE_STATUS_FIELD[serviceType];
+    const previousAvailability = availability;
+
+    toggleInFlightRef.current = true;
+    setIsTogglingService(true);
+
+    // Optimistic UI update so the Live/Chat/Call switch reflects the intended state.
+    if (previousAvailability && typeof previousAvailability === 'object') {
+      setAvailability({
+        ...previousAvailability,
+        [statusField]: status,
+      });
+    }
+
     try {
       const response = await astrologerServicesApi.toggleAstrologerService({
-        astrologerId: profile?.id || '',
+        astrologerId: String(astrologerId),
         serviceType,
         status,
       });
 
-      const result = response?.data?.toggleAstrologerService;
+      const result = response?.toggleAstrologerService;
 
       if (result?.success) {
-        console.log(result.message);
-
-        fetchServices(); // refresh switches
+        if (result.message) {
+          showSuccess(result.message);
+        }
+        await fetchServices();
+      } else {
+        setAvailability(previousAvailability);
+        showError(result?.message || 'Failed to update service status');
       }
     } catch (error) {
+      setAvailability(previousAvailability);
+      showError(getErrorMessage(error));
       console.log('toggle service error:', error);
     } finally {
-      fetchServices();
+      toggleInFlightRef.current = false;
+      setIsTogglingService(false);
     }
   };
 
@@ -303,7 +350,7 @@ export const AccountScreen: React.FC = () => {
           <StatusToggleCard
             availability={availability}
             onToggle={togglePromotionalService}
-            loading={updating}
+            loading={isTogglingService || updating}
           />
         )}
 
