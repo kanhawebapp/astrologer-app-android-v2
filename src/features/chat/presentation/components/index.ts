@@ -6,4 +6,5 @@ export { ChatRequestModal } from './ChatRequestModal';
 export { MessageList } from './MessageList';
 export { EmptyState } from './EmptyState';
 export { ChatStatusMessage } from './ChatStatusMessage';
+export { PreviousRemedies } from './PreviousRemedies';
 

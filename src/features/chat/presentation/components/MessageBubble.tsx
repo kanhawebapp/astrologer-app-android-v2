@@ -16,6 +16,8 @@ import { useTheme } from '../../../../hooks/useTheme';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../../store';
 import type { ChatMessage } from '../../domain/chatTypes';
+import type { PreviousRemedy } from '../../../../services/api/previousRemedies/previousRemedies.types';
+import { PreviousRemedies } from './PreviousRemedies';
 
 interface MessageBubbleProps {
   message: ChatMessage;
@@ -23,6 +25,11 @@ interface MessageBubbleProps {
   onImagePress?: (imageUrl: string) => void;
   onMessageLongPress?: (message: ChatMessage) => void;
   showReplyPreview?: boolean;
+  previousRemedies?: PreviousRemedy[];
+  previousRemediesLoading?: boolean;
+  previousRemediesError?: string | null;
+  onUseAgainRemedy?: (remedy: PreviousRemedy) => void;
+  onRetryPreviousRemedies?: () => void;
 }
 
 export const MessageBubble: React.FC<MessageBubbleProps> = ({
@@ -31,6 +38,11 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
   onImagePress,
   onMessageLongPress,
   showReplyPreview = true,
+  previousRemedies = [],
+  previousRemediesLoading = false,
+  previousRemediesError = null,
+  onUseAgainRemedy,
+  onRetryPreviousRemedies,
 }) => {
   const { theme } = useTheme();
   const chatRequest = useSelector((state: RootState) => state.user.chatRequest);
@@ -138,6 +150,16 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
             📍 {chatRequest?.location || '-'}
           </AppText>
         </View>
+
+        {onUseAgainRemedy ? (
+          <PreviousRemedies
+            remedies={previousRemedies}
+            loading={previousRemediesLoading}
+            error={previousRemediesError}
+            onUseAgain={onUseAgainRemedy}
+            onRetry={onRetryPreviousRemedies}
+          />
+        ) : null}
       </Animated.View>
     );
   }
@@ -359,7 +381,8 @@ const styles = StyleSheet.create({
 
   /* USER CARD */
   userCardWrapper: {
-    width: '60%',
+    width: '92%',
+    alignSelf: 'center',
     paddingHorizontal: 12,
     paddingVertical: 6,
     alignItems: 'center',

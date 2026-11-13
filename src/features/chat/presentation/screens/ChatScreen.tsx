@@ -17,8 +17,8 @@ import {
   MessageBubble,
   TypingIndicator,
   ChatInput,
+  EmptyState,
 } from '../components';
-import { EmptyState } from '../components';
 import { useTheme } from '../../../../hooks/useTheme';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
@@ -39,16 +39,29 @@ export const ChatScreen: React.FC = () => {
         message={item}
         onReplyPress={vm.handleReplyPress}
         onImagePress={handleImagePress}
+        previousRemedies={vm.previousRemedies}
+        previousRemediesLoading={vm.previousRemediesLoading}
+        previousRemediesError={vm.previousRemediesError}
+        onUseAgainRemedy={vm.handleUseAgainRemedy}
+        onRetryPreviousRemedies={vm.refetchPreviousRemedies}
       />
     ),
-    [vm.handleReplyPress],
+    [
+      vm.handleReplyPress,
+      handleImagePress,
+      vm.previousRemedies,
+      vm.previousRemediesLoading,
+      vm.previousRemediesError,
+      vm.handleUseAgainRemedy,
+      vm.refetchPreviousRemedies,
+    ],
   );
- const renderTypingIndicator = React.useCallback(() => {
-  if (vm.isTyping && vm.activeSession) {
-    return <TypingIndicator userName={vm.typingUserName} />;
-  }
-  return null;
-}, [vm.isTyping, vm.typingUserName, vm.activeSession]);
+  const renderTypingIndicator = React.useCallback(() => {
+    if (vm.isTyping && vm.activeSession) {
+      return <TypingIndicator userName={vm.typingUserName} />;
+    }
+    return null;
+  }, [vm.isTyping, vm.typingUserName, vm.activeSession]);
 
   const keyExtractor = React.useCallback((item: any) => item.id, []);
 
@@ -79,7 +92,6 @@ export const ChatScreen: React.FC = () => {
         progress={vm.progress}
         isActive={vm.isActive}
       />
-
       {vm.chatStatus === 'ACTIVE' ? (
         <KeyboardAvoidingView
           style={styles.keyboardView}
@@ -118,6 +130,8 @@ export const ChatScreen: React.FC = () => {
               replyToMessage={vm.replyToMessage}
               onCancelReply={vm.handleCancelReply}
               onKundliPress={vm.handleKundliPress}
+              prefillText={vm.prefillText}
+              onPrefillConsumed={vm.handlePrefillConsumed}
             />
           </View>
         </KeyboardAvoidingView>

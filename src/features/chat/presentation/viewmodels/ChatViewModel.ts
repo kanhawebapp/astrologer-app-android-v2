@@ -5,13 +5,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../../../../store';
 import { setActiveChat } from '../../../../store/slices/chatSlice';
 import { selectMessagesByRoom } from '../../../../store/selectors/chatSelectors';
-import { useChatSocket, useChatMessages, useChatTimer } from '../hooks';
+import { useChatSocket, useChatMessages, useChatTimer, usePreviousRemedies } from '../hooks';
 import type { ChatMessage, ReplyToData } from '../../domain/chatTypes';
 import { RootStackParamList } from '../../../../navigation/types';
 import { socketManager } from '../../../../services/socket/socketManager';
 import { geocodeAddress } from '../../../../services/location/geocoding';
 import { URLS } from '../../../../utils/constants';
 import { useToast } from '../../../../hooks/useToast';
+import type { PreviousRemedy } from '../../../../services/api/previousRemedies/previousRemedies.types';
 
 const DEBUG_PREFIX = '[ChatViewModel]';
 
@@ -40,6 +41,7 @@ export const useChatViewModel = () => {
   );
   const [isTyping, setIsTyping] = useState(false);
   const [typingUserName, setTypingUserName] = useState('');
+  const [prefillText, setPrefillText] = useState<string | null>(null);
 
   // Route params
   const routeParams = route.params || {};
@@ -85,6 +87,18 @@ export const useChatViewModel = () => {
   const chats = useSelector((state: RootState) => state.chat.chats);
   const authUser = useSelector((state: RootState) => state.auth.user);
   const { showError } = useToast();
+
+  // Prefer the chat customer's id from the active session / route; fall back to
+  // the logged-in astrologer id from auth store when unavailable.
+  const previousRemediesUserId =
+    activeSession?.userId || paramUserId || authUser?.id || null;
+
+  const {
+    remedies: previousRemedies,
+    loading: previousRemediesLoading,
+    error: previousRemediesError,
+    refetch: refetchPreviousRemedies,
+  } = usePreviousRemedies(previousRemediesUserId);
 
   // Derived: effective room ID
   const effectiveRoomId = useMemo((): string | undefined => {
@@ -419,6 +433,18 @@ export const useChatViewModel = () => {
     setReplyToMessage(undefined);
   }, []);
 
+  const handleUseAgainRemedy = useCallback((remedy: PreviousRemedy) => {
+    const remedyText = remedy?.remedyText?.trim();
+    if (!remedyText) return;
+
+    // Populate chat input only — do not auto-send to avoid duplicate messages.
+    setPrefillText(remedyText);
+  }, []);
+
+  const handlePrefillConsumed = useCallback(() => {
+    setPrefillText(null);
+  }, []);
+
   const handleKundliPress = useCallback(async () => {
     try {
       const userName = chatRequest?.userName || '';
@@ -528,6 +554,11 @@ export const useChatViewModel = () => {
       isTimeCritical,
       progress,
       isActive,
+      previousRemedies,
+      previousRemediesLoading,
+      previousRemediesError,
+      prefillText,
+      refetchPreviousRemedies,
       handleBack,
       handleEndChat,
       handleLeave,
@@ -535,6 +566,8 @@ export const useChatViewModel = () => {
       handleSendMessage,
       handleReplyPress,
       handleCancelReply,
+      handleUseAgainRemedy,
+      handlePrefillConsumed,
       handleKundliPress,
       handleContentSizeChange,
       flatListRef,
@@ -563,6 +596,11 @@ export const useChatViewModel = () => {
       isTimeCritical,
       progress,
       isActive,
+      previousRemedies,
+      previousRemediesLoading,
+      previousRemediesError,
+      prefillText,
+      refetchPreviousRemedies,
       handleBack,
       handleEndChat,
       handleLeave,
@@ -570,6 +608,8 @@ export const useChatViewModel = () => {
       handleSendMessage,
       handleReplyPress,
       handleCancelReply,
+      handleUseAgainRemedy,
+      handlePrefillConsumed,
       handleKundliPress,
       handleContentSizeChange,
       flatListRef,

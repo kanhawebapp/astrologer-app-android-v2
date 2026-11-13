@@ -35,6 +35,8 @@ interface ChatInputProps {
   replyToMessage?: ReplyToData | null;
   onCancelReply?: () => void;
   onKundliPress?: () => void;
+  prefillText?: string | null;
+  onPrefillConsumed?: () => void;
 }
 
 export const ChatInput: React.FC<ChatInputProps> = ({
@@ -44,6 +46,8 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   replyToMessage,
   onCancelReply,
   onKundliPress,
+  prefillText,
+  onPrefillConsumed,
 }) => {
   const { theme } = useTheme();
   const [text, setText] = useState('');
@@ -56,6 +60,14 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const inputRef = useRef<TextInput>(null);
+
+  useEffect(() => {
+    if (!prefillText) return;
+
+    setText(prefillText);
+    inputRef.current?.focus();
+    onPrefillConsumed?.();
+  }, [prefillText, onPrefillConsumed]);
 
   // Animation values
   const sendScale = useRef(new Animated.Value(1)).current;
