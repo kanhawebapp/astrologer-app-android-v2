@@ -9,6 +9,7 @@ import {
 import {LiveChatCredentials} from '../../domain/liveTypes';
 import {getErrorMessage} from '../../../../utils/helpers';
 import {useAgoraBroadcast} from './useAgoraBroadcast';
+import {useLiveInteractionHost} from './useLiveInteractionHost';
 import {useEndLive, useMediaPermissions} from './useLiveSession';
 
 const formatDuration = (seconds: number): string => {
@@ -49,6 +50,14 @@ export const useLiveBroadcast = (streamId: string) => {
   const {start: startBroadcast, leave: leaveBroadcast} = agora;
   const {ensureMediaPermissions, openSettings} = useMediaPermissions();
   const {confirmEndLive, isEnding} = useEndLive();
+  const isBroadcasting = agora.broadcastState === 'live';
+  const interaction = useLiveInteractionHost({
+    liveStreamId: session?.id,
+    enabled: !!session && isBroadcasting,
+    subscribeGuest: agora.subscribeGuest,
+    unsubscribeGuest: agora.unsubscribeGuest,
+    setOnGuestOffline: agora.setOnGuestOffline,
+  });
 
   const [isJoining, setIsJoining] = useState(false);
   const [connectError, setConnectError] = useState<string | null>(null);
@@ -100,8 +109,6 @@ export const useLiveBroadcast = (streamId: string) => {
     }
   }, [session, connect]);
 
-  const isBroadcasting = agora.broadcastState === 'live';
-
   useEffect(() => {
     const startedAt = parseLiveTimestamp(session?.createdAt);
     if (!isBroadcasting || !startedAt) {
@@ -123,12 +130,13 @@ export const useLiveBroadcast = (streamId: string) => {
         return;
       }
       confirmEndLive(session, () => {
+        interaction.endInteraction();
         setChatCredentials(null);
         leaveBroadcast();
         onEnded();
       });
     },
-    [session, confirmEndLive, leaveBroadcast],
+    [session, confirmEndLive, leaveBroadcast, interaction.endInteraction],
   );
 
   const refreshChatCredentials = useCallback(async () => {
@@ -155,6 +163,8 @@ export const useLiveBroadcast = (streamId: string) => {
     isCameraOff: agora.isCameraOff,
     /** Unique remote RTC UIDs in the channel (excludes local broadcaster). */
     rtcViewerCount: agora.viewerCount,
+    guestUid: agora.guestUid,
+    isGuestVideoOn: agora.isGuestVideoOn,
     formattedDuration: formatDuration(elapsedSeconds),
     toggleMic: agora.toggleMic,
     toggleCamera: agora.toggleCamera,
@@ -166,5 +176,6 @@ export const useLiveBroadcast = (streamId: string) => {
     isChatUnavailable,
     chatSenderName,
     refreshChatCredentials,
+    interaction,
   };
 };

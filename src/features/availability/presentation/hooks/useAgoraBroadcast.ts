@@ -11,6 +11,7 @@ import {
   LocalAudioStreamState,
   LocalVideoStreamReason,
   LocalVideoStreamState,
+  RemoteVideoState,
 } from 'react-native-agora';
 import {JoinLiveCredentials} from '../../domain/liveTypes';
 import {
@@ -69,10 +70,20 @@ export const useAgoraBroadcast = () => {
   // RtcSurfaceView binds via setupLocalVideo only once on mount, so it must not mount before the engine is initialized.
   const [isLocalVideoReady, setIsLocalVideoReady] = useState(false);
   const [viewerCount, setViewerCount] = useState(0);
+  const [guestUid, setGuestUid] = useState<number | null>(null);
+  const [isGuestVideoOn, setIsGuestVideoOn] = useState(false);
+  const guestUidRef = useRef<number | null>(null);
+  const onGuestOfflineRef = useRef<((uid: number) => void) | null>(null);
 
   const resetRemoteAudience = useCallback(() => {
     remoteAudienceRef.current = resetAudiencePresence<number>();
     setViewerCount(0);
+  }, []);
+
+  const clearGuestState = useCallback(() => {
+    guestUidRef.current = null;
+    setGuestUid(null);
+    setIsGuestVideoOn(false);
   }, []);
 
   const releaseEngine = useCallback(() => {
@@ -80,6 +91,7 @@ export const useAgoraBroadcast = () => {
     engineRef.current = null;
     localUidRef.current = null;
     resetRemoteAudience();
+    clearGuestState();
     setIsLocalVideoReady(false);
     if (!engine) {
       return;
@@ -96,7 +108,7 @@ export const useAgoraBroadcast = () => {
       liveWarn('Agora engine release failed', describeError(error));
     }
     handlerRef.current = null;
-  }, [resetRemoteAudience]);
+  }, [clearGuestState, resetRemoteAudience]);
 
   const start = useCallback(
     async (credentials: JoinLiveCredentials) => {
@@ -170,21 +182,33 @@ export const useAgoraBroadcast = () => {
                 remoteAudienceRef.current,
                 remoteUid,
               );
-              if (next === remoteAudienceRef.current) {
-                return;
+              if (next !== remoteAudienceRef.current) {
+                remoteAudienceRef.current = next;
+                setViewerCount(next.count);
               }
-              remoteAudienceRef.current = next;
-              setViewerCount(next.count);
               liveLog('Remote user left channel', {
                 remoteUid,
                 viewerCount: next.count,
               });
+              if (guestUidRef.current === remoteUid) {
+                clearGuestState();
+                onGuestOfflineRef.current?.(remoteUid);
+              }
             } catch (error) {
               liveWarn(
                 'Failed to track remote user leave',
                 describeError(error),
               );
             }
+          },
+          onRemoteVideoStateChanged: (_connection, remoteUid, state) => {
+            if (guestUidRef.current !== remoteUid) {
+              return;
+            }
+            setIsGuestVideoOn(
+              state === RemoteVideoState.RemoteVideoStateStarting ||
+                state === RemoteVideoState.RemoteVideoStateDecoding,
+            );
           },
           onError: (err, msg) => {
             liveWarn('Agora error', {code: err, message: msg});
@@ -334,6 +358,71 @@ export const useAgoraBroadcast = () => {
     liveLog('Camera switched', {result});
   }, []);
 
+  /**
+   * Subscribe to a co-host guest's streams inside the existing live channel.
+   * Broadcast keeps publishing; autoSubscribe stays false for other viewers.
+   */
+  const subscribeGuest = useCallback(
+    (uid: number, options: {subscribeVideo: boolean}) => {
+      const engine = engineRef.current;
+      if (!engine || !Number.isFinite(uid)) {
+        liveWarn('subscribeGuest ignored: engine missing or invalid uid', {
+          uid,
+        });
+        return false;
+      }
+      const previous = guestUidRef.current;
+      if (previous != null && previous !== uid) {
+        try {
+          engine.muteRemoteAudioStream(previous, true);
+          engine.muteRemoteVideoStream(previous, true);
+        } catch (error) {
+          liveWarn('Failed to mute previous guest', describeError(error));
+        }
+      }
+      const audioResult = engine.muteRemoteAudioStream(uid, false);
+      const videoResult = options.subscribeVideo
+        ? engine.muteRemoteVideoStream(uid, false)
+        : engine.muteRemoteVideoStream(uid, true);
+      liveLog('Subscribed to interaction guest', {
+        uid,
+        subscribeVideo: options.subscribeVideo,
+        audioResult,
+        videoResult,
+      });
+      if (audioResult !== 0) {
+        return false;
+      }
+      guestUidRef.current = uid;
+      setGuestUid(uid);
+      setIsGuestVideoOn(false);
+      return true;
+    },
+    [],
+  );
+
+  const unsubscribeGuest = useCallback(() => {
+    const engine = engineRef.current;
+    const uid = guestUidRef.current;
+    if (engine && uid != null) {
+      try {
+        engine.muteRemoteAudioStream(uid, true);
+        engine.muteRemoteVideoStream(uid, true);
+        liveLog('Unsubscribed from interaction guest', {uid});
+      } catch (error) {
+        liveWarn('unsubscribeGuest failed', describeError(error));
+      }
+    }
+    clearGuestState();
+  }, [clearGuestState]);
+
+  const setOnGuestOffline = useCallback(
+    (handler: ((uid: number) => void) | null) => {
+      onGuestOfflineRef.current = handler;
+    },
+    [],
+  );
+
   // Release media on unmount; the server-side session is intentionally left running.
   useEffect(() => releaseEngine, [releaseEngine]);
 
@@ -346,11 +435,16 @@ export const useAgoraBroadcast = () => {
     isLocalVideoReady,
     /** Unique remote RTC UIDs currently in the channel (excludes local broadcaster). */
     viewerCount,
+    guestUid,
+    isGuestVideoOn,
     hasEngine: broadcastState !== 'idle' && broadcastState !== 'failed',
     start,
     leave,
     toggleMic,
     toggleCamera,
     switchCamera,
+    subscribeGuest,
+    unsubscribeGuest,
+    setOnGuestOffline,
   };
 };

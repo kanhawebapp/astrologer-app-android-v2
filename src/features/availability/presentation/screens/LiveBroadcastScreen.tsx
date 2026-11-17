@@ -25,6 +25,8 @@ import { BroadcastState } from '../hooks/useAgoraBroadcast';
 import { useKeyboardInset } from '../hooks/useKeyboardInset';
 import { LiveChatPanel } from '../components/LiveChatPanel';
 import { ViewerCountBadge } from '../components/ViewerCountBadge';
+import { IncomingLiveInteractionCard } from '../components/IncomingLiveInteractionCard';
+import { ActiveLiveInteractionOverlay } from '../components/ActiveLiveInteractionOverlay';
 
 const LOCAL_VIDEO_CANVAS = { uid: 0 };
 
@@ -80,6 +82,9 @@ export const LiveBroadcastScreen: React.FC = () => {
     isChatUnavailable,
     chatSenderName,
     refreshChatCredentials,
+    guestUid,
+    isGuestVideoOn,
+    interaction,
   } = useLiveBroadcast(route.params.streamId);
   const [chatAudienceCount, setChatAudienceCount] = useState(0);
   const handleChatAudienceCountChange = useCallback((count: number) => {
@@ -226,6 +231,16 @@ export const LiveBroadcastScreen: React.FC = () => {
           {session.title}
         </AppText>
 
+        {interaction.activeRequest ? (
+          <ActiveLiveInteractionOverlay
+            request={interaction.activeRequest}
+            guestName={interaction.guestName}
+            guestUid={guestUid}
+            isGuestVideoOn={isGuestVideoOn}
+            onEnd={interaction.endInteraction}
+          />
+        ) : null}
+
         <Pressable
           style={[styles.bottomOverlay, { paddingBottom: keyboardInset }]}
           onPress={Keyboard.dismiss}
@@ -264,6 +279,44 @@ export const LiveBroadcastScreen: React.FC = () => {
               </View>
             </View>
           )}
+          {(interaction.actionError || interaction.pendingError) && (
+            <View
+              style={[styles.errorBox, { backgroundColor: colors.errorLight }]}>
+              <AppText variant="body2" color={colors.error}>
+                {interaction.actionError || interaction.pendingError}
+              </AppText>
+              {interaction.pendingError ? (
+                <View style={styles.errorActions}>
+                  <TouchableOpacity
+                    style={[
+                      styles.pillButton,
+                      { backgroundColor: colors.surface },
+                    ]}
+                    onPress={() => {
+                      interaction.retryPending();
+                    }}>
+                    <AppText variant="button" color={colors.text}>
+                      Retry
+                    </AppText>
+                  </TouchableOpacity>
+                </View>
+              ) : null}
+            </View>
+          )}
+          {interaction.incomingRequest && !interaction.activeRequest ? (
+            <IncomingLiveInteractionCard
+              request={interaction.incomingRequest}
+              guestName={interaction.guestName}
+              queuedCount={interaction.queuedCount}
+              isResponding={interaction.isResponding}
+              onAccept={() =>
+                interaction.acceptRequest(interaction.incomingRequest!)
+              }
+              onReject={() =>
+                interaction.rejectRequest(interaction.incomingRequest!)
+              }
+            />
+          ) : null}
           <LiveChatPanel
             credentials={chatCredentials}
             isUnavailable={isChatUnavailable}
