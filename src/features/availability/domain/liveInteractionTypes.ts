@@ -32,6 +32,10 @@ export interface RespondLiveInteractionRequestResponse {
   respondLiveInteractionRequest: LiveInteractionRequest | null;
 }
 
+export interface EndLiveInteractionResponse {
+  endLiveInteraction: LiveInteractionRequest | null;
+}
+
 export type HostInteractionPhase =
   | 'idle'
   | 'incoming'

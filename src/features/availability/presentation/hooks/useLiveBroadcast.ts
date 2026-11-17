@@ -130,13 +130,23 @@ export const useLiveBroadcast = (streamId: string) => {
         return;
       }
       confirmEndLive(session, () => {
-        interaction.endInteraction();
-        setChatCredentials(null);
-        leaveBroadcast();
-        onEnded();
+        void (async () => {
+          if (interaction.activeRequest) {
+            await interaction.endInteraction();
+          }
+          setChatCredentials(null);
+          leaveBroadcast();
+          onEnded();
+        })();
       });
     },
-    [session, confirmEndLive, leaveBroadcast, interaction.endInteraction],
+    [
+      session,
+      confirmEndLive,
+      leaveBroadcast,
+      interaction.activeRequest,
+      interaction.endInteraction,
+    ],
   );
 
   const refreshChatCredentials = useCallback(async () => {

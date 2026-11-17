@@ -1,5 +1,6 @@
 import {graphqlRequest} from '../../../services/graphqlClient';
 import {
+  EndLiveInteractionResponse,
   GetPendingLiveInteractionsResponse,
   LiveInteractionAction,
   RespondLiveInteractionRequestResponse,
@@ -35,13 +36,33 @@ const RESPOND_LIVE_INTERACTION_REQUEST_MUTATION = `
       action: $action
     ) {
       id
-      status
-      interactionType
-      agoraUid
-      userId
       liveStreamId
+      astrologerId
+      userId
+      interactionType
+      status
+      agoraUid
+      acceptedAt
+      requestedAt
+      endedAt
+      __typename
+    }
+  }
+`;
+
+const END_LIVE_INTERACTION_MUTATION = `
+  mutation EndLiveInteraction($requestId: ID!) {
+    endLiveInteraction(requestId: $requestId) {
+      id
+      liveStreamId
+      astrologerId
+      userId
+      interactionType
+      status
+      agoraUid
       acceptedAt
       endedAt
+      requestedAt
       __typename
     }
   }
@@ -60,4 +81,10 @@ export const respondLiveInteractionRequest = (
   graphqlRequest<RespondLiveInteractionRequestResponse>({
     query: RESPOND_LIVE_INTERACTION_REQUEST_MUTATION,
     variables: {requestId, action},
+  });
+
+export const endLiveInteraction = (requestId: string) =>
+  graphqlRequest<EndLiveInteractionResponse>({
+    query: END_LIVE_INTERACTION_MUTATION,
+    variables: {requestId},
   });

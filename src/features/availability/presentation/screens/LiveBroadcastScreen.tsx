@@ -237,7 +237,10 @@ export const LiveBroadcastScreen: React.FC = () => {
             guestName={interaction.guestName}
             guestUid={guestUid}
             isGuestVideoOn={isGuestVideoOn}
-            onEnd={interaction.endInteraction}
+            isEnding={interaction.isEnding}
+            onEnd={() => {
+              void interaction.endInteraction();
+            }}
           />
         ) : null}
 

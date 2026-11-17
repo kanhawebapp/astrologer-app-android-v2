@@ -79,3 +79,26 @@ export const respondLiveInteractionRequest = async (
     throw error;
   }
 };
+
+export const endLiveInteraction = async (
+  requestId: string,
+): Promise<LiveInteractionRequest> => {
+  if (!isNonEmptyString(requestId)) {
+    throw new Error('Request id is required');
+  }
+  try {
+    const response = await liveInteractionService.endLiveInteraction(requestId);
+    const result = normalizeRequest(response.endLiveInteraction);
+    if (!result) {
+      throw new Error('Server did not return an end-interaction response');
+    }
+    liveLog('EndLiveInteraction', {
+      requestId,
+      status: result.status,
+    });
+    return result;
+  } catch (error) {
+    liveWarn('EndLiveInteraction error', describeError(error));
+    throw error;
+  }
+};

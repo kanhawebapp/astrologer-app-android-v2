@@ -1,5 +1,10 @@
 import React, {memo} from 'react';
-import {View, StyleSheet, TouchableOpacity} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {
   RenderModeType,
@@ -15,6 +20,7 @@ interface ActiveLiveInteractionOverlayProps {
   guestName: string;
   guestUid: number | null;
   isGuestVideoOn: boolean;
+  isEnding?: boolean;
   onEnd: () => void;
 }
 
@@ -24,6 +30,7 @@ export const ActiveLiveInteractionOverlay = memo(
     guestName,
     guestUid,
     isGuestVideoOn,
+    isEnding = false,
     onEnd,
   }: ActiveLiveInteractionOverlayProps) => {
     const {theme} = useTheme();
@@ -73,13 +80,26 @@ export const ActiveLiveInteractionOverlay = memo(
           </View>
 
           <TouchableOpacity
-            style={[styles.endButton, {backgroundColor: colors.error}]}
+            style={[
+              styles.endButton,
+              {
+                backgroundColor: colors.error,
+                opacity: isEnding ? 0.7 : 1,
+              },
+            ]}
             onPress={onEnd}
+            disabled={isEnding}
             accessibilityLabel="End interaction">
-            <Icon name="call" size={18} color={colors.white} />
-            <AppText variant="caption" color={colors.white}>
-              End
-            </AppText>
+            {isEnding ? (
+              <ActivityIndicator color={colors.white} size="small" />
+            ) : (
+              <>
+                {/* <Icon name="call" size={18} color={colors.white} /> */}
+                <AppText variant="caption" color={colors.white}>
+                  End
+                </AppText>
+              </>
+            )}
           </TouchableOpacity>
         </View>
       </View>

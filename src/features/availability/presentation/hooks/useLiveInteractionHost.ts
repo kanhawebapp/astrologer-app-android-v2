@@ -4,6 +4,7 @@ import {
   LiveInteractionRequest,
 } from '../../domain/liveInteractionTypes';
 import * as liveInteractionRepo from '../../data/liveInteractionRepository';
+import {liveWarn} from '../../data/liveLogger';
 import {userDetailsApi} from '../../../../services/api/userDetail/userDetails.service';
 import {getErrorMessage} from '../../../../utils/helpers';
 import {usePendingLiveInteractions} from './usePendingLiveInteractions';
@@ -25,9 +26,9 @@ interface UseLiveInteractionHostOptions {
 }
 
 /**
- * Astrologer-side live interaction: pending queue, accept/reject, and active guest.
- * Ending an accepted interaction locally unsubscribes RTC; astroAuth has no
- * endLiveInteraction mutation — guest end or remote offline clears the session.
+ * Astrologer-side live interaction: pending queue, ACCEPT/REJECT, and End.
+ * Uses RespondLiveInteractionRequest + EndLiveInteraction; keeps the main
+ * Agora broadcast channel running when an interaction ends.
  */
 export const useLiveInteractionHost = ({
   liveStreamId,
@@ -41,9 +42,11 @@ export const useLiveInteractionHost = ({
     useState<LiveInteractionRequest | null>(null);
   const [phase, setPhase] = useState<HostInteractionPhase>('idle');
   const [respondingId, setRespondingId] = useState<string | null>(null);
+  const [isEnding, setIsEnding] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
   const [guestProfile, setGuestProfile] = useState<GuestProfile | null>(null);
   const activeRequestRef = useRef<LiveInteractionRequest | null>(null);
+  const endingRef = useRef(false);
   activeRequestRef.current = activeRequest;
 
   const incomingRequest = useMemo(() => {
@@ -96,31 +99,51 @@ export const useLiveInteractionHost = ({
     unsubscribeGuest();
     setActiveRequest(null);
     setPhase('idle');
-    setActionError(null);
+    setIsEnding(false);
+    endingRef.current = false;
+  }, [unsubscribeGuest]);
+
+  const endInteractionLocally = useCallback(() => {
+    unsubscribeGuest();
+    setActiveRequest(null);
+    setPhase('idle');
+    setIsEnding(false);
+    endingRef.current = false;
   }, [unsubscribeGuest]);
 
   useEffect(() => {
     setOnGuestOffline(uid => {
       const current = activeRequestRef.current;
-      if (current && current.agoraUid === uid) {
-        setActiveRequest(null);
-        setPhase('idle');
-        setActionError(null);
+      if (!current || current.agoraUid !== uid || endingRef.current) {
+        return;
       }
+      // Guest left unexpectedly — sync server end, then clear local RTC UI.
+      endingRef.current = true;
+      setIsEnding(true);
+      setPhase('ending');
+      liveInteractionRepo
+        .endLiveInteraction(current.id)
+        .catch(() => {
+          // Local cleanup still required even if the end mutation fails.
+        })
+        .finally(() => {
+          endInteractionLocally();
+        });
     });
     return () => setOnGuestOffline(null);
-  }, [setOnGuestOffline]);
+  }, [setOnGuestOffline, endInteractionLocally]);
 
   useEffect(() => {
     if (!enabled) {
       clearActiveInteraction();
       setRespondingId(null);
+      setActionError(null);
     }
   }, [enabled, clearActiveInteraction]);
 
   const respond = useCallback(
     async (request: LiveInteractionRequest, action: 'ACCEPT' | 'REJECT') => {
-      if (respondingId || activeRequest) {
+      if (respondingId || activeRequest || endingRef.current) {
         return;
       }
       setRespondingId(request.id);
@@ -165,12 +188,7 @@ export const useLiveInteractionHost = ({
         setRespondingId(null);
       }
     },
-    [
-      respondingId,
-      activeRequest,
-      pending.removeRequest,
-      subscribeGuest,
-    ],
+    [respondingId, activeRequest, pending.removeRequest, subscribeGuest],
   );
 
   const acceptRequest = useCallback(
@@ -183,11 +201,31 @@ export const useLiveInteractionHost = ({
     [respond],
   );
 
-  const endInteraction = useCallback(() => {
-    // astroAuth does not expose endLiveInteraction; stop local subscription only.
+  const endInteraction = useCallback(async () => {
+    const current = activeRequestRef.current;
+    if (!current || endingRef.current) {
+      return;
+    }
+    endingRef.current = true;
+    setIsEnding(true);
     setPhase('ending');
-    clearActiveInteraction();
-  }, [clearActiveInteraction]);
+    setActionError(null);
+    try {
+      const result = await liveInteractionRepo.endLiveInteraction(current.id);
+      if (result.status !== 'ENDED' && result.status !== 'CANCELLED') {
+        // Still tear down local tracks; broadcast must continue.
+        liveWarn('Unexpected EndLiveInteraction status', {
+          status: result.status,
+          requestId: current.id,
+        });
+      }
+    } catch (error) {
+      setActionError(getErrorMessage(error));
+    } finally {
+      // Always restore host UI without leaving the live broadcast channel.
+      endInteractionLocally();
+    }
+  }, [endInteractionLocally]);
 
   return {
     incomingRequest,
@@ -197,9 +235,14 @@ export const useLiveInteractionHost = ({
     guestProfile,
     guestName:
       guestProfile?.name ||
-      (activeRequest ? 'Audience member' : incomingRequest ? 'Audience member' : ''),
+      (activeRequest
+        ? 'Audience member'
+        : incomingRequest
+        ? 'Audience member'
+        : ''),
     isResponding: respondingId != null,
     respondingId,
+    isEnding,
     actionError,
     pendingError: pending.error,
     isPendingLoading: pending.isLoading,
