@@ -4,7 +4,7 @@ import { Config } from '../../config/env';
 import { AuthEvents } from './socketEvents';
 import { SocketNamespaces } from './socketEvents';
  
-const SOCKET_URL = 'https://dhwaniastro.com';
+const SOCKET_URL = 'https://staging.dhwaniastro.com';
 const SOCKET_NAMESPACE = SocketNamespaces.DHWANI_ASTRO;
 const SOCKET_FULL_URL = `${SOCKET_URL}${SOCKET_NAMESPACE}`;
 const SOCKET_PATH = '/astro-websocket-service-v2/socket.io';

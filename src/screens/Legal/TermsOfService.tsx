@@ -27,7 +27,7 @@ export const TermsOfService: React.FC = () => {
       />
       <View style={styles.webViewWrapper}>
         <WebView
-          source={{ uri: 'https://dhwaniastro.com/astrologer/terms-and-conditions' }}
+          source={{ uri: 'https://staging.dhwaniastro.com/astrologer/terms-and-conditions' }}
           originWhitelist={['*']}
           scrollEnabled
           nestedScrollEnabled

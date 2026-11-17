@@ -18,7 +18,7 @@ export const uploadApi = {
         );
 
         console.log('File:', file);
-        const API_BASE_URL = 'https://dhwaniastro.com';
+        const API_BASE_URL = 'https://staging.dhwaniastro.com';
 
         const authToken = token || (await getAuthToken());
 
