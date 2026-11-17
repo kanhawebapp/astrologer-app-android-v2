@@ -78,6 +78,7 @@ import AnalytcsScreen from '../features/account/presentation/screens/AnalyticsSc
 import AstrologerUpdatesScreen from '../features/home/notification/AstrologerUpdatesScreen';
 import MyRemedies from '../features/account/presentation/screens/MyRemedies';
 import MyServices from '../features/account/presentation/screens/MyServices';
+import {LiveHistoryScreen} from '../features/account/presentation/screens/LiveHistoryScreen';
 import {ChatRequestCard} from '../components/common/ChatRequestCard';
 import {LiveBroadcastScreen} from '../features/availability/presentation/screens/LiveBroadcastScreen';
 
@@ -152,6 +153,14 @@ export const RootNavigator: React.FC = () => {
               <Stack.Screen name="MyRemedies" component={MyRemedies} />
 
               <Stack.Screen name="MyServices" component={MyServices} />
+
+              <Stack.Screen
+                name="LiveHistory"
+                component={LiveHistoryScreen}
+                options={{
+                  presentation: 'card',
+                }}
+              />
 
               <Stack.Screen
                 name="AstrologerUpdatesScreen"

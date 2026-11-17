@@ -219,10 +219,18 @@ export const AccountScreen: React.FC = () => {
       title: 'My Reviews',
       subtitle: `${profile?.totalReviews} reviews received`,
       onPress: () => navigation.navigate('AllReviewScreen' as never),
+      leftIcon: 'star-outline',
+    },
+    {
+      title: 'Live History',
+      subtitle: 'Audio & video live interactions',
+      onPress: () => navigation.navigate('LiveHistory' as never),
+      leftIcon: 'videocam-outline',
     },
     {
       title: 'My Offers',
       onPress: () => navigation.navigate('OfferScreen' as never),
+      leftIcon: 'pricetag-outline',
     },
     {
       title: 'My Followers',
@@ -230,14 +238,17 @@ export const AccountScreen: React.FC = () => {
         navigation.navigate('AllFollowers', {
           astrologerId: profile?.id,
         }),
+      leftIcon: 'people-outline',
     },
     {
       title: 'My Remedies',
       onPress: () => navigation.navigate('MyRemedies'),
+      leftIcon: 'leaf-outline',
     },
     {
       title: 'My Services',
       onPress: () => navigation.navigate('MyServices'),
+      leftIcon: 'grid-outline',
     },
   ];
 
@@ -379,13 +390,14 @@ export const AccountScreen: React.FC = () => {
           </>
         )}
         {actions.map((item, index) =>
-          item.subtitle && !profile ? null : (
+          item.title === 'My Reviews' && !profile ? null : (
             <ReviewActionCard
               key={index}
               title={item.title}
               subtitle={item.subtitle}
               theme={theme}
               onPress={item.onPress}
+              leftIcon={item.leftIcon}
             />
           ),
         )}

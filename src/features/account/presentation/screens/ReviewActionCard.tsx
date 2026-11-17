@@ -9,6 +9,7 @@ interface ReviewActionCardProps {
   onPress: () => void;
   theme: any;
   icon?: string;
+  leftIcon?: string;
 }
 
 const ReviewActionCard: React.FC<ReviewActionCardProps> = ({
@@ -17,6 +18,7 @@ const ReviewActionCard: React.FC<ReviewActionCardProps> = ({
   onPress,
   theme,
   icon = 'chevron-forward',
+  leftIcon = 'analytics-outline',
 }) => {
   return (
     <TouchableOpacity
@@ -39,11 +41,7 @@ const ReviewActionCard: React.FC<ReviewActionCardProps> = ({
               backgroundColor: theme.colors.primary + '15',
             },
           ]}>
-          <Ionicons
-            name="analytics-outline"
-            size={20}
-            color={theme.colors.primary}
-          />
+          <Ionicons name={leftIcon} size={20} color={theme.colors.primary} />
         </View>
 
         {/* Content */}
@@ -66,11 +64,7 @@ const ReviewActionCard: React.FC<ReviewActionCardProps> = ({
         </View>
 
         {/* Right Arrow */}
-        <Ionicons
-          name={icon}
-          size={18}
-          color={theme.colors.textSecondary}
-        />
+        <Ionicons name={icon} size={18} color={theme.colors.textSecondary} />
       </View>
     </TouchableOpacity>
   );
@@ -116,4 +110,3 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
 });
-
