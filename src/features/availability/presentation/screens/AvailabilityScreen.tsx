@@ -25,9 +25,19 @@ import { UpcomingLiveList } from '../components/UpcomingLiveList';
 import { ScheduleLiveModal } from '../components/ScheduleLiveModal';
 import { LiveSession } from '../../domain/liveTypes';
 import { liveLog } from '../../data/liveLogger';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../../store';
+import { astrologerServicesApi } from '../../../../services/api/AvailvalityToggle/toggleAstrologerService.service';
+import { getErrorMessage } from '../../../../utils/helpers';
+import { useToast } from '../../../../hooks/useToast';
 
 export const AvailabilityScreen: React.FC = () => {
   const { theme } = useTheme();
+  const { showWarning, showError } = useToast();
+  const astrologerId = useSelector(
+    (state: RootState) =>
+      state.account.profile?.id || state.auth.user?.id || null,
+  );
   const {
     availability,
     isLoading,
@@ -60,17 +70,43 @@ export const AvailabilityScreen: React.FC = () => {
   } = useLiveSession();
 
   const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [isValidatingScheduled, setIsValidatingScheduled] = useState(false);
 
   const handleRefresh = () => {
     refresh();
     refreshLive();
   };
 
-  const handleStartScheduledLive = (session: LiveSession) => {
+  const handleStartScheduledLive = async (session: LiveSession) => {
     liveLog('Scheduled Start Live tapped', {
       sessionId: session.id,
       status: session.status,
     });
+
+    if (!astrologerId) {
+      showError('Unable to identify astrologer. Please sign in again.');
+      return;
+    }
+
+    setIsValidatingScheduled(true);
+    try {
+      const response = await astrologerServicesApi.getAstrologerServices({
+        astrologerId: String(astrologerId),
+      });
+      const isLiveActive =
+        response?.getAstrologerById?.isLiveActive === true;
+
+      if (!isLiveActive) {
+        showWarning('Please turn ON Live stream first.');
+        return;
+      }
+    } catch (error) {
+      showError(getErrorMessage(error));
+      return;
+    } finally {
+      setIsValidatingScheduled(false);
+    }
+
     startLive(session.title);
   };
 
