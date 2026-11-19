@@ -124,6 +124,8 @@ interface UseLiveRoomChatOptions {
   refreshCredentials?: () => Promise<LiveChatCredentials>;
 }
 
+
+
 /**
  * Logs in to Agora Chat with the live session's credentials, joins its chat room,
  * and streams room messages. Independent of RTC: failures here only affect chat.
