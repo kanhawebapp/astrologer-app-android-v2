@@ -197,21 +197,21 @@ export const LiveHistoryItemCard: React.FC<LiveHistoryItemCardProps> =
           {ratePerMin ? (
             <FieldRow
               label="Rate / Min"
-              value={`${ratePerMin} coins`}
+              value={`₹${ratePerMin}`}
               theme={theme}
             />
           ) : null}
           {chargedCoins ? (
             <FieldRow
-              label="Charged Coins"
-              value={chargedCoins}
+              label="Charged"
+              value={`₹${chargedCoins}`}
               theme={theme}
             />
           ) : null}
           {astrologerEarned ? (
             <FieldRow
               label="Earnings"
-              value={astrologerEarned}
+              value={`₹${astrologerEarned}`}
               theme={theme}
               valueColor={theme.colors.success}
             />

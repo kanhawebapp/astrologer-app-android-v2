@@ -227,9 +227,9 @@ export const AllReviewScreen: React.FC = () => {
         }
     };
 
-    const formatSessionId = (sessionId: string | number) => {
-        return String(sessionId).slice(-8).padStart(8, '0');
-    };
+   const formatSessionId = (sessionId: string | number) => {
+    return String(sessionId).slice(0, 8).padStart(8, '0');
+};
 
     return (
         <ScreenContainer scrollable={false} withPadding={false}>
